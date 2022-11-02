@@ -74,19 +74,19 @@ public:
 
 	mBOOL DLLINTERNAL found_child_plugins(int source_index) const;
 	void DLLINTERNAL clear_source_plugin_index(int source_index);
-	void DLLINTERNAL trim_list(void);
+	void DLLINTERNAL trim_list();
 
-	mBOOL DLLINTERNAL ini_startup(void);			// read inifile at startup
-	mBOOL DLLINTERNAL ini_refresh(void);			// re-read inifile
+	mBOOL DLLINTERNAL ini_startup();			// read inifile at startup
+	mBOOL DLLINTERNAL ini_refresh();			// re-read inifile
 	mBOOL DLLINTERNAL cmd_addload(const char* args);	// load from console command
 	MPlugin* DLLINTERNAL plugin_addload(plid_t plid, const char* fname, PLUG_LOADTIME now); //load from plugin
 
-	mBOOL DLLINTERNAL load(void);				// load the list, at startup
+	mBOOL DLLINTERNAL load();				// load the list, at startup
 	mBOOL DLLINTERNAL refresh(PLUG_LOADTIME now);		// update from re-read inifile
-	void DLLINTERNAL unpause_all(void);			// unpause any paused plugins
+	void DLLINTERNAL unpause_all();			// unpause any paused plugins
 	void DLLINTERNAL retry_all(PLUG_LOADTIME now);		// retry any pending plugin actions
 	void DLLINTERNAL show(int source_index);		// list plugins to console
-	void DLLINTERNAL show(void) { show(-1); };		// list plugins to console
+	void DLLINTERNAL show() { show(-1); };		// list plugins to console
 	void DLLINTERNAL show_client(edict_t* pEntity);		// list plugins to player client
 };
 

@@ -442,16 +442,16 @@ END_API_CALLER_FUNC_void((const void*, const void*, ...), (p->p1, p->p2, p->str)
 
 //-
 BEGIN_API_CALLER_FUNC(void, void)
-END_API_CALLER_FUNC_void((void), ())
+END_API_CALLER_FUNC_void((), ())
 
 BEGIN_API_CALLER_FUNC(ptr, void)
-END_API_CALLER_FUNC(void*, (void), ())
+END_API_CALLER_FUNC(void*, (), ())
 
 BEGIN_API_CALLER_FUNC(int, void)
-END_API_CALLER_FUNC(int, (void), ())
+END_API_CALLER_FUNC(int, (), ())
 
 BEGIN_API_CALLER_FUNC(float, void)
-END_API_CALLER_FUNC(float, (void), ())
+END_API_CALLER_FUNC(float, (), ())
 
 //-
 BEGIN_API_CALLER_FUNC(float, 2f)

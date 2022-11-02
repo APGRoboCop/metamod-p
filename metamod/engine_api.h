@@ -79,7 +79,7 @@ typedef edict_t* (*FN_FINDCLIENTINPVS) (edict_t* pEdict);
 typedef edict_t* (*FN_ENTITIESINPVS) (edict_t* pplayer);
 typedef void (*FN_MAKEVECTORS) (const float* rgflVector);
 typedef void (*FN_ANGLEVECTORS) (const float* rgflVector, float* forward, float* right, float* up);
-typedef edict_t* (*FN_CREATEENTITY) (void);
+typedef edict_t* (*FN_CREATEENTITY) ();
 typedef void (*FN_REMOVEENTITY) (edict_t* e);
 typedef edict_t* (*FN_CREATENAMEDENTITY) (int className);
 typedef void (*FN_MAKESTATIC) (edict_t* ent);
@@ -98,14 +98,14 @@ typedef const char* (*FN_TRACETEXTURE) (edict_t* pTextureEntity, const float* v1
 typedef void (*FN_TRACESPHERE) (const float* v1, const float* v2, int fNoMonsters, float radius, edict_t* pentToSkip, TraceResult* ptr);
 typedef void (*FN_GETAIMVECTOR) (edict_t* ent, float speed, float* rgflReturn);
 typedef void (*FN_SERVERCOMMAND) (char* str);
-typedef void (*FN_SERVEREXECUTE) (void);
+typedef void (*FN_SERVEREXECUTE) ();
 typedef void (*FN_CLIENTCOMMAND_ENG) (edict_t* pEdict, char* szFmt, ...);
 typedef void (*FN_PARTICLEEFFECT) (const float* org, const float* dir, float color, float count);
 typedef void (*FN_LIGHTSTYLE) (int style, char* val);
 typedef int (*FN_DECALINDEX) (const char* name);
 typedef int (*FN_POINTCONTENTS) (const float* rgflVector);
 typedef void (*FN_MESSAGEBEGIN) (int msg_dest, int msg_type, const float* pOrigin, edict_t* ed);
-typedef void (*FN_MESSAGEEND) (void);
+typedef void (*FN_MESSAGEEND) ();
 typedef void (*FN_WRITEBYTE) (int iValue);
 typedef void (*FN_WRITECHAR) (int iValue);
 typedef void (*FN_WRITESHORT) (int iValue);
@@ -150,9 +150,9 @@ typedef const char* (*FN_NAMEFORFUNCTION) (uint32 function);
 #endif
 typedef void (*FN_CLIENTPRINTF) (edict_t* pEdict, PRINT_TYPE ptype, const char* szMsg);
 typedef void (*FN_SERVERPRINT) (const char* szMsg);
-typedef const char* (*FN_CMD_ARGS) (void);
+typedef const char* (*FN_CMD_ARGS) ();
 typedef const char* (*FN_CMD_ARGV) (int argc);
-typedef int (*FN_CMD_ARGC) (void);
+typedef int (*FN_CMD_ARGC) ();
 typedef void (*FN_GETATTACHMENT) (const edict_t* pEdict, int iAttachment, float* rgflOrigin, float* rgflAngles);
 typedef void (*FN_CRC32_INIT) (CRC32_t* pulCRC);
 typedef void (*FN_CRC32_PROCESSBUFFER) (CRC32_t* pulCRC, void* p, int len);
@@ -165,7 +165,7 @@ typedef int32(*FN_RANDOMLONG) (int32 lLow, int32 lHigh);
 #endif
 typedef float (*FN_RANDOMFLOAT) (float flLow, float flHigh);
 typedef void (*FN_SETVIEW) (const edict_t* pClient, const edict_t* pViewent);
-typedef float (*FN_TIME) (void);
+typedef float (*FN_TIME) ();
 typedef void (*FN_CROSSHAIRANGLE) (const edict_t* pClient, float pitch, float yaw);
 typedef byte* (*FN_LOADFILEFORME) (char* filename, int* pLength);
 typedef void (*FN_FREEFILE) (void* buffer);
@@ -177,7 +177,7 @@ typedef void (*FN_FADECLIENTVOLUME) (const edict_t* pEdict, int fadePercent, int
 typedef void (*FN_SETCLIENTMAXSPEED) (const edict_t* pEdict, float fNewMaxspeed);
 typedef edict_t* (*FN_CREATEFAKECLIENT) (const char* netname);
 typedef void (*FN_RUNPLAYERMOVE) (edict_t* fakeclient, const float* viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, byte impulse, byte msec);
-typedef int (*FN_NUMBEROFENTITIES) (void);
+typedef int (*FN_NUMBEROFENTITIES) ();
 typedef char* (*FN_GETINFOKEYBUFFER) (edict_t* e);
 typedef char* (*FN_INFOKEYVALUE) (char* infobuffer, char* key);
 typedef void (*FN_SETKEYVALUE) (char* infobuffer, char* key, char* value);
@@ -187,7 +187,7 @@ typedef void (*FN_STATICDECAL) (const float* origin, int decalIndex, int entityI
 typedef int (*FN_PRECACHEGENERIC) (char* s);
 typedef int (*FN_GETPLAYERUSERID) (edict_t* e);
 typedef void (*FN_BUILDSOUNDMSG) (edict_t* entity, int channel, const char* sample, /*int*/float volume, float attenuation, int fFlags, int pitch, int msg_dest, int msg_type, const float* pOrigin, edict_t* ed);
-typedef int (*FN_ISDEDICATEDSERVER) (void);
+typedef int (*FN_ISDEDICATEDSERVER) ();
 typedef cvar_t* (*FN_CVARGETPOINTER) (const char* szVarName);
 typedef unsigned int (*FN_GETPLAYERWONID) (edict_t* e);
 typedef void (*FN_INFO_REMOVEKEY) (char* s, const char* key);
@@ -202,7 +202,7 @@ typedef int (*FN_CHECKVISIBILITY) (const edict_t* entity, unsigned char* pset);
 typedef void (*FN_DELTASETFIELD) (struct delta_s* pFields, const char* fieldname);
 typedef void (*FN_DELTAUNSETFIELD) (struct delta_s* pFields, const char* fieldname);
 typedef void (*FN_DELTAADDENCODER) (char* name, void (*conditionalencode)(struct delta_s* pFields, const unsigned char* from, const unsigned char* to));
-typedef int (*FN_GETCURRENTPLAYER) (void);
+typedef int (*FN_GETCURRENTPLAYER) ();
 typedef int (*FN_CANSKIPPLAYER) (const edict_t* player);
 typedef int (*FN_DELTAFINDFIELD) (struct delta_s* pFields, const char* fieldname);
 typedef void (*FN_DELTASETFIELDBYINDEX) (struct delta_s* pFields, int fieldNumber);
@@ -212,7 +212,7 @@ typedef int (*FN_CREATEINSTANCEDBASELINE) (int classname, struct entity_state_s*
 typedef void (*FN_CVAR_DIRECTSET) (struct cvar_s* var, char* value);
 typedef void (*FN_FORCEUNMODIFIED) (FORCE_TYPE type, float* mins, float* maxs, const char* filename);
 typedef void (*FN_GETPLAYERSTATS) (const edict_t* pClient, int* ping, int* packet_loss);
-typedef void (*FN_ADDSERVERCOMMAND) (char* cmd_name, void (*function) (void));
+typedef void (*FN_ADDSERVERCOMMAND) (char* cmd_name, void (*function) ());
 // Added in SDK 2.2:
 typedef qboolean(*FN_VOICE_GETCLIENTLISTENING) (int iReceiver, int iSender);
 typedef qboolean(*FN_VOICE_SETCLIENTLISTENING) (int iReceiver, int iSender, qboolean bListen);
@@ -223,13 +223,13 @@ typedef sequenceEntry_s* (*FN_SEQUENCEGET) (const char* fileName, const char* en
 typedef sentenceEntry_s* (*FN_SEQUENCEPICKSENTENCE) (const char* groupName, int pickMethod, int* picked);
 typedef int (*FN_GETFILESIZE) (char* filename);
 typedef unsigned int (*FN_GETAPPROXWAVEPLAYLEN) (const char* filepath);
-typedef int (*FN_ISCAREERMATCH) (void);
+typedef int (*FN_ISCAREERMATCH) ();
 typedef int (*FN_GETLOCALIZEDSTRINGLENGTH) (const char* label);
 typedef void (*FN_REGISTERTUTORMESSAGESHOWN) (int mid);
 typedef int (*FN_GETTIMESTUTORMESSAGESHOWN) (int mid);
 typedef void (*FN_PROCESSTUTORMESSAGEDECAYBUFFER) (int* buffer, int bufferLength);
 typedef void (*FN_CONSTRUCTTUTORMESSAGEDECAYBUFFER) (int* buffer, int bufferLength);
-typedef void (*FN_RESETTUTORMESSAGEDECAYDATA) (void);
+typedef void (*FN_RESETTUTORMESSAGEDECAYDATA) ();
 // Added 2005/08/11 (no SDK update):
 typedef void (*FN_QUERYCLIENTCVARVALUE) (const edict_t* player, const char* cvarName);
 // Added 2005/11/21 (no SDK update):

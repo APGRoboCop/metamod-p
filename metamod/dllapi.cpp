@@ -56,7 +56,7 @@
 #define META_DLLAPI_HANDLE(ret_t, ret_init, FN_TYPE, pfnName, pack_args_type, pfn_args) \
 	API_START_TSC_TRACKING(); \
 	API_PACK_ARGS(pack_args_type, pfn_args); \
-	class_ret_t ret_val(main_hook_function(class_ret_t((ret_t)ret_init), offsetof(dllapi_info_t, pfnName), e_api_dllapi, offsetof(DLL_FUNCTIONS, pfnName), &packed_args)); \
+	class_ret_t ret_val(main_hook_function(class_ret_t((ret_t)(ret_init)), offsetof(dllapi_info_t, pfnName), e_api_dllapi, offsetof(DLL_FUNCTIONS, pfnName), &packed_args)); \
 	API_END_TSC_TRACKING()
 
 // The "new" api routines (just 3 right now), functions returning "void".
@@ -70,11 +70,11 @@
 #define META_NEWAPI_HANDLE(ret_t, ret_init, FN_TYPE, pfnName, pack_args_type, pfn_args) \
 	API_START_TSC_TRACKING(); \
 	API_PACK_ARGS(pack_args_type, pfn_args); \
-	class_ret_t ret_val(main_hook_function(class_ret_t((ret_t)ret_init), offsetof(newapi_info_t, pfnName), e_api_newapi, offsetof(NEW_DLL_FUNCTIONS, pfnName), &packed_args)); \
+	class_ret_t ret_val(main_hook_function(class_ret_t((ret_t)(ret_init)), offsetof(newapi_info_t, pfnName), e_api_newapi, offsetof(NEW_DLL_FUNCTIONS, pfnName), &packed_args)); \
 	API_END_TSC_TRACKING()
 
 // From SDK dlls/game.cpp:
-static void mm_GameDLLInit(void) {
+static void mm_GameDLLInit() {
 	META_DLLAPI_HANDLE_void(FN_GAMEINIT, pfnGameInit, void, (VOID_ARG));
 	RETURN_API_void();
 }
@@ -136,7 +136,7 @@ static void mm_RestoreGlobalState(SAVERESTOREDATA* pSaveData) {
 	META_DLLAPI_HANDLE_void(FN_RESTOREGLOBALSTATE, pfnRestoreGlobalState, p, (pSaveData));
 	RETURN_API_void();
 }
-static void mm_ResetGlobalState(void) {
+static void mm_ResetGlobalState() {
 	META_DLLAPI_HANDLE_void(FN_RESETGLOBALSTATE, pfnResetGlobalState, void, (VOID_ARG));
 	RETURN_API_void();
 }
@@ -175,7 +175,7 @@ static void mm_ServerActivate(edict_t* pEdictList, int edictCount, int clientMax
 	META_DLLAPI_HANDLE_void(FN_SERVERACTIVATE, pfnServerActivate, p2i, (pEdictList, edictCount, clientMax));
 	RETURN_API_void();
 }
-static void mm_ServerDeactivate(void) {
+static void mm_ServerDeactivate() {
 	META_DLLAPI_HANDLE_void(FN_SERVERDEACTIVATE, pfnServerDeactivate, void, (VOID_ARG));
 	// Update loaded plugins.  Look for new plugins in inifile, as well as
 	// any plugins waiting for a changelevel to load.
@@ -205,21 +205,21 @@ static void mm_PlayerPostThink(edict_t* pEntity) {
 	META_DLLAPI_HANDLE_void(FN_PLAYERPOSTTHINK, pfnPlayerPostThink, p, (pEntity));
 	RETURN_API_void();
 }
-static void mm_StartFrame(void) {
+static void mm_StartFrame() {
 	meta_debug_value = (int)meta_debug.value;
 
 	META_DLLAPI_HANDLE_void(FN_STARTFRAME, pfnStartFrame, void, (VOID_ARG));
 	RETURN_API_void();
 }
-static void mm_ParmsNewLevel(void) {
+static void mm_ParmsNewLevel() {
 	META_DLLAPI_HANDLE_void(FN_PARMSNEWLEVEL, pfnParmsNewLevel, void, (VOID_ARG));
 	RETURN_API_void();
 }
-static void mm_ParmsChangeLevel(void) {
+static void mm_ParmsChangeLevel() {
 	META_DLLAPI_HANDLE_void(FN_PARMSCHANGELEVEL, pfnParmsChangeLevel, void, (VOID_ARG));
 	RETURN_API_void();
 }
-static const char* mm_GetGameDescription(void) {
+static const char* mm_GetGameDescription() {
 	META_DLLAPI_HANDLE(const char*, NULL, FN_GETGAMEDESCRIPTION, pfnGetGameDescription, void, (VOID_ARG));
 	RETURN_API(const char*);
 }
@@ -275,7 +275,7 @@ static void mm_CreateBaseline(int player, int eindex, struct entity_state_s *bas
 	META_DLLAPI_HANDLE_void(FN_CREATEBASELINE, pfnCreateBaseline, 2i2pi2v3, (player, eindex, baseline, entity, playermodelindex, player_mins, player_maxs));
 	RETURN_API_void();
 }
-static void mm_RegisterEncoders(void) {
+static void mm_RegisterEncoders() {
 	META_DLLAPI_HANDLE_void(FN_REGISTERENCODERS, pfnRegisterEncoders, void, (VOID_ARG));
 	RETURN_API_void();
 }
@@ -299,7 +299,7 @@ static int mm_GetHullBounds(int hullnumber, float* mins, float* maxs) {
 	META_DLLAPI_HANDLE(int, 0, FN_GETHULLBOUNDS, pfnGetHullBounds, i2p, (hullnumber, mins, maxs));
 	RETURN_API(int);
 }
-static void mm_CreateInstancedBaselines(void) {
+static void mm_CreateInstancedBaselines() {
 	META_DLLAPI_HANDLE_void(FN_CREATEINSTANCEDBASELINES, pfnCreateInstancedBaselines, void, (VOID_ARG));
 	RETURN_API_void();
 }
@@ -307,7 +307,7 @@ static int mm_InconsistentFile(const edict_t* player, const char* filename, char
 	META_DLLAPI_HANDLE(int, 0, FN_INCONSISTENTFILE, pfnInconsistentFile, 3p, (player, filename, disconnect_message));
 	RETURN_API(int);
 }
-static int mm_AllowLagCompensation(void) {
+static int mm_AllowLagCompensation() {
 	META_DLLAPI_HANDLE(int, 0, FN_ALLOWLAGCOMPENSATION, pfnAllowLagCompensation, void, (VOID_ARG));
 	RETURN_API(int);
 }
@@ -318,7 +318,7 @@ static void mm_OnFreeEntPrivateData(edict_t* pEnt) {
 	META_NEWAPI_HANDLE_void(FN_ONFREEENTPRIVATEDATA, pfnOnFreeEntPrivateData, p, (pEnt));
 	RETURN_API_void();
 }
-static void mm_GameShutdown(void) {
+static void mm_GameShutdown() {
 	META_NEWAPI_HANDLE_void(FN_GAMESHUTDOWN, pfnGameShutdown, void, (VOID_ARG));
 	RETURN_API_void();
 }

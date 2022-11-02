@@ -77,7 +77,7 @@
 #else
 #define META_DEBUG(level, args) \
 		do { \
-			if(unlikely(meta_debug_value >= level)) { \
+			if(unlikely(meta_debug_value >= (level))) { \
 				META_DEBUG_SET_LEVEL(level); \
 				META_DO_DEBUG args; \
 			} \
@@ -111,6 +111,6 @@ void DLLINTERNAL META_DEBUG_SET_LEVEL(int level);
 void DLLINTERNAL META_DO_DEBUG(const char* fmt, ...);
 #endif
 
-void DLLINTERNAL flush_ALERT_buffer(void);
+void DLLINTERNAL flush_ALERT_buffer();
 
 #endif /* LOG_META_H */

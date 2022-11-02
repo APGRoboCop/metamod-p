@@ -224,7 +224,7 @@ mBOOL DLLINTERNAL MPlugin::plugin_parseline(const char* fname, int loader_index)
 // Make sure this plugin has the necessary minimal information.
 // meta_errno values:
 //  - ME_ARGUMENT	missing necessary fields in plugin
-mBOOL DLLINTERNAL MPlugin::check_input(void) {
+mBOOL DLLINTERNAL MPlugin::check_input() {
 	// doublecheck our input/state
 	if (status < PL_VALID) {
 		META_WARNING("dll: Tried to operate on plugin[%d] with a non-valid status (%d)", index, str_status());
@@ -266,7 +266,7 @@ mBOOL DLLINTERNAL MPlugin::check_input(void) {
 // meta_errno values:
 //  - ME_NOTFOUND	couldn't find a matching file for the partial name
 //  - errno's from check_input()
-mBOOL DLLINTERNAL MPlugin::resolve(void) {
+mBOOL DLLINTERNAL MPlugin::resolve() {
 	char* found;
 	if (!check_input()) {
 		// details logged, meta_errno set in check_input()
@@ -624,7 +624,7 @@ mBOOL DLLINTERNAL MPlugin::load(PLUG_LOADTIME now) {
 //  - ME_DLMISSING	couldn't find a query() or giveFuncs() in plugin
 //  - ME_DLERROR	plugin query() returned error
 //  - ME_NULLDATA	info struct from query() was null
-mBOOL DLLINTERNAL MPlugin::query(void) {
+mBOOL DLLINTERNAL MPlugin::query() {
 	META_GIVE_PEXT_FUNCTIONS_FN pfn_give_pext_funcs;
 	GIVE_ENGINE_FUNCTIONS_FN pfn_give_engfuncs;
 
@@ -851,8 +851,8 @@ mBOOL DLLINTERNAL MPlugin::attach(PLUG_LOADTIME now) {
 	// a function isn't an option since we have varying types.
 #define GET_FUNC_TABLE_FROM_PLUGIN(pfnGetFuncs, STR_GetFuncs, struct_field, API_TYPE, TABLE_TYPE, TABLE_SIZE, vers_pass, vers_int, vers_want) \
 	if(meta_table.pfnGetFuncs) { \
-		if(!struct_field) { \
-			struct_field = (TABLE_TYPE*)calloc(1, TABLE_SIZE); \
+		if(!(struct_field)) { \
+			(struct_field) = (TABLE_TYPE*)calloc(1, TABLE_SIZE); \
 		} else { \
 			memset(struct_field, 0, TABLE_SIZE); \
 		} \
@@ -861,7 +861,7 @@ mBOOL DLLINTERNAL MPlugin::attach(PLUG_LOADTIME now) {
 		} \
 		else { \
 			META_WARNING("dll: Failure calling %s in plugin '%s'", STR_GetFuncs, desc); \
-			if(vers_int != vers_want) \
+			if((vers_int) != (vers_want)) \
 				META_WARNING("dll: Interface version didn't match; expected %d, found %d", vers_want, vers_int); \
 		} \
 	} \
@@ -869,7 +869,7 @@ mBOOL DLLINTERNAL MPlugin::attach(PLUG_LOADTIME now) {
 		META_DEBUG(5, ("dll: Plugin '%s': No %s", desc, STR_GetFuncs)); \
 		if(struct_field) \
 			free(struct_field); \
-		struct_field=NULL; \
+		(struct_field)=NULL; \
 	}
 
 	// Look for API-NEW interface in plugin.  We do this before API2/API, because
@@ -1154,7 +1154,7 @@ mBOOL DLLINTERNAL MPlugin::reload(PLUG_LOADTIME now, PL_UNLOAD_REASON reason) {
 //  - ME_ALREADY	this plugin already paused
 //  - ME_BADREQ		can't pause; not running
 //  - ME_NOTALLOWED	plugin doesn't want to be paused
-mBOOL MPlugin::pause(void) {
+mBOOL MPlugin::pause() {
 	if (status == PL_PAUSED) {
 		META_WARNING("Not pausing plugin '%s'; already paused", desc);
 		RETURN_ERRNO(mFALSE, ME_ALREADY);
@@ -1179,7 +1179,7 @@ mBOOL MPlugin::pause(void) {
 // Unpause a plugin.
 // meta_errno values:
 //  - ME_BADREQ		can't unpause; not paused
-mBOOL DLLINTERNAL MPlugin::unpause(void) {
+mBOOL DLLINTERNAL MPlugin::unpause() {
 	if (status != PL_PAUSED) {
 		META_WARNING("Cannot unpause plugin '%s'; not currently paused (status=%s)", desc, str_status());
 		RETURN_ERRNO(mFALSE, ME_BADREQ);
@@ -1209,7 +1209,7 @@ mBOOL DLLINTERNAL MPlugin::retry(PLUG_LOADTIME now, PL_UNLOAD_REASON reason) {
 }
 
 //
-void DLLINTERNAL MPlugin::free_api_pointers(void) const
+void DLLINTERNAL MPlugin::free_api_pointers() const
 {
 	if (gamedll_funcs.dllapi_table)
 		free(gamedll_funcs.dllapi_table);
@@ -1235,7 +1235,7 @@ void DLLINTERNAL MPlugin::free_api_pointers(void) const
 // meta_errno values:
 //  - ME_BADREQ		not marked for clearing
 //  - ME_DLERROR	failed to dlclose
-mBOOL DLLINTERNAL MPlugin::clear(void) {
+mBOOL DLLINTERNAL MPlugin::clear() {
 	if (status != PL_FAILED && status != PL_BADFILE
 		&& status != PL_EMPTY && status != PL_OPENED) {
 		META_WARNING("Cannot clear plugin '%s'; not marked as failed, empty, or open (status=%s)", desc, str_status());
@@ -1268,7 +1268,7 @@ mBOOL DLLINTERNAL MPlugin::clear(void) {
 }
 
 // List information about plugin to console.
-void DLLINTERNAL MPlugin::show(void) {
+void DLLINTERNAL MPlugin::show() {
 	char* cp;
 	int n;
 	const auto width = 13;
@@ -1354,7 +1354,7 @@ void DLLINTERNAL MPlugin::show(void) {
 // meta_errno values:
 //  - ME_NOFILE		couldn't find file
 //  - ME_NOERROR	no error; false indicates file not newer
-mBOOL DLLINTERNAL MPlugin::newer_file(void) const
+mBOOL DLLINTERNAL MPlugin::newer_file() const
 {
 	struct stat st;
 

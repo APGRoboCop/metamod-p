@@ -82,7 +82,7 @@ private:
 	MConfig(const MConfig& src) = delete;
 public:
 	// contructor
-	MConfig(void) DLLINTERNAL;
+	MConfig() DLLINTERNAL;
 	// data
 	int debuglevel;		// to use for meta_debug
 	char* gamedll;		// string if specified in config.ini
@@ -94,7 +94,7 @@ public:
 	void DLLINTERNAL init(option_t* global_options);
 	mBOOL DLLINTERNAL load(const char* filename);
 	mBOOL DLLINTERNAL set(const char* key, const char* value) const;
-	void DLLINTERNAL show(void) const;
+	void DLLINTERNAL show() const;
 };
 
 #endif /* CONF_META_H */

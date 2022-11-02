@@ -73,7 +73,7 @@ void DLLINTERNAL MRegCmd::init(int idx)
 // meta_errno values:
 //  - ME_BADREQ		function disabled/invalid
 //  - ME_ARGUMENT	function pointer is null
-mBOOL DLLINTERNAL MRegCmd::call(void) {
+mBOOL DLLINTERNAL MRegCmd::call() {
 	// can we expect to call this function?
 	if (status != RG_VALID)
 		RETURN_ERRNO(mFALSE, ME_BADREQ);
@@ -96,7 +96,7 @@ mBOOL DLLINTERNAL MRegCmd::call(void) {
 ///// class MRegCmdList:
 
 // Constructor
-MRegCmdList::MRegCmdList(void)
+MRegCmdList::MRegCmdList()
 	: mlist(nullptr), size(REG_CMD_GROWSIZE), endlist(0)
 {
 	mlist = (MRegCmd*)calloc(1, size * sizeof(MRegCmd));
@@ -168,7 +168,7 @@ void DLLINTERNAL MRegCmdList::disable(int plugin_id) const
 }
 
 // List all the registered commands.
-void DLLINTERNAL MRegCmdList::show(void) const
+void DLLINTERNAL MRegCmdList::show() const
 {
 	auto n = 0, a = 0;
 	char bplug[18 + 1];	// +1 for term null
@@ -266,7 +266,7 @@ mBOOL DLLINTERNAL MRegCvar::set(cvar_t* src) const
 ///// class MRegCvarList:
 
 // Constructor
-MRegCvarList::MRegCvarList(void)
+MRegCvarList::MRegCvarList()
 	: vlist(nullptr), size(REG_CVAR_GROWSIZE), endlist(0)
 {
 	vlist = (MRegCvar*)calloc(1, size * sizeof(MRegCvar));
@@ -351,7 +351,7 @@ void DLLINTERNAL MRegCvarList::disable(int plugin_id) const
 }
 
 // List all the registered cvars.
-void DLLINTERNAL MRegCvarList::show(void) const
+void DLLINTERNAL MRegCvarList::show() const
 {
 	auto n = 0, a = 0;
 	char bplug[13 + 1], bname[20 + 1], bval[15 + 1];	// +1 for term null
@@ -428,7 +428,7 @@ void DLLINTERNAL MRegCvarList::show(int plugin_id) const
 ///// class MRegMsgList:
 
 // Constructor
-MRegMsgList::MRegMsgList(void)
+MRegMsgList::MRegMsgList()
 	: size(MAX_REG_MSGS), endlist(0)
 {
 	// initialize array
@@ -486,7 +486,7 @@ MRegMsg* DLLINTERNAL MRegMsgList::find(int findmsgid) {
 }
 
 // List the registered usermsgs for the gamedll.
-void DLLINTERNAL MRegMsgList::show(void) {
+void DLLINTERNAL MRegMsgList::show() {
 	auto n = 0;
 	char bname[25 + 1];	// +1 for term null
 

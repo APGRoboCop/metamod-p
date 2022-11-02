@@ -123,7 +123,7 @@ void DLLINTERNAL MPlayer::clear_cvar_query(const char* /*cvar*/)
 // Check if a client cvar is queried for this player
 // Returns NULL if not
 // or the name of the cvar.
-const char* DLLINTERNAL MPlayer::is_querying_cvar(void) const
+const char* DLLINTERNAL MPlayer::is_querying_cvar() const
 {
 	if (isQueried) {
 		return(cvarName);
@@ -156,7 +156,7 @@ void DLLINTERNAL MPlayerList::clear_player_cvar_query(const edict_t* pEntity, co
 	players[indx].clear_cvar_query(cvar);
 }
 
-void DLLINTERNAL MPlayerList::clear_all_cvar_queries(void)
+void DLLINTERNAL MPlayerList::clear_all_cvar_queries()
 {
 	for (auto indx = 1; indx < MPlayerList::NUM_SLOTS; ++indx) {
 		players[indx].clear_cvar_query();
@@ -168,7 +168,7 @@ void DLLINTERNAL MPlayerList::clear_all_cvar_queries(void)
 // or the name of the cvar.
 // meta_errno values:
 //  - ME_NOTFOUND  invalid entity
-const char* DLLINTERNAL MPlayerList::is_querying_cvar(const edict_t* pEntity)
+const char* DLLINTERNAL MPlayerList::is_querying_cvar(const edict_t* pEntity) const
 {
 	const auto indx = ENTINDEX(const_cast<edict_t*>(pEntity));
 

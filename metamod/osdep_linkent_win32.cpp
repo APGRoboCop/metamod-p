@@ -51,9 +51,9 @@ typedef struct sort_names_s {
 } sort_names_t;
 
 //relative virtual address to virtual address
-#define rva_to_va(base, rva) ((unsigned long)base + (unsigned long)rva)
+#define rva_to_va(base, rva) ((unsigned long)(base) + (unsigned long)(rva))
 //virtual address to relative virtual address
-#define va_to_rva(base, va) ((unsigned long)va - (unsigned long)base)
+#define va_to_rva(base, va) ((unsigned long)(va) - (unsigned long)(base))
 
 //
 // Checks module signatures and return ntheaders pointer for valid module

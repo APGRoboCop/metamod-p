@@ -61,7 +61,7 @@ public:
 	~MPlayer() DLLINTERNAL;
 	void        DLLINTERNAL set_cvar_query(const char* cvar);            // mark this player as querying a client cvar
 	void        DLLINTERNAL clear_cvar_query(const char* cvar = nullptr);     // unmark this player as querying a client cvar
-	const char* DLLINTERNAL is_querying_cvar(void) const;                      // check if a player is querying a cvar. returns
+	const char* DLLINTERNAL is_querying_cvar() const;                      // check if a player is querying a cvar. returns
 																		 //   NULL if not or the name of the cvar
 };
 
@@ -77,8 +77,8 @@ private:
 public:
 	void        DLLINTERNAL set_player_cvar_query(const edict_t* pEntity, const char* cvar);
 	void        DLLINTERNAL clear_player_cvar_query(const edict_t* pEntity, const char* cvar = nullptr);
-	void        DLLINTERNAL clear_all_cvar_queries(void);
-	const char* DLLINTERNAL is_querying_cvar(const edict_t* pEntity);
+	void        DLLINTERNAL clear_all_cvar_queries();
+	const char* DLLINTERNAL is_querying_cvar(const edict_t* pEntity) const;
 };
 
 #endif /* INCLUDE_METAMOD_PLAYER_H */

@@ -117,7 +117,7 @@ bool DLLINTERNAL EngineInfo::check_for_engine_module(const char* _pName)
 
 #ifdef _WIN32
 
-int DLLINTERNAL EngineInfo::nthdr_module_name(void)
+int DLLINTERNAL EngineInfo::nthdr_module_name()
 {
 	const auto* pName = "sw.dll";
 

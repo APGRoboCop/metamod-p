@@ -68,7 +68,7 @@ typedef enum {
 } REG_STATUS;
 
 // Pointer to function registered by AddServerCommand.
-typedef void (*REG_CMD_FN) (void);
+typedef void (*REG_CMD_FN) ();
 
 // An individual registered function/command.
 class MRegCmd : public class_metamod_new {
@@ -83,7 +83,7 @@ public:
 	REG_STATUS status;		// whether corresponding plugin is loaded
 // functions:
 	void DLLINTERNAL init(int idx);	// init values, as not using constructors
-	mBOOL DLLINTERNAL call(void);	// try to call the function
+	mBOOL DLLINTERNAL call();	// try to call the function
 };
 
 // A list of registered commands.
@@ -100,13 +100,13 @@ private:
 
 public:
 	// constructor:
-	MRegCmdList(void) DLLINTERNAL;
+	MRegCmdList() DLLINTERNAL;
 
 	// functions:
 	MRegCmd* DLLINTERNAL find(const char* findname) const;	// find by MRegCmd->name
 	MRegCmd* DLLINTERNAL add(const char* addname);
 	void DLLINTERNAL disable(int plugin_id) const;		// change status to Invalid
-	void DLLINTERNAL show(void) const;			// list all funcs to console
+	void DLLINTERNAL show() const;			// list all funcs to console
 	void DLLINTERNAL show(int plugin_id) const;		// list given plugin's funcs to console
 };
 
@@ -139,13 +139,13 @@ private:
 
 public:
 	// constructor:
-	MRegCvarList(void) DLLINTERNAL;
+	MRegCvarList() DLLINTERNAL;
 
 	// functions:
 	MRegCvar* DLLINTERNAL add(const char* addname);
 	MRegCvar* DLLINTERNAL find(const char* findname) const;	// find by MRegCvar->data.name
 	void DLLINTERNAL disable(int plugin_id) const;		// change status to Invalid
-	void DLLINTERNAL show(void) const;			// list all cvars to console
+	void DLLINTERNAL show() const;			// list all cvars to console
 	void DLLINTERNAL show(int plugin_id) const;		// list given plugin's cvars to console
 };
 
@@ -171,13 +171,13 @@ private:
 
 public:
 	// constructor:
-	MRegMsgList(void) DLLINTERNAL;
+	MRegMsgList() DLLINTERNAL;
 
 	// functions:
 	MRegMsg* DLLINTERNAL add(const char* addname, int addmsgid, int addsize);
 	MRegMsg* DLLINTERNAL find(const char* findname);
 	MRegMsg* DLLINTERNAL find(int findmsgid);
-	void DLLINTERNAL show(void);						// list all msgs to console
+	void DLLINTERNAL show();						// list all msgs to console
 };
 
 #endif /* MREG_H */

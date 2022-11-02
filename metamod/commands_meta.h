@@ -57,20 +57,20 @@ typedef enum {
 
 void DLLINTERNAL meta_register_cmdcvar();
 
-void DLLHIDDEN svr_meta(void); // only hidden because called from outside!
+void DLLHIDDEN svr_meta(); // only hidden because called from outside!
 
-void DLLINTERNAL cmd_meta_usage(void);
-void DLLINTERNAL cmd_meta_version(void);
-void DLLINTERNAL cmd_meta_gpl(void);
+void DLLINTERNAL cmd_meta_usage();
+void DLLINTERNAL cmd_meta_version();
+void DLLINTERNAL cmd_meta_gpl();
 
-void DLLINTERNAL cmd_meta_game(void);
-void DLLINTERNAL cmd_meta_refresh(void);
-void DLLINTERNAL cmd_meta_load(void);
+void DLLINTERNAL cmd_meta_game();
+void DLLINTERNAL cmd_meta_refresh();
+void DLLINTERNAL cmd_meta_load();
 
-void DLLINTERNAL cmd_meta_pluginlist(void);
-void DLLINTERNAL cmd_meta_cmdlist(void);
-void DLLINTERNAL cmd_meta_cvarlist(void);
-void DLLINTERNAL cmd_meta_config(void);
+void DLLINTERNAL cmd_meta_pluginlist();
+void DLLINTERNAL cmd_meta_cmdlist();
+void DLLINTERNAL cmd_meta_cvarlist();
+void DLLINTERNAL cmd_meta_config();
 
 void DLLINTERNAL cmd_doplug(PLUG_CMD pcmd);
 

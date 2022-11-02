@@ -51,7 +51,7 @@
  // dll.
 
 const int c_NumDummies = 5;
-typedef void (*pdummyfunc)(void);
+typedef void (*pdummyfunc)();
 
 // --------------------------------------------------------------------
 // meta_new_dll_functions_t
@@ -66,7 +66,7 @@ struct meta_new_dll_functions_t : public NEW_DLL_FUNCTIONS {
 
 	meta_new_dll_functions_t(
 		void  (*pfnOnFreeEntPrivateData) (edict_t*),
-		void  (*pfnGameShutdown)         (void),
+		void  (*pfnGameShutdown)         (),
 		int   (*pfnShouldCollide)        (edict_t*, edict_t*),
 		void  (*pfnCvarValue)            (const edict_t*, const char*),
 		void  (*pfnCvarValue2)           (const edict_t*, int, const char*, const char*)
@@ -82,7 +82,7 @@ struct meta_new_dll_functions_t : public NEW_DLL_FUNCTIONS {
 	void DLLINTERNAL copy_to(NEW_DLL_FUNCTIONS* pFuncs);
 
 	// return the engine's version of NEW_DLL_FUNCTIONS
-	static int DLLINTERNAL version(void);
+	static int DLLINTERNAL version();
 
 private:
 
@@ -116,7 +116,7 @@ private:
 		// Calculates our idea of the engine's version of the
 		// NEW_DLL_FUNCTIONS interface. Stores this version for future
 		// reference in m_version and returns it.
-	static int DLLINTERNAL determine_interface_version(void);
+	static int DLLINTERNAL determine_interface_version();
 
 	// Comfort function to determine the size of the NEW_DLL_FUNCTIONS
 	// struct for the different versions.
@@ -127,7 +127,7 @@ private:
 	// engine's interface. Should that version have not yet been
 	// determined (via the enginefuncs_t interface), 0 is returned to
 	// indicated this error state.
-	size_t DLLINTERNAL get_size(int version = 0);
+	static size_t DLLINTERNAL get_size(int version = 0);
 };
 
 // Inline functions
@@ -154,7 +154,7 @@ inline void meta_new_dll_functions_t::set_from(NEW_DLL_FUNCTIONS* _pFuncs)
 	memcpy(this, _pFuncs, sizeof(NEW_DLL_FUNCTIONS));
 }
 
-inline int meta_new_dll_functions_t::version(void)
+inline int meta_new_dll_functions_t::version()
 {
 	return sm_version ? sm_version : determine_interface_version();
 }
@@ -197,7 +197,7 @@ struct meta_enginefuncs_t : public enginefuncs_t {
 		edict_t* (*_pfnEntitiesInPVS)                   (edict_t*),
 		void             (*_pfnMakeVectors)                     (const float*),
 		void             (*_pfnAngleVectors)                    (const float*, float*, float*, float*),
-		edict_t* (*_pfnCreateEntity)                    (void),
+		edict_t* (*_pfnCreateEntity)                    (),
 		void             (*_pfnRemoveEntity)                    (edict_t*),
 		edict_t* (*_pfnCreateNamedEntity)               (int),
 		void             (*_pfnMakeStatic)                      (edict_t*),
@@ -216,14 +216,14 @@ struct meta_enginefuncs_t : public enginefuncs_t {
 		void             (*_pfnTraceSphere)                     (const float*, const float*, int, float, edict_t*, TraceResult*),
 		void             (*_pfnGetAimVector)                    (edict_t*, float, float*),
 		void             (*_pfnServerCommand)                   (char*),
-		void             (*_pfnServerExecute)                   (void),
+		void             (*_pfnServerExecute)                   (),
 		void             (*_pfnClientCommand)                   (edict_t*, char*, ...),
 		void             (*_pfnParticleEffect)                  (const float*, const float*, float, float),
 		void             (*_pfnLightStyle)                      (int, char*),
 		int	             (*_pfnDecalIndex)                      (const char*),
 		int              (*_pfnPointContents)                   (const float*),
 		void             (*_pfnMessageBegin)                    (int, int, const float*, edict_t*),
-		void             (*_pfnMessageEnd)                      (void),
+		void             (*_pfnMessageEnd)                      (),
 		void             (*_pfnWriteByte)                       (int),
 		void             (*_pfnWriteChar)                       (int),
 		void             (*_pfnWriteShort)                      (int),
@@ -258,9 +258,9 @@ struct meta_enginefuncs_t : public enginefuncs_t {
 		const char* (*_pfnNameForFunction)                 (uint32),
 		void             (*_pfnClientPrintf)                    (edict_t*, PRINT_TYPE, const char*),
 		void             (*_pfnServerPrint)                     (const char*),
-		const char* (*_pfnCmd_Args)                        (void),
+		const char* (*_pfnCmd_Args)                        (),
 		const char* (*_pfnCmd_Argv)                        (int argc),
-		int	             (*_pfnCmd_Argc)                        (void),
+		int	             (*_pfnCmd_Argc)                        (),
 		void             (*_pfnGetAttachment)                   (const edict_t*, int, float*, float*),
 		void             (*_pfnCRC32_Init)                      (CRC32_t*),
 		void             (*_pfnCRC32_ProcessBuffer)             (CRC32_t*, void*, int),
@@ -269,7 +269,7 @@ struct meta_enginefuncs_t : public enginefuncs_t {
 		int32(*_pfnRandomLong)                      (int32, int32),
 		float            (*_pfnRandomFloat)                     (float, float),
 		void             (*_pfnSetView)                         (const edict_t*, const edict_t*),
-		float            (*_pfnTime)                            (void),
+		float            (*_pfnTime)                            (),
 		void             (*_pfnCrosshairAngle)                  (const edict_t*, float, float),
 		byte* (*_pfnLoadFileForMe)                   (char*, int*),
 		void             (*_pfnFreeFile)                        (void*),
@@ -281,7 +281,7 @@ struct meta_enginefuncs_t : public enginefuncs_t {
 		void             (*_pfnSetClientMaxspeed)               (const edict_t*, float),
 		edict_t* (*_pfnCreateFakeClient)                (const char*),
 		void             (*_pfnRunPlayerMove)                   (edict_t*, const float*, float, float, float, unsigned short, byte, byte),
-		int              (*_pfnNumberOfEntities)                (void),
+		int              (*_pfnNumberOfEntities)                (),
 		char* (*_pfnGetInfoKeyBuffer)                (edict_t*),
 		char* (*_pfnInfoKeyValue)                    (char*, char*),
 		void             (*_pfnSetKeyValue)                     (char*, char*, char*),
@@ -291,7 +291,7 @@ struct meta_enginefuncs_t : public enginefuncs_t {
 		int              (*_pfnPrecacheGeneric)                 (char*),
 		int	             (*_pfnGetPlayerUserId)                 (edict_t*),
 		void             (*_pfnBuildSoundMsg)                   (edict_t*, int, const char*, float, float, int, int, int, int, const float*, edict_t*),
-		int              (*_pfnIsDedicatedServer)               (void),
+		int              (*_pfnIsDedicatedServer)               (),
 		cvar_t* (*_pfnCVarGetPointer)                  (const char*),
 		unsigned int     (*_pfnGetPlayerWONId)                  (edict_t*),
 		void             (*_pfnInfo_RemoveKey)                  (char*, const char*),
@@ -306,7 +306,7 @@ struct meta_enginefuncs_t : public enginefuncs_t {
 		void             (*_pfnDeltaSetField)                   (struct delta_s*, const char*),
 		void             (*_pfnDeltaUnsetField)                 (struct delta_s*, const char*),
 		void             (*_pfnDeltaAddEncoder)                 (char*, void (*)(struct delta_s*, const unsigned char*, const unsigned char*)),
-		int              (*_pfnGetCurrentPlayer)                (void),
+		int              (*_pfnGetCurrentPlayer)                (),
 		int              (*_pfnCanSkipPlayer)                   (const edict_t*),
 		int              (*_pfnDeltaFindField)                  (struct delta_s*, const char*),
 		void             (*_pfnDeltaSetFieldByIndex)            (struct delta_s*, int),
@@ -316,7 +316,7 @@ struct meta_enginefuncs_t : public enginefuncs_t {
 		void             (*_pfnCvar_DirectSet)                  (struct cvar_s*, char*),
 		void             (*_pfnForceUnmodified)                 (FORCE_TYPE, float*, float*, const char*),
 		void             (*_pfnGetPlayerStats)                  (const edict_t*, int*, int*),
-		void             (*_pfnAddServerCommand)                (char*, void (*) (void)),
+		void             (*_pfnAddServerCommand)                (char*, void (*) ()),
 		qboolean(*_pfnVoice_GetClientListening)        (int, int),
 		qboolean(*_pfnVoice_SetClientListening)        (int, int, qboolean),
 		const char* (*_pfnGetPlayerAuthId)                 (edict_t*),
@@ -324,13 +324,13 @@ struct meta_enginefuncs_t : public enginefuncs_t {
 		sentenceEntry_s* (*_pfnSequencePickSentence)            (const char*, int, int*),
 		int              (*_pfnGetFileSize)                     (char*),
 		unsigned int     (*_pfnGetApproxWavePlayLen)            (const char*),
-		int              (*_pfnIsCareerMatch)                   (void),
+		int              (*_pfnIsCareerMatch)                   (),
 		int              (*_pfnGetLocalizedStringLength)        (const char*),
 		void             (*_pfnRegisterTutorMessageShown)       (int),
 		int              (*_pfnGetTimesTutorMessageShown)       (int),
 		void             (*_pfnProcessTutorMessageDecayBuffer)  (int*, int),
 		void             (*_pfnConstructTutorMessageDecayBuffer)(int*, int),
-		void             (*_pfnResetTutorMessageDecayData)      (void),
+		void             (*_pfnResetTutorMessageDecayData)      (),
 		void             (*_pfnQueryClientCvarValue)            (const edict_t*, const char*),
 		void             (*_pfnQueryClientCvarValue2)           (const edict_t*, const char*, int),
 		int              (*_pfnEngCheckParm)                    (const char*, char**)
@@ -346,7 +346,7 @@ struct meta_enginefuncs_t : public enginefuncs_t {
 	void DLLINTERNAL copy_to(enginefuncs_t* pFuncs) const;
 
 	// return the engine interface version
-	static int DLLINTERNAL version(void);
+	static int DLLINTERNAL version();
 
 protected:
 
@@ -404,7 +404,7 @@ inline void meta_enginefuncs_t::copy_to(enginefuncs_t* _pFuncs) const
 	memcpy(_pFuncs, this, sizeof(enginefuncs_t));
 }
 
-inline int meta_enginefuncs_t::version(void)
+inline int meta_enginefuncs_t::version()
 {
 	return sm_version;
 }
@@ -443,11 +443,11 @@ private:
 
 	// Determine the version of the engine interface from the
 	// enginefuncs signature.
-	void DLLINTERNAL determine_engine_interface_version(void);
+	void DLLINTERNAL determine_engine_interface_version();
 
 	// Fixup the enginefuncs pointers according to the determined
 	// version as some pointers may be invalid.
-	void DLLINTERNAL fixup_engine_interface(void);
+	void DLLINTERNAL fixup_engine_interface();
 };
 
 inline HL_enginefuncs_t::HL_enginefuncs_t() : meta_enginefuncs_t() { };

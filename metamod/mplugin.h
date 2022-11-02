@@ -122,10 +122,11 @@ public:
 	api_tables_t tables;
 	api_tables_t post_tables;
 
-	inline DLLINTERNAL void* get_api_table(enum_api_t api) {
+	DLLINTERNAL void* get_api_table(enum_api_t api) {
 		return(((void**)&tables)[api]);
 	}
-	inline DLLINTERNAL void* get_api_post_table(enum_api_t api) {
+
+	DLLINTERNAL void* get_api_post_table(enum_api_t api) {
 		return(((void**)&post_tables)[api]);
 	}
 
@@ -150,9 +151,9 @@ public:
 	mBOOL DLLINTERNAL ini_parseline(const char* line);		// parse line from inifile
 	mBOOL DLLINTERNAL cmd_parseline(const char* line);		// parse from console command
 	mBOOL DLLINTERNAL plugin_parseline(const char* fname, int loader_index); // parse from plugin
-	mBOOL DLLINTERNAL check_input(void);
+	mBOOL DLLINTERNAL check_input();
 
-	mBOOL DLLINTERNAL resolve(void);				// find a matching file on disk
+	mBOOL DLLINTERNAL resolve();				// find a matching file on disk
 	char* DLLINTERNAL resolve_dirs(const char* path) const;
 	char* DLLINTERNAL resolve_prefix(const char* path) const;
 	char* DLLINTERNAL resolve_suffix(const char* path) const;
@@ -163,15 +164,15 @@ public:
 	mBOOL DLLINTERNAL load(PLUG_LOADTIME now);
 	mBOOL DLLINTERNAL unload(PLUG_LOADTIME now, PL_UNLOAD_REASON reason, PL_UNLOAD_REASON real_reason);
 	mBOOL DLLINTERNAL reload(PLUG_LOADTIME now, PL_UNLOAD_REASON reason);
-	mBOOL DLLINTERNAL pause(void);
-	mBOOL DLLINTERNAL unpause(void);
+	mBOOL DLLINTERNAL pause();
+	mBOOL DLLINTERNAL unpause();
 	mBOOL DLLINTERNAL retry(PLUG_LOADTIME now, PL_UNLOAD_REASON reason); // if previously failed
-	void DLLINTERNAL free_api_pointers(void) const;
-	mBOOL DLLINTERNAL clear(void);
+	void DLLINTERNAL free_api_pointers() const;
+	mBOOL DLLINTERNAL clear();
 	mBOOL DLLINTERNAL plugin_unload(plid_t plid, PLUG_LOADTIME now, PL_UNLOAD_REASON reason); // other plugin unloading
-	void DLLINTERNAL show(void);				// print info about plugin to console
+	void DLLINTERNAL show();				// print info about plugin to console
 
-	mBOOL DLLINTERNAL newer_file(void) const;			// check for newer file on disk
+	mBOOL DLLINTERNAL newer_file() const;			// check for newer file on disk
 
 // output string functions
 	const char* DLLINTERNAL str_status(STR_STATUS fmt) const;
@@ -181,28 +182,31 @@ public:
 	const char* DLLINTERNAL str_reason(PL_UNLOAD_REASON preason, PL_UNLOAD_REASON preal_reason) const;
 	static const char* DLLINTERNAL str_loadtime(PLUG_LOADTIME pallow, STR_LOADTIME fmt);
 
-	inline const char* DLLINTERNAL str_status(void) const { return(str_status(ST_SIMPLE)); };
-	inline const char* DLLINTERNAL str_action(void) const { return(str_action(SA_SIMPLE)); };
-	inline const char* DLLINTERNAL str_source(void) const { return(str_source(SO_SIMPLE)); };
+	const char* DLLINTERNAL str_status() const { return(str_status(ST_SIMPLE)); };
+	const char* DLLINTERNAL str_action() const { return(str_action(SA_SIMPLE)); };
+	const char* DLLINTERNAL str_source() const { return(str_source(SO_SIMPLE)); };
 
-	inline const char* DLLINTERNAL str_loadable(void) const
+	const char* DLLINTERNAL str_loadable() const
 	{
 		return(info ? str_loadtime(info->loadable, SL_SIMPLE) : " -");
 	};
-	inline const char* DLLINTERNAL str_unloadable(void) const
+
+	const char* DLLINTERNAL str_unloadable() const
 	{
 		return(info ? str_loadtime(info->unloadable, SL_SIMPLE) : " -");
 	};
-	inline const char* DLLINTERNAL str_loadable(STR_LOADTIME fmt) const
+
+	const char* DLLINTERNAL str_loadable(STR_LOADTIME fmt) const
 	{
 		return(info ? str_loadtime(info->loadable, fmt) : " -");
 	};
-	inline const char* DLLINTERNAL str_unloadable(STR_LOADTIME fmt) const
+
+	const char* DLLINTERNAL str_unloadable(STR_LOADTIME fmt) const
 	{
 		return(info ? str_loadtime(info->unloadable, fmt) : " -");
 	};
 private:
-	mBOOL DLLINTERNAL query(void);
+	mBOOL DLLINTERNAL query();
 	mBOOL DLLINTERNAL attach(PLUG_LOADTIME now);
 	mBOOL DLLINTERNAL detach(PLUG_LOADTIME now, PL_UNLOAD_REASON reason);
 
@@ -215,9 +219,9 @@ private:
 #define SHOW_DEF_API(api_info, api_table, pre_str, post_str) \
 	n=0; \
 	{ \
-		const api_info_t * ainfo = (const api_info_t *)&api_info; \
-		const void ** table = (const void **)api_table; \
-		for(int i = 0; &ainfo[i] < &api_info.END; i++) { \
+		const api_info_t * ainfo = (const api_info_t *)&(api_info); \
+		const void ** table = (const void **)(api_table); \
+		for(int i = 0; &ainfo[i] < &(api_info).END; i++) { \
 			if(table[i]) { \
 				META_CONS("%s%s%s", pre_str, ainfo[i].name, post_str); \
 				n++; \

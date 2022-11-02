@@ -123,7 +123,7 @@ extern mutil_funcs_t* gpMetaUtilFuncs DLLHIDDEN;
 // both standalone DLL's and metamod plugins. (optional; not required in
 // plugin)
 C_DLLEXPORT void Meta_Init(void);
-typedef void (*META_INIT_FN) (void);
+typedef void (*META_INIT_FN) ();
 
 // Get info about plugin, compare meta_interface versions, provide meta
 // utility callback functions.

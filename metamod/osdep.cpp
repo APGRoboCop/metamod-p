@@ -219,7 +219,7 @@ void DLLINTERNAL safevoid_snprintf(char* s, size_t n, const char* format, ...) {
 //    http://msdn.microsoft.com/library/en-us/debug/errors_0sdh.asp
 // except without FORMAT_MESSAGE_ALLOCATE_BUFFER, since we use a local
 // static buffer.
-char* DLLINTERNAL str_GetLastError(void) {
+char* DLLINTERNAL str_GetLastError() {
 	static char buf[MAX_STRBUF_LEN];
 	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		nullptr, GetLastError(),

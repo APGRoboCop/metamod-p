@@ -60,7 +60,7 @@
 #define META_ENGINE_HANDLE(ret_t, ret_init, FN_TYPE, pfnName, pack_args_type, pfn_args) \
 	API_START_TSC_TRACKING(); \
 	API_PACK_ARGS(pack_args_type, pfn_args); \
-	class_ret_t ret_val(main_hook_function(class_ret_t((ret_t)ret_init), offsetof(engine_info_t, pfnName), e_api_engine, offsetof(enginefuncs_t, pfnName), &packed_args)); \
+	class_ret_t ret_val(main_hook_function(class_ret_t((ret_t)(ret_init)), offsetof(engine_info_t, pfnName), e_api_engine, offsetof(enginefuncs_t, pfnName), &packed_args)); \
 	API_END_TSC_TRACKING()
 
 // For varargs functions
@@ -115,7 +115,7 @@
 	API_START_TSC_TRACKING(); \
 	META_DEBUG(engine_info.pfnName.loglevel, ("In %s: fmt=%s", engine_info.pfnName.name, fmt_arg)); \
 	API_PACK_ARGS(pack_args_type, (pfn_arg, "%s", buf)); \
-	class_ret_t ret_val(main_hook_function(class_ret_t((ret_t)ret_init), offsetof(engine_info_t, pfnName), e_api_engine, offsetof(enginefuncs_t, pfnName), &packed_args)); \
+	class_ret_t ret_val(main_hook_function(class_ret_t((ret_t)(ret_init)), offsetof(engine_info_t, pfnName), e_api_engine, offsetof(enginefuncs_t, pfnName), &packed_args)); \
 	API_END_TSC_TRACKING() \
 	CLEAN_FORMATED_STRING()
 
@@ -208,7 +208,7 @@ static void mm_AngleVectors(const float* rgflVector, float* forward, float* righ
 	RETURN_API_void()
 }
 
-static edict_t* mm_CreateEntity(void) {
+static edict_t* mm_CreateEntity() {
 	META_ENGINE_HANDLE(edict_t*, NULL, FN_CREATEENTITY, pfnCreateEntity, void, (VOID_ARG));
 	RETURN_API(edict_t*)
 }
@@ -289,7 +289,7 @@ static void mm_ServerCommand(char* str) {
 	META_ENGINE_HANDLE_void(FN_SERVERCOMMAND, pfnServerCommand, p, (str));
 	RETURN_API_void()
 }
-static void mm_ServerExecute(void) {
+static void mm_ServerExecute() {
 	META_ENGINE_HANDLE_void(FN_SERVEREXECUTE, pfnServerExecute, void, (VOID_ARG));
 	RETURN_API_void()
 }
@@ -319,7 +319,7 @@ static void mm_MessageBegin(int msg_dest, int msg_type, const float* pOrigin, ed
 	META_ENGINE_HANDLE_void(FN_MESSAGEBEGIN, pfnMessageBegin, 2i2p, (msg_dest, msg_type, pOrigin, ed));
 	RETURN_API_void()
 }
-static void mm_MessageEnd(void) {
+static void mm_MessageEnd() {
 	META_ENGINE_HANDLE_void(FN_MESSAGEEND, pfnMessageEnd, void, (VOID_ARG));
 	RETURN_API_void()
 }
@@ -514,7 +514,7 @@ static void mm_ServerPrint(const char* szMsg) {
 }
 
 //! these 3 added so game DLL can easily access client 'cmd' strings
-static const char* mm_Cmd_Args(void) {
+static const char* mm_Cmd_Args() {
 	META_ENGINE_HANDLE(const char*, NULL, FN_CMD_ARGS, pfnCmd_Args, void, (VOID_ARG));
 	RETURN_API(const char*)
 }
@@ -522,7 +522,7 @@ static const char* mm_Cmd_Argv(int argc) {
 	META_ENGINE_HANDLE(const char*, NULL, FN_CMD_ARGV, pfnCmd_Argv, i, (argc));
 	RETURN_API(const char*)
 }
-static int mm_Cmd_Argc(void) {
+static int mm_Cmd_Argc() {
 	META_ENGINE_HANDLE(int, 0, FN_CMD_ARGC, pfnCmd_Argc, void, (VOID_ARG));
 	RETURN_API(int)
 }
@@ -569,7 +569,7 @@ static void mm_SetView(const edict_t * pClient, const edict_t * pViewent) {
 	META_ENGINE_HANDLE_void(FN_SETVIEW, pfnSetView, 2p, (pClient, pViewent));
 	RETURN_API_void()
 }
-static float mm_Time(void) {
+static float mm_Time() {
 	META_ENGINE_HANDLE(float, 0.0, FN_TIME, pfnTime, void, (VOID_ARG));
 	RETURN_API(float)
 }
@@ -621,7 +621,7 @@ static void mm_RunPlayerMove(edict_t * fakeclient, const float* viewangles, floa
 	META_ENGINE_HANDLE_void(FN_RUNPLAYERMOVE, pfnRunPlayerMove, 2p3fus2uc, (fakeclient, viewangles, forwardmove, sidemove, upmove, buttons, impulse, msec));
 	RETURN_API_void()
 }
-static int mm_NumberOfEntities(void) {
+static int mm_NumberOfEntities() {
 	META_ENGINE_HANDLE(int, 0, FN_NUMBEROFENTITIES, pfnNumberOfEntities, void, (VOID_ARG));
 	RETURN_API(int)
 }
@@ -667,7 +667,7 @@ static void mm_BuildSoundMsg(edict_t * entity, int channel, const char* sample, 
 	RETURN_API_void()
 }
 //! is this a dedicated server?
-static int mm_IsDedicatedServer(void) {
+static int mm_IsDedicatedServer() {
 	META_ENGINE_HANDLE(int, 0, FN_ISDEDICATEDSERVER, pfnIsDedicatedServer, void, (VOID_ARG));
 	RETURN_API(int)
 }
@@ -733,7 +733,7 @@ static void mm_DeltaAddEncoder(char* name, void (*conditionalencode)(struct delt
 	META_ENGINE_HANDLE_void(FN_DELTAADDENCODER, pfnDeltaAddEncoder, 2p, (name, (void*)conditionalencode));
 	RETURN_API_void()
 }
-static int mm_GetCurrentPlayer(void) {
+static int mm_GetCurrentPlayer() {
 	META_ENGINE_HANDLE(int, 0, FN_GETCURRENTPLAYER, pfnGetCurrentPlayer, void, (VOID_ARG));
 	RETURN_API(int)
 }
@@ -784,7 +784,7 @@ static void mm_GetPlayerStats(const edict_t * pClient, int* ping, int* packet_lo
 	RETURN_API_void()
 }
 
-static void mm_AddServerCommand(char* cmd_name, void (*function) (void)) {
+static void mm_AddServerCommand(char* cmd_name, void (*function) ()) {
 	META_ENGINE_HANDLE_void(FN_ADDSERVERCOMMAND, pfnAddServerCommand, 2p, (cmd_name, (void*)function));
 	RETURN_API_void()
 }
@@ -831,7 +831,7 @@ static unsigned int mm_GetApproxWavePlayLen(const char* filepath) {
 	RETURN_API(unsigned int)
 }
 
-static int mm_IsCareerMatch(void) {
+static int mm_IsCareerMatch() {
 	META_ENGINE_HANDLE(int, 0, FN_ISCAREERMATCH, pfnIsCareerMatch, void, (VOID_ARG));
 	RETURN_API(int)
 }
@@ -861,7 +861,7 @@ static void mm_ConstructTutorMessageDecayBuffer(int* buffer, int bufferLength) {
 	RETURN_API_void()
 }
 
-static void mm_ResetTutorMessageDecayData(void) {
+static void mm_ResetTutorMessageDecayData() {
 	META_ENGINE_HANDLE_void(FN_RESETTUTORMESSAGEDECAYDATA, pfnResetTutorMessageDecayData, void, (VOID_ARG));
 	RETURN_API_void()
 }

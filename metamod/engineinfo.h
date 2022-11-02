@@ -57,7 +57,7 @@ private:
 
 	// Set info using the PE header found by module name.
 	// Returns 0 on success, error code on failure.
-	int DLLINTERNAL nthdr_module_name(void);
+	int DLLINTERNAL nthdr_module_name();
 
 	int DLLINTERNAL vac_pe_approx(enginefuncs_t* pFuncs);
 
@@ -106,7 +106,7 @@ public:
 	EngineInfo& operator=(const EngineInfo&) DLLINTERNAL;
 	EngineInfo(const EngineInfo&) DLLINTERNAL;
 
-	const char* DLLINTERNAL type(void) const;
+	const char* DLLINTERNAL type() const;
 
 	// Initilaise object, determining the bounds of the code segment of
 	// the HL engine shared object.
@@ -122,12 +122,12 @@ public:
 	bool DLLINTERNAL is_valid_code_pointer(sentenceEntry_s* (*fp) (const char*, int, int*));
 	bool DLLINTERNAL is_valid_code_pointer(int (*fp) (char*));
 	bool DLLINTERNAL is_valid_code_pointer(unsigned int (*fp) (const char*));
-	bool DLLINTERNAL is_valid_code_pointer(int (*fp) (void));
+	bool DLLINTERNAL is_valid_code_pointer(int (*fp) ());
 	bool DLLINTERNAL is_valid_code_pointer(int (*fp) (const char*));
 	bool DLLINTERNAL is_valid_code_pointer(void (*fp) (int));
 	bool DLLINTERNAL is_valid_code_pointer(int (*fp) (int));
 	bool DLLINTERNAL is_valid_code_pointer(void (*fp) (int*, int));
-	bool DLLINTERNAL is_valid_code_pointer(void (*fp) (void));
+	bool DLLINTERNAL is_valid_code_pointer(void (*fp) ());
 	bool DLLINTERNAL is_valid_code_pointer(void (*fp) (const edict_t*, const char*));
 	bool DLLINTERNAL is_valid_code_pointer(void (*fp) (const edict_t*, const char*, int));
 	bool DLLINTERNAL is_valid_code_pointer(int (*fp) (const char*, char**));
@@ -160,7 +160,7 @@ inline EngineInfo& EngineInfo::operator=(const EngineInfo& _rhs)
 	return *this;
 }
 
-inline const char* EngineInfo::type(void) const
+inline const char* EngineInfo::type() const
 {
 	return m_type;
 }
@@ -202,7 +202,7 @@ inline bool EngineInfo::is_valid_code_pointer(unsigned int (*_fp) (const char*))
 	return is_valid_code_pointer((void*)_fp);
 }
 
-inline bool EngineInfo::is_valid_code_pointer(int (*_fp) (void))
+inline bool EngineInfo::is_valid_code_pointer(int (*_fp) ())
 {
 	return is_valid_code_pointer((void*)_fp);
 }
@@ -227,7 +227,7 @@ inline bool EngineInfo::is_valid_code_pointer(void (*_fp) (int*, int))
 	return is_valid_code_pointer((void*)_fp);
 }
 
-inline bool EngineInfo::is_valid_code_pointer(void (*_fp) (void))
+inline bool EngineInfo::is_valid_code_pointer(void (*_fp) ())
 {
 	return is_valid_code_pointer((void*)_fp);
 }

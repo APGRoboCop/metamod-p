@@ -155,8 +155,8 @@ inline int DLLINTERNAL DLCLOSE(DLHANDLE handle) {
 }
 // Windows doesn't provide a function corresponding to dlerror(), so
 // we make our own.
-char* DLLINTERNAL str_GetLastError(void);
-inline const char* DLLINTERNAL DLERROR(void) {
+char* DLLINTERNAL str_GetLastError();
+inline const char* DLLINTERNAL DLERROR() {
 	if (dlclose_handle_invalid)
 		return("Invalid handle.");
 	return(str_GetLastError());
@@ -207,7 +207,7 @@ char* DLLINTERNAL my_strlwr(char* s);
 #include <io.h>
 #include <direct.h>
 
-#define sleep(x) Sleep(x*1000)
+#define sleep(x) Sleep((x)*1000)
 
 // Fixed MSVC compiling, by Nikolay "The Storm" Baklicharov.
 #if defined(__GNUC__) || defined (_MSC_VER) && _MSC_VER >= 1400
@@ -291,7 +291,7 @@ char* DLLINTERNAL realpath(const char* file_name, char* resolved_name);
 
 // Generic "error string" from a recent OS call.  For linux, this is based
 // on errno.  For win32, it's based on GetLastError.
-inline const char* DLLINTERNAL str_os_error(void) {
+inline const char* DLLINTERNAL str_os_error() {
 #ifdef linux
 	return(strerror(errno));
 #elif defined(_WIN32)

@@ -121,10 +121,10 @@ extern MPlayerList g_Players DLLHIDDEN;
 
 extern int requestid_counter DLLHIDDEN;
 
-int DLLINTERNAL metamod_startup(void);
+int DLLINTERNAL metamod_startup();
 
-mBOOL DLLINTERNAL meta_init_gamedll(void);
-mBOOL DLLINTERNAL meta_load_gamedll(void);
+mBOOL DLLINTERNAL meta_init_gamedll();
+mBOOL DLLINTERNAL meta_load_gamedll();
 
 // ===== lotsa macros... ======================================================
 

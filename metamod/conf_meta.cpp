@@ -44,7 +44,7 @@
 #include "support_meta.h"	// strmatch
 #include "osdep.h"			// strtok,
 
-MConfig::MConfig(void)
+MConfig::MConfig()
 	: list(nullptr), filename(nullptr), debuglevel(0), gamedll(nullptr),
 	plugins_file(nullptr), exec_cfg(nullptr)
 {
@@ -140,6 +140,8 @@ mBOOL DLLINTERNAL MConfig::set(option_t* setp, const char* setstr) {
 	default:
 		META_WARNING("unrecognized config type '%d'", setp->type);
 		RETURN_ERRNO(mFALSE, ME_ARGUMENT);
+	//case CF_NONE:
+	//	break;
 	}
 	return(mTRUE);
 }
@@ -197,7 +199,7 @@ mBOOL DLLINTERNAL MConfig::load(const char* fn) {
 	return(mTRUE);
 }
 
-void DLLINTERNAL MConfig::show(void) const
+void DLLINTERNAL MConfig::show() const
 {
 	if (filename)
 		META_CONS("%s and %s:", "Config options from localinfo", filename);

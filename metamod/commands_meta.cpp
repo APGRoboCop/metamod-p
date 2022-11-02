@@ -79,7 +79,7 @@ void DLLINTERNAL meta_register_cmdcvar() {
 }
 
 // Parse "meta" console command.
-void DLLHIDDEN svr_meta(void) {
+void DLLHIDDEN svr_meta() {
 	const auto* cmd = CMD_ARGV(1);
 	// arguments: none
 	if (!strcasecmp(cmd, "version"))
@@ -155,7 +155,7 @@ void DLLINTERNAL client_meta(edict_t* pEntity) {
 }
 
 // Print usage for "meta" console command.
-void DLLINTERNAL cmd_meta_usage(void) {
+void DLLINTERNAL cmd_meta_usage() {
 	META_CONS("usage: meta <command> [<arguments>]");
 	META_CONS("valid commands are:");
 	META_CONS("   version          - display metamod version info");
@@ -191,7 +191,7 @@ void DLLINTERNAL client_meta_aybabtu(edict_t* pEntity) {
 }
 
 // "meta version" console command.
-void DLLINTERNAL cmd_meta_version(void) {
+void DLLINTERNAL cmd_meta_version() {
 	if (CMD_ARGC() != 2) {
 		META_CONS("usage: meta version");
 		return;
@@ -222,7 +222,7 @@ void DLLINTERNAL client_meta_version(edict_t* pEntity) {
 }
 
 // "meta gpl" console command.
-void DLLINTERNAL cmd_meta_gpl(void) {
+void DLLINTERNAL cmd_meta_gpl() {
 	META_CONS("%s version %s  %s", VNAME, VVERSION, VDATE);
 	META_CONS("Copyright (c) 2001-%s %s", COPYRIGHT_YEAR, VAUTHOR);
 	META_CONS("");
@@ -255,7 +255,7 @@ void DLLINTERNAL cmd_meta_gpl(void) {
 }
 
 // "meta game" console command.
-void DLLINTERNAL cmd_meta_game(void) {
+void DLLINTERNAL cmd_meta_game() {
 	if (CMD_ARGC() != 2) {
 		META_CONS("usage: meta game");
 		return;
@@ -270,7 +270,7 @@ void DLLINTERNAL cmd_meta_game(void) {
 }
 
 // "meta refresh" console command.
-void DLLINTERNAL cmd_meta_refresh(void) {
+void DLLINTERNAL cmd_meta_refresh() {
 	if (CMD_ARGC() != 2) {
 		META_CONS("usage: meta refresh");
 		return;
@@ -282,7 +282,7 @@ void DLLINTERNAL cmd_meta_refresh(void) {
 }
 
 // "meta list" console command.
-void DLLINTERNAL cmd_meta_pluginlist(void) {
+void DLLINTERNAL cmd_meta_pluginlist() {
 	if (CMD_ARGC() != 2) {
 		META_CONS("usage: meta list");
 		return;
@@ -300,7 +300,7 @@ void DLLINTERNAL client_meta_pluginlist(edict_t* pEntity) {
 }
 
 // "meta cmds" console command.
-void DLLINTERNAL cmd_meta_cmdlist(void) {
+void DLLINTERNAL cmd_meta_cmdlist() {
 	if (CMD_ARGC() != 2) {
 		META_CONS("usage: meta cmds");
 		return;
@@ -309,7 +309,7 @@ void DLLINTERNAL cmd_meta_cmdlist(void) {
 }
 
 // "meta cvars" console command.
-void DLLINTERNAL cmd_meta_cvarlist(void) {
+void DLLINTERNAL cmd_meta_cvarlist() {
 	if (CMD_ARGC() != 2) {
 		META_CONS("usage: meta cvars");
 		return;
@@ -318,7 +318,7 @@ void DLLINTERNAL cmd_meta_cvarlist(void) {
 }
 
 // "meta config" console command.
-void DLLINTERNAL cmd_meta_config(void) {
+void DLLINTERNAL cmd_meta_config() {
 	if (CMD_ARGC() != 2) {
 		META_CONS("usage: meta cvars");
 		return;
@@ -339,7 +339,7 @@ void DLLINTERNAL cmd_meta_config(void) {
 // path_i386.so, path_i486.so, etc
 
 // "meta load" console command.
-void DLLINTERNAL cmd_meta_load(void) {
+void DLLINTERNAL cmd_meta_load() {
 	const auto argc = CMD_ARGC();
 	if (argc < 3) {
 		META_CONS("usage: meta load <name> [<description>]");

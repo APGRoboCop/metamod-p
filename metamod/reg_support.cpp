@@ -91,7 +91,7 @@
 // Generic command handler, passed to the engine for any AddServerCommand
 // calls made by the plugin.  It finds the appropriate plugin function
 // pointer to call based on CMD_ARGV(0).
-void DLLHIDDEN meta_command_handler(void) {
+void DLLHIDDEN meta_command_handler() {
 	META_DEBUG(5, ("called: meta_command_handler; arg0=%s args='%s'", CMD_ARGV(0), CMD_ARGS()));
 	const auto* cmd = CMD_ARGV(0);
 	if (!cmd) {
@@ -117,7 +117,7 @@ void DLLHIDDEN meta_command_handler(void) {
 // The string handed to the engine is just a strdup() of the plugin's
 // string.  The function pointer handed to the engine is actually a pointer
 // to a generic command-handler function (see above).
-void DLLHIDDEN meta_AddServerCommand(char* cmd_name, void (*function) (void)) {
+void DLLHIDDEN meta_AddServerCommand(char* cmd_name, void (*function) ()) {
 	MPlugin* iplug = nullptr;
 
 	META_DEBUG(4, ("called: meta_AddServerCommand; cmd_name=%s, function=%d", cmd_name, function));

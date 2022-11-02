@@ -217,7 +217,7 @@ static void buffered_ALERT(MLOG_SERVICE service, ALERT_TYPE atype, const char* p
 // Flushes the message queue, printing messages to the respective
 // service. This function doesn't check anymore if the g_engfuncs
 // jumptable is set. Don't call it if it isn't set.
-void DLLINTERNAL flush_ALERT_buffer(void) {
+void DLLINTERNAL flush_ALERT_buffer() {
 	auto* msg = messageQueueStart;
 	const auto dev = (int)CVAR_GET_FLOAT("developer");
 

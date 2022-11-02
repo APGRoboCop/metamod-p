@@ -136,7 +136,7 @@ mBOOL DLLINTERNAL MPluginList::found_child_plugins(int source_index) const
 }
 
 // Try make endlist lower (called after plugin unload)
-void DLLINTERNAL MPluginList::trim_list(void) {
+void DLLINTERNAL MPluginList::trim_list() {
 	int i, n;
 
 	if (endlist <= 0)
@@ -776,7 +776,7 @@ mBOOL DLLINTERNAL MPluginList::refresh(PLUG_LOADTIME now) {
 // Re-enable any plugins currently paused.
 // meta_errno values:
 //  - none
-void DLLINTERNAL MPluginList::unpause_all(void) {
+void DLLINTERNAL MPluginList::unpause_all() {
 	for (auto i = 0; i < endlist; i++) {
 		auto* iplug = &plist[i];
 		if (iplug->status == PL_PAUSED)

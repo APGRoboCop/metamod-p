@@ -40,7 +40,7 @@
 #include "mreg.h"			// REG_CMD_FN, etc
 
  // these are only 'hidden' because called from outside (plugins and engine)
-void DLLHIDDEN meta_command_handler(void);
+void DLLHIDDEN meta_command_handler();
 void DLLHIDDEN meta_AddServerCommand(char* cmd_name, REG_CMD_FN function);
 void DLLHIDDEN meta_CVarRegister(cvar_t* pCvar);
 int DLLHIDDEN meta_RegUserMsg(const char* pszName, int iSize);
