@@ -223,7 +223,6 @@ void DLLINTERNAL flush_ALERT_buffer() {
 
 	while (nullptr != msg) {
 		if (msg->service == mlsDEV && dev == 0) {
-			;
 		}
 		else {
 			ALERT(msg->atype, "b>%s %s\n", msg->prefix, msg->buf);

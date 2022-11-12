@@ -139,7 +139,7 @@ void DLLINTERNAL MPlayerList::set_player_cvar_query(const edict_t* pEntity, cons
 {
 	const auto indx = ENTINDEX(const_cast<edict_t*>(pEntity));
 
-	if (indx < 1 || indx >= MPlayerList::NUM_SLOTS)
+	if (indx < 1 || indx >= NUM_SLOTS)
 		return;	//maybe output a message?
 
 	players[indx].set_cvar_query(cvar);
@@ -150,7 +150,7 @@ void DLLINTERNAL MPlayerList::clear_player_cvar_query(const edict_t* pEntity, co
 {
 	const auto indx = ENTINDEX(const_cast<edict_t*>(pEntity));
 
-	if (indx < 1 || indx >= MPlayerList::NUM_SLOTS)
+	if (indx < 1 || indx >= NUM_SLOTS)
 		return;	//maybe output a message?
 
 	players[indx].clear_cvar_query(cvar);
@@ -158,7 +158,7 @@ void DLLINTERNAL MPlayerList::clear_player_cvar_query(const edict_t* pEntity, co
 
 void DLLINTERNAL MPlayerList::clear_all_cvar_queries()
 {
-	for (auto indx = 1; indx < MPlayerList::NUM_SLOTS; ++indx) {
+	for (auto indx = 1; indx < NUM_SLOTS; ++indx) {
 		players[indx].clear_cvar_query();
 	}
 }
