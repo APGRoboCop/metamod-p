@@ -33,6 +33,8 @@
  *    version.
  *
  */
+#include <cstring>
+
 #include <fcntl.h>          // open, write
 
 #include <extdll.h>			// always
@@ -97,11 +99,11 @@ mBOOL DLLINTERNAL install_gamedll(char* from, const char* to) {
 	if (!to)
 		to = from;
 
-	auto* cachefile = LOAD_FILE_FOR_ME(from, &length_in);
+	byte* cachefile = LOAD_FILE_FOR_ME(from, &length_in);
 
 	// If the file seems to exist in the cache.
 	if (cachefile) {
-		const auto fd = open(to, O_WRONLY | O_CREAT | O_EXCL | O_BINARY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
+		const int fd = open(to, O_WRONLY | O_CREAT | O_EXCL | O_BINARY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
 
 		if (fd < 0) {
 			META_DEBUG(3, ("Installing gamedll from cache: Failed to create file %s: %s", to, strerror(errno)));
@@ -154,8 +156,8 @@ mBOOL DLLINTERNAL setup_gamedll(gamedll_t* gamedll) {
 	char* cp, * strippedfn;
 #endif
 
-	const char* autofn = nullptr, * knownfn = nullptr, * usedfn = nullptr;
-	auto override = 0;
+	const char* autofn = 0, * knownfn = 0, * usedfn = 0;
+	int override = 0;
 
 	// Check for old-style "metagame.ini" file and complain.
 	if (valid_gamedir_file(OLD_GAMEDLL_TXT))
