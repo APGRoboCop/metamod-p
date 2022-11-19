@@ -90,6 +90,10 @@ char* DLLINTERNAL my_strlwr(char* s) {
 }
 #endif
 
+#if (! defined(va_copy)) && defined(__GNUC__) && defined(__MINGW32__)
+	#define va_copy(d,s)	__builtin_va_copy(d,s)
+#endif
+
 #ifndef DO_NOT_FIX_VARARG_ENGINE_API_WARPERS
 // Microsoft's msvcrt.dll:vsnprintf is buggy and so is vsnprintf on some glibc versions.
 // We use wrapper function to fix bugs.
