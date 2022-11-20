@@ -14,3 +14,6 @@ metamod/Release/*
 *.i
 *.cfg
 *.cmd
+doc/package_template/liblist.gam
+doc/package_template/addons/metamod/config.ini
+doc/package_template/addons/metamod/plugins.ini
