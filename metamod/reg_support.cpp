@@ -93,7 +93,7 @@
 // pointer to call based on CMD_ARGV(0).
 void DLLHIDDEN meta_command_handler() {
 	META_DEBUG(5, ("called: meta_command_handler; arg0=%s args='%s'", CMD_ARGV(0), CMD_ARGS()));
-	const auto* cmd = CMD_ARGV(0);
+	const char* cmd = CMD_ARGV(0);
 	if (!cmd) {
 		META_WARNING("Null command name in meta_command_handler() ??");
 		return;

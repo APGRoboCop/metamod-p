@@ -69,13 +69,13 @@ int DLLINTERNAL valid_gamedir_file(const char* path) {
 	else
 		safevoid_snprintf(buf, sizeof(buf), "%s/%s", GameDLL.gamedir, path);
 
-	const auto ret = stat(buf, &st);
+	const int ret = stat(buf, &st);
 	if (ret != 0) {
 		META_DEBUG(5, ("Unable to stat '%s': %s", buf, strerror(errno)));
 		return(FALSE);
 	}
 
-	const auto reg = S_ISREG(st.st_mode);
+	const int reg = S_ISREG(st.st_mode);
 	if (!reg) {
 		META_DEBUG(5, ("Not a regular file: %s", buf));
 		return(FALSE);

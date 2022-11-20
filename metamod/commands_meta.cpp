@@ -80,7 +80,7 @@ void DLLINTERNAL meta_register_cmdcvar() {
 
 // Parse "meta" console command.
 void DLLHIDDEN svr_meta() {
-	const auto* cmd = CMD_ARGV(1);
+	const char* cmd = CMD_ARGV(1);
 	// arguments: none
 	if (!strcasecmp(cmd, "version"))
 		cmd_meta_version();
@@ -136,7 +136,7 @@ void DLLHIDDEN svr_meta() {
 
 // Parse "meta" client command.
 void DLLINTERNAL client_meta(edict_t* pEntity) {
-	const auto* cmd = CMD_ARGV(1);
+	const char* cmd = CMD_ARGV(1);
 	META_LOG("ClientCommand 'meta %s' from player '%s'",
 		CMD_ARGS(), STRING(pEntity->v.netname));
 	// arguments: none
@@ -340,7 +340,7 @@ void DLLINTERNAL cmd_meta_config() {
 
 // "meta load" console command.
 void DLLINTERNAL cmd_meta_load() {
-	const auto argc = CMD_ARGC();
+	const int argc = CMD_ARGC();
 	if (argc < 3) {
 		META_CONS("usage: meta load <name> [<description>]");
 		META_CONS("   where <name> is an identifier used to locate the plugin file.");
@@ -371,7 +371,7 @@ void DLLINTERNAL cmd_meta_load() {
 		META_CONS("      <given path, if absolute>");
 		return;
 	}
-	const auto* args = CMD_ARGS();
+	const char* args = CMD_ARGS();
 	// cmd_addload() handles all the feedback to the console..
 	Plugins->cmd_addload(args);
 }
@@ -380,8 +380,8 @@ void DLLINTERNAL cmd_meta_load() {
 void DLLINTERNAL cmd_doplug(PLUG_CMD pcmd) {
 	MPlugin* findp;
 
-	const auto argc = CMD_ARGC();
-	const auto* cmd = CMD_ARGV(1);
+	const int argc = CMD_ARGC();
+	const char* cmd = CMD_ARGV(1);
 	if (argc < 3) {
 		META_CONS("usage: meta %s <plugin> [<plugin> ...]", cmd);
 		META_CONS("   where <plugin> can be either the plugin index #");
@@ -392,7 +392,7 @@ void DLLINTERNAL cmd_doplug(PLUG_CMD pcmd) {
 	for (auto i = 2; i < argc; i++) {
 		char* endptr;
 
-		const auto* arg = CMD_ARGV(i);
+		const char* arg = CMD_ARGV(i);
 
 		// try to match plugin id first
 		const int pindex = strtol(arg, &endptr, 10);
