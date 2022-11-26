@@ -1,4 +1,4 @@
-Metamod Half-Life utility mod
+#Metamod Half-Life utility mod
 
 See the files under "doc/txt" or "doc/html" for more information.
 
