@@ -67,7 +67,7 @@ static void mutil_LogConsole(plid_t /* plid */, const char* fmt, ...) {
 	safevoid_vsnprintf(buf, sizeof(buf), fmt, ap);
 	va_end(ap);
 	// end msg with newline
-	const auto len = strlen(buf);
+	const size_t len = strlen(buf);
 	if (len < sizeof(buf) - 2)		// -1 null, -1 for newline
 		strcat(buf, "\n");
 	else
@@ -155,7 +155,7 @@ static qboolean mutil_CallGameEntity(plid_t plid, const char* entStr, entvars_t*
 	const plugin_info_t* plinfo = plid;
 	META_DEBUG(8, ("Looking up game entity '%s' for plugin '%s'", entStr,
 		plinfo->name));
-	const auto pfnEntity = (ENTITY_FN)DLSYM(GameDLL.handle, entStr);
+	const ENTITY_FN pfnEntity = (ENTITY_FN)DLSYM(GameDLL.handle, entStr);
 	if (!pfnEntity) {
 		META_WARNING("Couldn't find game entity '%s' in game DLL '%s' for plugin '%s'", entStr, GameDLL.name, plinfo->name);
 		return(false);

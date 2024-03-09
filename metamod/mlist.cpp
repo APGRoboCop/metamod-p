@@ -55,7 +55,7 @@ MPluginList::MPluginList(const char* ifile)
 	// store filename of ini file
 	STRNCPY(inifile, ifile, sizeof(inifile));
 	// initialize array
-	for (auto i = 0; i < size; i++) {
+	for (int i = 0; i < size; i++) {
 		//reset to empty
 		plist[i].index = i + 1;
 		reset_plugin(&plist[i]);
@@ -67,7 +67,7 @@ MPluginList::MPluginList(const char* ifile)
 void DLLINTERNAL MPluginList::reset_plugin(MPlugin* pl_find) const
 {
 	//calculate index
-	const auto i = pl_find - &plist[0];
+	const int i = pl_find - &plist[0];
 
 	//free any pointers first
 	pl_find->free_api_pointers();
@@ -85,7 +85,7 @@ void DLLINTERNAL MPluginList::reset_plugin(MPlugin* pl_find) const
 MPlugin* DLLINTERNAL MPluginList::find(int pindex) {
 	if (pindex <= 0)
 		RETURN_ERRNO(NULL, ME_ARGUMENT);
-	auto* pfound = &plist[pindex - 1];
+	MPlugin* pfound = &plist[pindex - 1];
 	if (pfound->status < PL_VALID)
 		RETURN_ERRNO(NULL, ME_NOTFOUND);
 	return(pfound);
@@ -98,7 +98,7 @@ MPlugin* DLLINTERNAL MPluginList::find(int pindex) {
 MPlugin* DLLINTERNAL MPluginList::find(DLHANDLE handle) {
 	if (!handle)
 		RETURN_ERRNO(NULL, ME_ARGUMENT);
-	for (auto i = 0; i < endlist; i++) {
+	for (int i = 0; i < endlist; i++) {
 		if (plist[i].status < PL_VALID)
 			continue;
 		if (plist[i].handle == handle)
@@ -112,7 +112,7 @@ void DLLINTERNAL MPluginList::clear_source_plugin_index(int source_index) {
 	if (source_index <= 0)
 		return;
 
-	for (auto i = 0; i < endlist; i++) {
+	for (int i = 0; i < endlist; i++) {
 		if (plist[i].status < PL_VALID)
 			continue;
 		if (plist[i].source_plugin_index == source_index)
@@ -126,7 +126,7 @@ mBOOL DLLINTERNAL MPluginList::found_child_plugins(int source_index) const
 	if (source_index <= 0)
 		return(mFALSE);
 
-	for (auto i = 0; i < endlist; i++) {
+	for (int i = 0; i < endlist; i++) {
 		if (plist[i].status < PL_VALID)
 			continue;
 		if (plist[i].source_plugin_index == source_index)
@@ -160,7 +160,7 @@ void DLLINTERNAL MPluginList::trim_list() {
 MPlugin* DLLINTERNAL MPluginList::find(plid_t id) {
 	if (!id)
 		RETURN_ERRNO(NULL, ME_ARGUMENT);
-	for (auto i = 0; i < endlist; i++) {
+	for (int i = 0; i < endlist; i++) {
 		if (plist[i].status < PL_VALID)
 			continue;
 		if (plist[i].info == id)
@@ -177,7 +177,7 @@ MPlugin* DLLINTERNAL MPluginList::find(const char* findpath) {
 	if (!findpath)
 		RETURN_ERRNO(NULL, ME_ARGUMENT);
 	META_DEBUG(8, ("Looking for loaded plugin with dlfnamepath: %s", findpath));
-	for (auto i = 0; i < endlist; i++) {
+	for (int i = 0; i < endlist; i++) {
 		META_DEBUG(9, ("Looking at: plugin %s loadedpath: %s", plist[i].file, plist[i].pathname));
 		if (plist[i].status < PL_VALID)
 			continue;
@@ -291,8 +291,8 @@ MPlugin* DLLINTERNAL MPluginList::find_match(MPlugin* pmatch) {
 	if (!pmatch)
 		RETURN_ERRNO(NULL, ME_ARGUMENT);
 	MPlugin* pfound = nullptr;
-	for (auto i = 0; i < endlist; i++) {
-		auto* iplug = &plist[i];
+	for (int i = 0; i < endlist; i++) {
+		MPlugin* iplug = &plist[i];
 		if (pmatch->platform_match(iplug)) {
 			pfound = iplug;
 			break;
@@ -326,7 +326,7 @@ MPlugin* DLLINTERNAL MPluginList::add(MPlugin* padd) {
 	// if we found the end of the list, advance end marker
 	if (i == endlist)
 		endlist++;
-	auto* iplug = &plist[i];
+	MPlugin* iplug = &plist[i];
 
 	// copy filename into this free slot
 	STRNCPY(iplug->filename, padd->filename, sizeof(iplug->filename));
@@ -362,7 +362,7 @@ mBOOL DLLINTERNAL MPluginList::ini_startup() {
 	}
 	full_gamedir_path(inifile, inifile);
 
-	auto* fp = fopen(inifile, "r");
+	FILE* fp = fopen(inifile, "r");
 	if (!fp) {
 		META_WARNING("ini: Unable to open plugins file '%s': %s", inifile,
 			strerror(errno));
@@ -428,14 +428,14 @@ mBOOL DLLINTERNAL MPluginList::ini_refresh() {
 	MPlugin pl_temp;
 	MPlugin* pl_found, * pl_added;
 
-	auto* fp = fopen(inifile, "r");
+	FILE* fp = fopen(inifile, "r");
 	if (!fp) {
 		META_WARNING("ini: Unable to open plugins file '%s': %s", inifile,
 			strerror(errno));
 		RETURN_ERRNO(mFALSE, ME_NOFILE);
 	}
 
-	META_LOG("ini: Begin re-reading plugins list: %s", inifile);
+	META_DEBUG(3, ("ini: Begin re-reading plugins list: %s", inifile));
 	for (n = 0, ln = 1; !feof(fp) && fgets(line, sizeof(line), fp) && n < size; ln++)
 	{
 		// Remove line terminations.
@@ -513,14 +513,14 @@ mBOOL DLLINTERNAL MPluginList::ini_refresh() {
 					pl_found->desc, pl_found->str_status());
 		}
 		if (nullptr != pl_found) {
-			META_LOG("ini: Read plugin config for: %s", pl_found->desc);
+			META_DEBUG(3, ("ini: Read plugin config for: %s", pl_found->desc));
 		}
 		else {
-			META_LOG("ini: Read plugin config for: %s", pl_temp.desc);
+			META_DEBUG(3, ("ini: Read plugin config for: %s", pl_temp.desc));
 		}
 		n++;
 	}
-	META_LOG("ini: Finished reading plugins list: %s; Found %d plugins", inifile, n);
+	META_DEBUG(3, ("ini: Finished reading plugins list: %s; Found %d plugins", inifile, n));
 
 	fclose(fp);
 	if (!n) {
@@ -702,7 +702,7 @@ mBOOL DLLINTERNAL MPluginList::load() {
 // meta_errno values:
 //  - errno's from ini_refresh()
 mBOOL DLLINTERNAL MPluginList::refresh(PLUG_LOADTIME now) {
-	auto ndone = 0, nkept = 0, nloaded = 0, nunloaded = 0, nreloaded = 0, ndelayed = 0;
+	int ndone = 0, nkept = 0, nloaded = 0, nunloaded = 0, nreloaded = 0, ndelayed = 0;
 
 	if (!ini_refresh()) {
 		META_WARNING("dll: Problem reloading plugins.ini: %s", inifile);
@@ -710,9 +710,9 @@ mBOOL DLLINTERNAL MPluginList::refresh(PLUG_LOADTIME now) {
 		return(mFALSE);
 	}
 
-	META_LOG("dll: Updating plugins...");
-	for (auto i = 0; i < endlist; i++) {
-		auto* iplug = &plist[i];
+	META_DEBUG(3, ("dll: Updating plugins..."));
+	for (int i = 0; i < endlist; i++) {
+		MPlugin* iplug = &plist[i];
 		if (iplug->status < PL_VALID)
 			continue;
 		switch (iplug->action) {
@@ -771,8 +771,8 @@ mBOOL DLLINTERNAL MPluginList::refresh(PLUG_LOADTIME now) {
 		}
 		ndone++;
 	}
-	META_LOG("dll: Finished updating %d plugins; kept %d, loaded %d, unloaded %d, reloaded %d, delayed %d",
-		ndone, nkept, nloaded, nunloaded, nreloaded, ndelayed);
+	META_DEBUG(3, ("dll: Finished updating %d plugins; kept %d, loaded %d, unloaded %d, reloaded %d, delayed %d",
+		ndone, nkept, nloaded, nunloaded, nreloaded, ndelayed));
 	return(mTRUE);
 }
 
@@ -780,8 +780,8 @@ mBOOL DLLINTERNAL MPluginList::refresh(PLUG_LOADTIME now) {
 // meta_errno values:
 //  - none
 void DLLINTERNAL MPluginList::unpause_all() {
-	for (auto i = 0; i < endlist; i++) {
-		auto* iplug = &plist[i];
+	for (int i = 0; i < endlist; i++) {
+		MPlugin* iplug = &plist[i];
 		if (iplug->status == PL_PAUSED)
 			iplug->unpause();
 	}
@@ -792,8 +792,8 @@ void DLLINTERNAL MPluginList::unpause_all() {
 // meta_errno values:
 //  - none
 void DLLINTERNAL MPluginList::retry_all(PLUG_LOADTIME now) {
-	for (auto i = 0; i < endlist; i++) {
-		auto* iplug = &plist[i];
+	for (int i = 0; i < endlist; i++) {
+		MPlugin* iplug = &plist[i];
 		if (iplug->action != PA_NONE)
 			iplug->retry(now, PNL_DELAYED);
 	}

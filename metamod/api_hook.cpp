@@ -240,11 +240,11 @@ void* DLLINTERNAL main_hook_function(const class_ret_t ret_init,
 	}
 
 	//Return class setup
-	auto dllret = ret_init;
-	auto override_ret = ret_init;
-	auto pub_override_ret = ret_init;
-	auto orig_ret = ret_init;
-	auto pub_orig_ret = ret_init;
+	class_ret_t dllret = ret_init;
+	class_ret_t override_ret = ret_init;
+	class_ret_t pub_override_ret = ret_init;
+	class_ret_t orig_ret = ret_init;
+	class_ret_t pub_orig_ret = ret_init;
 
 	//Setup
 	loglevel = api_info->loglevel;

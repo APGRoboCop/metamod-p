@@ -96,12 +96,13 @@ static IMAGE_EXPORT_DIRECTORY* DLLINTERNAL_NOVIS get_export_table(void* mapview,
 }
 
 mBOOL DLLINTERNAL is_gamedll(const char* filename) {
-	auto has_GiveFnptrsToDll = 0;
-	auto has_GetEntityAPI2 = 0;
-	auto has_GetEntityAPI = 0;
+	int has_GiveFnptrsToDll = 0;
+	int has_GetEntityAPI2 = 0;
+	int has_GetEntityAPI = 0;
 
 	// Try open file for read
-	auto* const hFile = CreateFileA(filename, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
+	void* const hFile = CreateFileA(filename, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING,
+	                                FILE_ATTRIBUTE_NORMAL,
 	                                nullptr);
 	if (is_invalid_handle(hFile)) {
 		META_DEBUG(3, ("is_gamedll(%s): CreateFile() failed.", filename));
@@ -109,7 +110,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 	}
 
 	//
-	auto* const hMap = CreateFileMapping(hFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
+	void* const hMap = CreateFileMapping(hFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
 	if (is_invalid_handle(hMap)) {
 		META_DEBUG(3, ("is_gamedll(%s): CreateFileMapping() failed.", filename));
 		CloseHandle(hFile);
@@ -117,7 +118,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 	}
 
 	//
-	auto* mapview = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, 0);
+	void* mapview = MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, 0);
 	if (!mapview) {
 		META_DEBUG(3, ("is_gamedll(%s): MapViewOfFile() failed.", filename));
 		CloseHandle(hMap);
@@ -125,7 +126,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 		return(mFALSE);
 	}
 
-	auto* ntheaders = get_ntheaders(mapview);
+	IMAGE_NT_HEADERS* ntheaders = get_ntheaders(mapview);
 	if (!ntheaders) {
 		META_DEBUG(3, ("is_gamedll(%s): get_ntheaders() failed.", filename));
 		UnmapViewOfFile(mapview);
@@ -135,7 +136,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 	}
 
 	//Sections for va_to_mapaddr function
-	auto* sections = IMAGE_FIRST_SECTION(ntheaders);
+	_IMAGE_SECTION_HEADER* sections = IMAGE_FIRST_SECTION(ntheaders);
 	const int num_sects = ntheaders->FileHeader.NumberOfSections;
 	if (IsBadReadPtr(sections, num_sects * sizeof(IMAGE_SECTION_HEADER))) {
 		META_DEBUG(3, ("is_gamedll(%s): IMAGE_FIRST_SECTION() failed.", filename));

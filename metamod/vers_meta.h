@@ -43,7 +43,7 @@
 #endif /* not OPT_TYPE */
 
 #define VDATE 			"2024/03/09"
-#define VPATCH_COPYRIGHT_YEAR   "2021"
+#define VPATCH_COPYRIGHT_YEAR   "2024"
 #define VMETA_VERSION		"1.21"
 
 #define VPATCH_NAME		"Metamod-P (mm-p)"

@@ -384,7 +384,7 @@ static void mm_CVarSetString(const char* szVarName, const char* szValue) {
 	RETURN_API_void()
 }
 
-static void mm_AlertMessage(ALERT_TYPE atype, char* szFmt, ...) {
+static void mm_AlertMessage(ALERT_TYPE atype, const char* szFmt, ...) {
 	META_ENGINE_HANDLE_void_varargs(FN_ALERTMESSAGE, pfnAlertMessage, ipV, atype, szFmt)
 	RETURN_API_void()
 }
@@ -868,7 +868,7 @@ static void mm_ResetTutorMessageDecayData() {
 
 // Added 2005/08/11 (no SDK update):
 static void mm_QueryClientCvarValue(const edict_t * player, const char* cvarName) {
-	static auto s_check = mFALSE;
+	static mBOOL s_check = mFALSE;
 
 	//Engine version didn't change when this API was added.  Check if the pointer is valid.
 	if (!s_check && g_engfuncs.pfnQueryClientCvarValue &&
@@ -883,7 +883,7 @@ static void mm_QueryClientCvarValue(const edict_t * player, const char* cvarName
 
 // Added 2005/11/21 (no SDK update):
 static void mm_QueryClientCvarValue2(const edict_t * player, const char* cvarName, int requestID) {
-	static auto s_check = mFALSE;
+	static mBOOL s_check = mFALSE;
 
 	//Engine version didn't change when this API was added.  Check if the pointer is valid.
 	if (!s_check && g_engfuncs.pfnQueryClientCvarValue2 &&
@@ -898,7 +898,7 @@ static void mm_QueryClientCvarValue2(const edict_t * player, const char* cvarNam
 
 // Added 2009/06/19 (no SDK update):
 static int mm_EngCheckParm(const char* pchCmdLineToken, char** pchNextVal) {
-	static auto s_check = mFALSE;
+	static mBOOL s_check = mFALSE;
 
 	//Engine version didn't change when this API was added.  Check if the pointer is valid.
 	if (!s_check && g_engfuncs.pfnEngCheckParm &&

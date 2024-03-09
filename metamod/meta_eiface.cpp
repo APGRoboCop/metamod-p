@@ -76,7 +76,7 @@ void DLLINTERNAL meta_new_dll_functions_t::copy_to(NEW_DLL_FUNCTIONS* _pFuncs) c
 	// that version over to the receiver, so that we do not overwrite his
 	// memory with functions that he doesn't know of in his copy of the
 	// struct.
-	const auto size = get_size();
+	const size_t size = get_size();
 
 	if (0 == size) {
 		// Ok, this is a real problem and should *not* happen.
@@ -128,7 +128,7 @@ int DLLINTERNAL meta_new_dll_functions_t::determine_interface_version()
 
 size_t DLLINTERNAL meta_new_dll_functions_t::get_size(int _version)
 {
-	auto size = sizeof(NEW_DLL_FUNCTIONS);
+	size_t size = sizeof(NEW_DLL_FUNCTIONS);
 
 	if (0 == _version) {
 		// Use the current engine's interface version
@@ -219,7 +219,7 @@ meta_enginefuncs_t::meta_enginefuncs_t(
 	const char* (*_pfnCVarGetString)                   (const char*),
 	void             (*_pfnCVarSetFloat)                    (const char*, float),
 	void             (*_pfnCVarSetString)                   (const char*, const char*),
-	void             (*_pfnAlertMessage)                    (ALERT_TYPE, char*, ...),
+	void             (*_pfnAlertMessage)                    (ALERT_TYPE, const char*, ...),
 	void             (*_pfnEngineFprintf)                   (void*, char*, ...),
 	void* (*_pfnPvAllocEntPrivateData)           (edict_t*, int32),
 	void* (*_pfnPvEntPrivateData)                (edict_t*),
@@ -627,7 +627,7 @@ void HL_enginefuncs_t::determine_engine_interface_version()
 	// made.
 	// (Yes, I know this could be done with a little hacky for() loop. We
 	// don't need to do hacky here.)
-	auto cntInvals = 0;
+	int cntInvals = 0;
 	if (pfnGetApproxWavePlayLen == nullptr) cntInvals++;
 	if (pfnIsCareerMatch == nullptr) cntInvals++;
 	if (pfnGetLocalizedStringLength == nullptr) cntInvals++;

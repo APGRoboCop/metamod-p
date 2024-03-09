@@ -119,7 +119,7 @@ typedef float (*FN_CVARGETFLOAT) (const char* szVarName);
 typedef const char* (*FN_CVARGETSTRING) (const char* szVarName);
 typedef void (*FN_CVARSETFLOAT) (const char* szVarName, float flValue);
 typedef void (*FN_CVARSETSTRING) (const char* szVarName, const char* szValue);
-typedef void (*FN_ALERTMESSAGE) (ALERT_TYPE atype, char* szFmt, ...);
+typedef void (*FN_ALERTMESSAGE) (ALERT_TYPE atype, const char* szFmt, ...);
 #ifdef HLSDK_3_2_OLD_EIFACE
 typedef void (*FN_ENGINEFPRINTF) (FILE* pfile, char* szFmt, ...);
 typedef void* (*FN_PVALLOCENTPRIVATEDATA) (edict_t* pEdict, long cb);

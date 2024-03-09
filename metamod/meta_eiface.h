@@ -237,7 +237,7 @@ struct meta_enginefuncs_t : public enginefuncs_t {
 		const char* (*_pfnCVarGetString)                   (const char*),
 		void             (*_pfnCVarSetFloat)                    (const char*, float),
 		void             (*_pfnCVarSetString)                   (const char*, const char*),
-		void             (*_pfnAlertMessage)                    (ALERT_TYPE, char*, ...),
+		void             (*_pfnAlertMessage)                    (ALERT_TYPE, const char*, ...),
 		void             (*_pfnEngineFprintf)                   (void*, char*, ...),
 		void* (*_pfnPvAllocEntPrivateData)           (edict_t*, int32),
 		void* (*_pfnPvEntPrivateData)                (edict_t*),

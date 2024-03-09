@@ -46,6 +46,9 @@
  // Max length of line in config file.
 #define MAX_CONF_LEN	1024
 
+// Max length of a map name
+#define MAX_MAPNAME_LENGTH	256
+
 // Supported config value-types.
 typedef enum {
 	CF_NONE = 0,
@@ -90,6 +93,8 @@ public:
 	char* exec_cfg;		// ie metaexec.cfg, exec.cfg
 	int autodetect;		// autodetection of gamedll (Metamod-All-Support patch)
 	int clientmeta;         // control 'meta' client-command
+	int slowhooks;         // disable expensive hooks if 0 -w00tguy
+	char* slowhooks_whitelist;	// slowhooks.ini
 	// functions
 	void DLLINTERNAL init(option_t* global_options);
 	mBOOL DLLINTERNAL load(const char* filename);

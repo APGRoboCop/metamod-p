@@ -136,8 +136,8 @@ static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMOD
 	unsigned long listFix;
 
 	//Get export tables
-	auto* exportMM = get_export_table(moduleMM);
-	auto* exportGame = get_export_table(moduleGame);
+	IMAGE_EXPORT_DIRECTORY* exportMM = get_export_table(moduleMM);
+	IMAGE_EXPORT_DIRECTORY* exportGame = get_export_table(moduleGame);
 	if (!exportMM || !exportGame)
 	{
 		META_ERROR("Couldn't initialize dynamic linkents, exportMM: %i, exportGame: %i.  Exiting...", exportMM, exportGame);
@@ -145,8 +145,8 @@ static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMOD
 	}
 
 	//setup new export table
-	const auto newNumberOfFunctions = exportMM->NumberOfFunctions + exportGame->NumberOfFunctions;
-	auto newNumberOfNames = exportMM->NumberOfNames + exportGame->NumberOfNames;
+	const unsigned long newNumberOfFunctions = exportMM->NumberOfFunctions + exportGame->NumberOfFunctions;
+	unsigned long newNumberOfNames = exportMM->NumberOfNames + exportGame->NumberOfNames;
 
 	//alloc lists
 	*(void**)&newFunctions = calloc(1, newNumberOfFunctions * sizeof(*newFunctions));

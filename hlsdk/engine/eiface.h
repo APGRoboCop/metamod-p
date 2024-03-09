@@ -165,7 +165,7 @@ typedef struct enginefuncs_s
 	const char*	(*pfnCVarGetString)			(const char *szVarName);
 	void		(*pfnCVarSetFloat)			(const char *szVarName, float flValue);
 	void		(*pfnCVarSetString)			(const char *szVarName, const char *szValue);
-	void		(*pfnAlertMessage)			(ALERT_TYPE atype, char *szFmt, ...);
+	void		(*pfnAlertMessage)			(ALERT_TYPE atype, const char *szFmt, ...);
 #ifdef HLSDK_3_2_OLD_EIFACE
 	void		(*pfnEngineFprintf)			(FILE *pfile, char *szFmt, ...);
 	void*		(*pfnPvAllocEntPrivateData)	(edict_t *pEdict, long cb);

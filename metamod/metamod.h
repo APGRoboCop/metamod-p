@@ -52,6 +52,9 @@
 #define PLUGINS_INI			"addons/metamod/plugins.ini"
 #define OLD_PLUGINS_INI		"metamod.ini"
 
+// file that lists maps where expensive hooks should be enabled
+#define SLOWHOOKS_INI		"addons/metamod/slowhooks.ini"
+
 // file that contains commands to metamod plugins at startup
 #define EXEC_CFG			"addons/metamod/exec.cfg"
 #define OLD_EXEC_CFG		"metaexec.cfg"
@@ -114,6 +117,19 @@ extern DLL_FUNCTIONS* g_pHookedDllFunctions DLLHIDDEN;
 extern NEW_DLL_FUNCTIONS* g_pHookedNewDllFunctions DLLHIDDEN;
 
 extern int metamod_not_loaded DLLHIDDEN;
+
+// function tables that have all hooks enabled
+extern meta_enginefuncs_t g_slow_hooks_table_engine;
+extern DLL_FUNCTIONS g_slow_hooks_table_dll;
+extern NEW_DLL_FUNCTIONS g_slow_hooks_table_newdll;
+
+// function tables which have expensive hooks disabled
+extern meta_enginefuncs_t g_fast_hooks_table_engine;
+extern DLL_FUNCTIONS g_fast_hooks_table_dll;
+extern NEW_DLL_FUNCTIONS g_fast_hooks_table_newdll;
+
+// pointer to the engine's dll function table. For enabling/disabling hooks without a restart.
+extern DLL_FUNCTIONS* g_engine_dll_funcs_table;
 
 // Holds cached player info, right now only things for querying cvars
 // Max players is always 32, small enough that we can use a static array

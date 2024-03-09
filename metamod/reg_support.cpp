@@ -99,7 +99,7 @@ void DLLHIDDEN meta_command_handler() {
 		return;
 	}
 
-	auto* icmd = RegCmds->find(cmd);
+	MRegCmd* icmd = RegCmds->find(cmd);
 	if (!icmd) {
 		META_WARNING("Couldn't find registered plugin command: %s", cmd);
 		return;
@@ -130,7 +130,7 @@ void DLLHIDDEN meta_AddServerCommand(char* cmd_name, void (*function) ()) {
 	}
 
 	// See if this command was previously registered, ie a "reloaded" plugin.
-	auto* icmd = RegCmds->find(cmd_name);
+	MRegCmd* icmd = RegCmds->find(cmd_name);
 	if (!icmd) {
 		// If not found, add.
 		icmd = RegCmds->add(cmd_name);
@@ -181,7 +181,7 @@ void DLLHIDDEN meta_CVarRegister(cvar_t* pCvar) {
 	}
 
 	// See if this cvar was previously registered, ie a "reloaded" plugin.
-	auto* icvar = RegCvars->find(pCvar->name);
+	MRegCvar* icvar = RegCvars->find(pCvar->name);
 	if (!icvar) {
 		// If not found, add.
 		icvar = RegCvars->add(pCvar->name);

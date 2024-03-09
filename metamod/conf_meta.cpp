@@ -46,7 +46,8 @@
 
 MConfig::MConfig()
 	: list(nullptr), filename(nullptr), debuglevel(0), gamedll(nullptr),
-	  plugins_file(nullptr), exec_cfg(nullptr), autodetect(0), clientmeta(0)
+	plugins_file(nullptr), exec_cfg(nullptr), autodetect(0), clientmeta(0),
+	slowhooks(0), slowhooks_whitelist(nullptr)
 {
 }
 

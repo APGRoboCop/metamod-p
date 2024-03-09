@@ -324,7 +324,7 @@ char* DLLINTERNAL realpath(const char* file_name, char* resolved_name) {
 	}
 	if (ret > 0) {
 		WIN32_FIND_DATAA find_data;
-		auto* const handle = FindFirstFileA(resolved_name, &find_data);
+		void* const handle = FindFirstFileA(resolved_name, &find_data);
 		if (INVALID_HANDLE_VALUE == handle) {
 			errno = ENOENT;
 			return(nullptr);

@@ -68,6 +68,8 @@ option_t global_options[] = {
 	{ "exec_cfg",		CF_STR,			&Config->exec_cfg,		EXEC_CFG },
 	{ "autodetect",		CF_BOOL,		&Config->autodetect,	"yes" },
 	{ "clientmeta",		CF_BOOL,		&Config->clientmeta,	"yes" },
+	{ "slowhooks",		CF_BOOL,		&Config->slowhooks,		"yes" },
+	{ "slowhooks_whitelist",CF_PATH,		&Config->slowhooks_whitelist,		SLOWHOOKS_INI },
 	// list terminator
 	{nullptr, CF_NONE, nullptr, nullptr }
 };
@@ -89,6 +91,16 @@ int requestid_counter = 0;
 
 DLHANDLE metamod_handle;
 int metamod_not_loaded = 0;
+
+meta_enginefuncs_t g_slow_hooks_table_engine;
+DLL_FUNCTIONS g_slow_hooks_table_dll;
+NEW_DLL_FUNCTIONS g_slow_hooks_table_newdll;
+
+meta_enginefuncs_t g_fast_hooks_table_engine;
+DLL_FUNCTIONS g_fast_hooks_table_dll;
+NEW_DLL_FUNCTIONS g_fast_hooks_table_newdll;
+
+DLL_FUNCTIONS* g_engine_dll_funcs_table;
 
 // Very first metamod function that's run.
 // Do startup operations...
@@ -188,6 +200,14 @@ int DLLINTERNAL metamod_startup() {
 	if ((cp = LOCALINFO("mm_clientmeta")) && *cp != '\0') {
 		META_LOG("Clientmeta specified via localinfo: %s", cp);
 		Config->set("clientmeta", cp);
+	}
+	if ((cp = LOCALINFO("mm_slowhooks")) && *cp != '\0') {
+		META_LOG("Slowhooks specified via localinfo: %s", cp);
+		Config->set("slowhooks", cp);
+	}
+	if ((cp = LOCALINFO("mm_slowhooks_whitelist")) && *cp != '\0') {
+		META_LOG("Slowhooks whitelist specified via localinfo: %s", cp);
+		Config->set("slowhooks_whitelist", cp);
 	}
 
 	// Check for an initial debug level, since cfg files don't get exec'd
@@ -370,6 +390,128 @@ mBOOL DLLINTERNAL meta_load_gamedll() {
 	// so that any plugin loaded later can catch what they need to.
 	if ((pfn_give_engfuncs = (GIVE_ENGINE_FUNCTIONS_FN)DLSYM(GameDLL.handle, "GiveFnptrsToDll")))
 	{
+		if (!Config->slowhooks) {
+			memcpy(&g_slow_hooks_table_engine, &meta_engfuncs, sizeof(meta_enginefuncs_t));
+			// disabling expensive hooks to improve linux performance
+			meta_engfuncs.pfnCheckVisibility = Engine.funcs->pfnCheckVisibility;
+			meta_engfuncs.pfnIndexOfEdict = Engine.funcs->pfnIndexOfEdict;
+			meta_engfuncs.pfnEntOffsetOfPEntity = Engine.funcs->pfnEntOffsetOfPEntity;
+			meta_engfuncs.pfnPEntityOfEntIndex = Engine.funcs->pfnPEntityOfEntIndex;
+
+			// disabling more hooks that seem totally useless, for a minor performance improvement
+			meta_engfuncs.pfnModelIndex = Engine.funcs->pfnModelIndex;
+			meta_engfuncs.pfnModelFrames = Engine.funcs->pfnModelFrames;
+			meta_engfuncs.pfnSetSize = Engine.funcs->pfnSetSize;
+			meta_engfuncs.pfnGetSpawnParms = Engine.funcs->pfnGetSpawnParms;
+			meta_engfuncs.pfnSaveSpawnParms = Engine.funcs->pfnSaveSpawnParms;
+			meta_engfuncs.pfnVecToYaw = Engine.funcs->pfnVecToYaw;
+			meta_engfuncs.pfnVecToAngles = Engine.funcs->pfnVecToAngles;
+			meta_engfuncs.pfnMoveToOrigin = Engine.funcs->pfnMoveToOrigin;
+			meta_engfuncs.pfnChangeYaw = Engine.funcs->pfnChangeYaw;
+			meta_engfuncs.pfnChangePitch = Engine.funcs->pfnChangePitch;
+			meta_engfuncs.pfnFindEntityByString = Engine.funcs->pfnFindEntityByString;
+			meta_engfuncs.pfnGetEntityIllum = Engine.funcs->pfnGetEntityIllum;
+			meta_engfuncs.pfnFindEntityInSphere = Engine.funcs->pfnFindEntityInSphere;
+			meta_engfuncs.pfnFindClientInPVS = Engine.funcs->pfnFindClientInPVS;
+			meta_engfuncs.pfnEntitiesInPVS = Engine.funcs->pfnEntitiesInPVS;
+			meta_engfuncs.pfnMakeVectors = Engine.funcs->pfnMakeVectors;
+			meta_engfuncs.pfnAngleVectors = Engine.funcs->pfnAngleVectors;
+			meta_engfuncs.pfnMakeStatic = Engine.funcs->pfnMakeStatic;
+			meta_engfuncs.pfnEntIsOnFloor = Engine.funcs->pfnEntIsOnFloor;
+			meta_engfuncs.pfnDropToFloor = Engine.funcs->pfnDropToFloor;
+			meta_engfuncs.pfnWalkMove = Engine.funcs->pfnWalkMove;
+			meta_engfuncs.pfnSetOrigin = Engine.funcs->pfnSetOrigin;
+			meta_engfuncs.pfnTraceLine = Engine.funcs->pfnTraceLine;
+			meta_engfuncs.pfnTraceToss = Engine.funcs->pfnTraceToss;
+			meta_engfuncs.pfnTraceMonsterHull = Engine.funcs->pfnTraceMonsterHull;
+			meta_engfuncs.pfnTraceHull = Engine.funcs->pfnTraceHull;
+			meta_engfuncs.pfnTraceModel = Engine.funcs->pfnTraceModel;
+			meta_engfuncs.pfnTraceTexture = Engine.funcs->pfnTraceTexture;
+			meta_engfuncs.pfnTraceSphere = Engine.funcs->pfnTraceSphere;
+			meta_engfuncs.pfnGetAimVector = Engine.funcs->pfnGetAimVector;
+			meta_engfuncs.pfnParticleEffect = Engine.funcs->pfnParticleEffect;
+			meta_engfuncs.pfnLightStyle = Engine.funcs->pfnLightStyle;
+			meta_engfuncs.pfnDecalIndex = Engine.funcs->pfnDecalIndex;
+			meta_engfuncs.pfnPointContents = Engine.funcs->pfnPointContents;
+			meta_engfuncs.pfnCVarGetFloat = Engine.funcs->pfnCVarGetFloat;
+			meta_engfuncs.pfnCVarGetString = Engine.funcs->pfnCVarGetString;
+			meta_engfuncs.pfnAlertMessage = Engine.funcs->pfnAlertMessage;
+			meta_engfuncs.pfnEngineFprintf = Engine.funcs->pfnEngineFprintf;
+			meta_engfuncs.pfnPvAllocEntPrivateData = Engine.funcs->pfnPvAllocEntPrivateData;
+			meta_engfuncs.pfnPvEntPrivateData = Engine.funcs->pfnPvEntPrivateData;
+			meta_engfuncs.pfnFreeEntPrivateData = Engine.funcs->pfnFreeEntPrivateData;
+			meta_engfuncs.pfnSzFromIndex = Engine.funcs->pfnSzFromIndex;
+			meta_engfuncs.pfnAllocString = Engine.funcs->pfnAllocString;
+			meta_engfuncs.pfnGetVarsOfEnt = Engine.funcs->pfnGetVarsOfEnt;
+			meta_engfuncs.pfnPEntityOfEntOffset = Engine.funcs->pfnPEntityOfEntOffset;
+			meta_engfuncs.pfnFindEntityByVars = Engine.funcs->pfnFindEntityByVars;
+			meta_engfuncs.pfnGetModelPtr = Engine.funcs->pfnGetModelPtr;
+			meta_engfuncs.pfnAnimationAutomove = Engine.funcs->pfnAnimationAutomove;
+			meta_engfuncs.pfnGetBonePosition = Engine.funcs->pfnGetBonePosition;
+			meta_engfuncs.pfnFunctionFromName = Engine.funcs->pfnFunctionFromName;
+			meta_engfuncs.pfnNameForFunction = Engine.funcs->pfnNameForFunction;
+			meta_engfuncs.pfnClientPrintf = Engine.funcs->pfnClientPrintf;
+			meta_engfuncs.pfnServerPrint = Engine.funcs->pfnServerPrint;
+			meta_engfuncs.pfnCmd_Args = Engine.funcs->pfnCmd_Args;
+			meta_engfuncs.pfnCmd_Argv = Engine.funcs->pfnCmd_Argv;
+			meta_engfuncs.pfnCmd_Argc = Engine.funcs->pfnCmd_Argc;
+			meta_engfuncs.pfnGetAttachment = Engine.funcs->pfnGetAttachment;
+			meta_engfuncs.pfnCRC32_Init = Engine.funcs->pfnCRC32_Init;
+			meta_engfuncs.pfnCRC32_ProcessBuffer = Engine.funcs->pfnCRC32_ProcessBuffer;
+			meta_engfuncs.pfnCRC32_ProcessByte = Engine.funcs->pfnCRC32_ProcessByte;
+			meta_engfuncs.pfnCRC32_Final = Engine.funcs->pfnCRC32_Final;
+			meta_engfuncs.pfnRandomLong = Engine.funcs->pfnRandomLong;
+			meta_engfuncs.pfnRandomFloat = Engine.funcs->pfnRandomFloat;
+			meta_engfuncs.pfnTime = Engine.funcs->pfnTime;
+			meta_engfuncs.pfnCrosshairAngle = Engine.funcs->pfnCrosshairAngle;
+			meta_engfuncs.pfnLoadFileForMe = Engine.funcs->pfnLoadFileForMe;
+			meta_engfuncs.pfnFreeFile = Engine.funcs->pfnFreeFile;
+			meta_engfuncs.pfnEndSection = Engine.funcs->pfnEndSection;
+			meta_engfuncs.pfnCompareFileTime = Engine.funcs->pfnCompareFileTime;
+			meta_engfuncs.pfnGetGameDir = Engine.funcs->pfnGetGameDir;
+			meta_engfuncs.pfnFadeClientVolume = Engine.funcs->pfnFadeClientVolume;
+			meta_engfuncs.pfnNumberOfEntities = Engine.funcs->pfnNumberOfEntities;
+			meta_engfuncs.pfnGetInfoKeyBuffer = Engine.funcs->pfnGetInfoKeyBuffer;
+			meta_engfuncs.pfnGetPlayerUserId = Engine.funcs->pfnGetPlayerUserId;
+			meta_engfuncs.pfnBuildSoundMsg = Engine.funcs->pfnBuildSoundMsg;
+			meta_engfuncs.pfnIsDedicatedServer = Engine.funcs->pfnIsDedicatedServer;
+			meta_engfuncs.pfnCVarGetPointer = Engine.funcs->pfnCVarGetPointer;
+			meta_engfuncs.pfnGetPlayerWONId = Engine.funcs->pfnGetPlayerWONId;
+			meta_engfuncs.pfnGetPhysicsKeyValue = Engine.funcs->pfnGetPhysicsKeyValue;
+			meta_engfuncs.pfnGetPhysicsInfoString = Engine.funcs->pfnGetPhysicsInfoString;
+			meta_engfuncs.pfnSetFatPVS = Engine.funcs->pfnSetFatPVS;
+			meta_engfuncs.pfnSetFatPAS = Engine.funcs->pfnSetFatPAS;
+			meta_engfuncs.pfnDeltaSetField = Engine.funcs->pfnDeltaSetField;
+			meta_engfuncs.pfnDeltaUnsetField = Engine.funcs->pfnDeltaUnsetField;
+			meta_engfuncs.pfnDeltaAddEncoder = Engine.funcs->pfnDeltaAddEncoder;
+			meta_engfuncs.pfnGetCurrentPlayer = Engine.funcs->pfnGetCurrentPlayer;
+			meta_engfuncs.pfnCanSkipPlayer = Engine.funcs->pfnCanSkipPlayer;
+			meta_engfuncs.pfnDeltaFindField = Engine.funcs->pfnDeltaFindField;
+			meta_engfuncs.pfnDeltaSetFieldByIndex = Engine.funcs->pfnDeltaSetFieldByIndex;
+			meta_engfuncs.pfnDeltaUnsetFieldByIndex = Engine.funcs->pfnDeltaUnsetFieldByIndex;
+			meta_engfuncs.pfnSetGroupMask = Engine.funcs->pfnSetGroupMask;
+			meta_engfuncs.pfnCreateInstancedBaseline = Engine.funcs->pfnCreateInstancedBaseline;
+			meta_engfuncs.pfnForceUnmodified = Engine.funcs->pfnForceUnmodified;
+			meta_engfuncs.pfnGetPlayerStats = Engine.funcs->pfnGetPlayerStats;
+			meta_engfuncs.pfnGetPlayerAuthId = Engine.funcs->pfnGetPlayerAuthId;
+			meta_engfuncs.pfnSequenceGet = Engine.funcs->pfnSequenceGet;
+			meta_engfuncs.pfnSequencePickSentence = Engine.funcs->pfnSequencePickSentence;
+			meta_engfuncs.pfnGetFileSize = Engine.funcs->pfnGetFileSize;
+			meta_engfuncs.pfnGetApproxWavePlayLen = Engine.funcs->pfnGetApproxWavePlayLen;
+			meta_engfuncs.pfnIsCareerMatch = Engine.funcs->pfnIsCareerMatch;
+			meta_engfuncs.pfnGetLocalizedStringLength = Engine.funcs->pfnGetLocalizedStringLength;
+			meta_engfuncs.pfnRegisterTutorMessageShown = Engine.funcs->pfnRegisterTutorMessageShown;
+			meta_engfuncs.pfnGetTimesTutorMessageShown = Engine.funcs->pfnGetTimesTutorMessageShown;
+			meta_engfuncs.pfnProcessTutorMessageDecayBuffer = Engine.funcs->pfnProcessTutorMessageDecayBuffer;
+			meta_engfuncs.pfnConstructTutorMessageDecayBuffer = Engine.funcs->pfnConstructTutorMessageDecayBuffer;
+			meta_engfuncs.pfnResetTutorMessageDecayData = Engine.funcs->pfnResetTutorMessageDecayData;
+			meta_engfuncs.pfnQueryClientCvarValue = Engine.funcs->pfnQueryClientCvarValue;
+			meta_engfuncs.pfnQueryClientCvarValue2 = Engine.funcs->pfnQueryClientCvarValue2;
+			meta_engfuncs.pfnEngCheckParm = Engine.funcs->pfnEngCheckParm;
+
+			memcpy(&g_fast_hooks_table_engine, &meta_engfuncs, sizeof(meta_enginefuncs_t));
+		}
+
 		pfn_give_engfuncs(&meta_engfuncs, gpGlobals);
 		META_DEBUG(3, ("dll: Game '%s': Called GiveFnptrsToDll",
 			GameDLL.name));

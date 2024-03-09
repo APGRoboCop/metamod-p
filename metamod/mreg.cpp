@@ -81,7 +81,7 @@ mBOOL DLLINTERNAL MRegCmd::call() {
 		RETURN_ERRNO(mFALSE, ME_ARGUMENT);
 
 	// try to call this function
-	const auto ret = os_safe_call(pfnCmd);
+	const mBOOL ret = os_safe_call(pfnCmd);
 	if (!ret) {
 		META_DEBUG(4, ("Plugin reg_cmd '%s' called after unloaded; removed from list", name));
 		status = RG_INVALID;
@@ -101,7 +101,7 @@ MRegCmdList::MRegCmdList()
 {
 	mlist = (MRegCmd*)calloc(1, size * sizeof(MRegCmd));
 	// initialize array
-	for (auto i = 0; i < size; i++)
+	for (int i = 0; i < size; i++)
 		mlist[i].init(i + 1);		// 1-based index
 	endlist = 0;
 }
@@ -111,7 +111,7 @@ MRegCmdList::MRegCmdList()
 //  - ME_NOTFOUND	couldn't find a matching function
 MRegCmd* DLLINTERNAL MRegCmdList::find(const char* findname) const
 {
-	for (auto i = 0; i < endlist; i++) {
+	for (int i = 0; i < endlist; i++) {
 		if (!strcasecmp(mlist[i].name, findname))
 			return(&mlist[i]);
 	}
@@ -127,7 +127,7 @@ MRegCmd* DLLINTERNAL MRegCmdList::add(const char* addname) {
 	if (endlist == size) {
 		const int newsize = size + REG_CMD_GROWSIZE;
 		META_DEBUG(6, ("Growing reg cmd list from %d to %d", size, newsize));
-		auto* temp = (MRegCmd*)realloc(mlist, newsize * sizeof(MRegCmd));
+		MRegCmd* temp = (MRegCmd*)realloc(mlist, newsize * sizeof(MRegCmd));
 		if (!temp) {
 			META_WARNING("Couldn't grow registered command list to %d for '%s': %s", newsize, addname, strerror(errno));
 			RETURN_ERRNO(NULL, ME_NOMEM);
@@ -135,12 +135,12 @@ MRegCmd* DLLINTERNAL MRegCmdList::add(const char* addname) {
 		mlist = temp;
 		size = newsize;
 		// initialize new (unused) entries
-		for (auto i = endlist; i < size; i++) {
+		for (int i = endlist; i < size; i++) {
 			memset(&mlist[i], 0, sizeof(mlist[i]));
 			mlist[i].init(i + 1);		// 1-based
 		}
 	}
-	auto* icmd = &mlist[endlist];
+	MRegCmd* icmd = &mlist[endlist];
 
 	// Malloc space separately for the command name, because:
 	//  - Can't point to memory loc in plugin (another segv waiting to
@@ -283,9 +283,9 @@ MRegCvarList::MRegCvarList()
 //  - ME_NOMEM			couldn't alloc or realloc for various parts
 MRegCvar* DLLINTERNAL MRegCvarList::add(const char* addname) {
 	if (endlist == size) {
-		const auto newsize = size + REG_CVAR_GROWSIZE;
+		const int newsize = size + REG_CVAR_GROWSIZE;
 		META_DEBUG(6, ("Growing reg cvar list from %d to %d", size, newsize));
-		auto* temp = (MRegCvar*)realloc(vlist, newsize * sizeof(MRegCvar));
+		MRegCvar* temp = (MRegCvar*)realloc(vlist, newsize * sizeof(MRegCvar));
 		if (!temp) {
 			META_WARNING("Couldn't grow registered cvar list to %d for '%s'; %s", newsize, addname, strerror(errno));
 			RETURN_ERRNO(NULL, ME_NOMEM);
@@ -299,7 +299,7 @@ MRegCvar* DLLINTERNAL MRegCvarList::add(const char* addname) {
 		}
 	}
 
-	auto* icvar = &vlist[endlist];
+	MRegCvar* icvar = &vlist[endlist];
 
 	// Malloc space for the cvar and cvar name, for two reasons:
 	//  - Can't point to memory loc in plugin (another segv waiting to
@@ -450,7 +450,7 @@ MRegMsg* DLLINTERNAL MRegMsgList::add(const char* addname, int addmsgid, int add
 		RETURN_ERRNO(NULL, ME_MAXREACHED);
 	}
 
-	auto* imsg = &mlist[endlist];
+	MRegMsg* imsg = &mlist[endlist];
 	endlist++;
 
 	// Copy msg data into empty slot.
