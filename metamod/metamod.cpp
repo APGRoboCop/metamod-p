@@ -316,7 +316,7 @@ mBOOL DLLINTERNAL meta_init_gamedll() {
 		// our gamedir, and truncate to get the game name.
 		// (note check for both linux and win32 full pathname.)
 		STRNCPY(GameDLL.gamedir, gamedir, sizeof(GameDLL.gamedir));
-		auto* cp = strrchr(gamedir, '/') + 1;
+		const char* cp = strrchr(gamedir, '/') + 1;
 		STRNCPY(GameDLL.name, cp, sizeof(GameDLL.name));
 	}
 	else {
@@ -428,21 +428,21 @@ mBOOL DLLINTERNAL meta_load_gamedll() {
 	iface_vers = NEW_DLL_FUNCTIONS_VERSION;
 	GET_FUNC_TABLE_FROM_GAME(GameDLL, pfn_getapinew, "GetNewDLLFunctions", newapi_table,
 		GETNEWDLLFUNCTIONS_FN, meta_new_dll_functions_t,
-		&iface_vers, iface_vers, NEW_DLL_FUNCTIONS_VERSION, found);
+		&iface_vers, iface_vers, NEW_DLL_FUNCTIONS_VERSION, found)
 
 	// Look for API2 interface in plugin; preferred over API-1.
 	found = 0;
 	iface_vers = INTERFACE_VERSION;
 	GET_FUNC_TABLE_FROM_GAME(GameDLL, pfn_getapi2, "GetEntityAPI2", dllapi_table,
 		GETENTITYAPI2_FN, DLL_FUNCTIONS,
-		&iface_vers, iface_vers, INTERFACE_VERSION, found);
+		&iface_vers, iface_vers, INTERFACE_VERSION, found)
 
 	// Look for API-1 in plugin, if API2 interface wasn't found.
 	if (!found) {
 		found = 0;
 		GET_FUNC_TABLE_FROM_GAME(GameDLL, pfn_getapi, "GetEntityAPI", dllapi_table,
 			GETENTITYAPI_FN, DLL_FUNCTIONS,
-			INTERFACE_VERSION, INTERFACE_VERSION, INTERFACE_VERSION, found);
+			INTERFACE_VERSION, INTERFACE_VERSION, INTERFACE_VERSION, found)
 	}
 
 	// If didn't find either, return failure.

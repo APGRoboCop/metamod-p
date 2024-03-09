@@ -66,8 +66,7 @@ const game_modlist_t known_games = {
 const game_modinfo_t* DLLINTERNAL lookup_game(const char* name) {
 	const game_modinfo_t* imod;
 	char check_path[NAME_MAX];
-	int i;
-	for (i = 0; known_games[i].name; i++) {
+	for (int i = 0; known_games[i].name; i++) {
 		imod = &known_games[i];
 		// If there are 2 or more same names check next dll file if doesn't exist
 		if (strcasematch(imod->name, name)) {
@@ -156,7 +155,7 @@ mBOOL DLLINTERNAL setup_gamedll(gamedll_t* gamedll) {
 	char* cp, * strippedfn;
 #endif
 
-	const char* autofn = 0, * knownfn = 0, * usedfn = 0;
+	const char* autofn = nullptr, * knownfn = nullptr, * usedfn = nullptr;
 	int override = 0;
 
 	// Check for old-style "metagame.ini" file and complain.

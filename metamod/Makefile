@@ -165,7 +165,7 @@ CCO += -flto -fvisibility=hidden -fno-aggressive-loop-optimizations
 ifeq "$(TARGETTYPE)" "amd64"
 	CCOPT_ARCH =
 else
-	CCOPT_ARCH = -march=i686 -mtune=generic -mmmx -msse -msse2 -pipe -mfpmath=sse
+	CCOPT_ARCH = -march=i686 -mtune=generic -mmmx -msse -msse2 -mfpmath=sse
 endif
 
 # debugging; halt on warnings

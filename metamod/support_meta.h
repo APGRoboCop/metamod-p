@@ -135,7 +135,7 @@ inline int DLLINTERNAL strncasematch(const char* s1, const char* s2, size_t n) {
 
 inline int DLLINTERNAL old_valid_file(char* path) {
 	int len, ret;
-	auto* cp = (char*)LOAD_FILE_FOR_ME(path, &len);
+	char* cp = (char*)LOAD_FILE_FOR_ME(path, &len);
 	if (cp && len)
 		ret = 1;
 	else

@@ -49,7 +49,7 @@ struct my_dirent {
 typedef struct {
 	HANDLE			 handle;
 	WIN32_FIND_DATAA find_data;
-	struct my_dirent ent;
+	my_dirent ent;
 	int              not_found;
 } my_DIR;
 
@@ -57,7 +57,7 @@ typedef struct {
 #define DIR my_DIR
 
 DIR* DLLINTERNAL my_opendir(const char*);
-struct dirent* DLLINTERNAL my_readdir(DIR*);
+dirent* DLLINTERNAL my_readdir(DIR*);
 void DLLINTERNAL my_closedir(DIR*);
 
 #define opendir(x) my_opendir(x)

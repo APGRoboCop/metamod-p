@@ -117,20 +117,20 @@ public:
 
 	// Overloaded versions of above test to keep the ugly pointer
 	// conversion stuff in here.
-	bool DLLINTERNAL is_valid_code_pointer(const char* (*fp) (edict_t*));
-	bool DLLINTERNAL is_valid_code_pointer(sequenceEntry_s* (*fp) (const char*, const char*));
-	bool DLLINTERNAL is_valid_code_pointer(sentenceEntry_s* (*fp) (const char*, int, int*));
-	bool DLLINTERNAL is_valid_code_pointer(int (*fp) (char*));
-	bool DLLINTERNAL is_valid_code_pointer(unsigned int (*fp) (const char*));
-	bool DLLINTERNAL is_valid_code_pointer(int (*fp) ());
-	bool DLLINTERNAL is_valid_code_pointer(int (*fp) (const char*));
-	bool DLLINTERNAL is_valid_code_pointer(void (*fp) (int));
-	bool DLLINTERNAL is_valid_code_pointer(int (*fp) (int));
-	bool DLLINTERNAL is_valid_code_pointer(void (*fp) (int*, int));
-	bool DLLINTERNAL is_valid_code_pointer(void (*fp) ());
-	bool DLLINTERNAL is_valid_code_pointer(void (*fp) (const edict_t*, const char*));
-	bool DLLINTERNAL is_valid_code_pointer(void (*fp) (const edict_t*, const char*, int));
-	bool DLLINTERNAL is_valid_code_pointer(int (*fp) (const char*, char**));
+	bool DLLINTERNAL is_valid_code_pointer(const char* (*fp) (edict_t*)) const;
+	bool DLLINTERNAL is_valid_code_pointer(sequenceEntry_s* (*fp) (const char*, const char*)) const;
+	bool DLLINTERNAL is_valid_code_pointer(sentenceEntry_s* (*fp) (const char*, int, int*)) const;
+	bool DLLINTERNAL is_valid_code_pointer(int (*fp) (char*)) const;
+	bool DLLINTERNAL is_valid_code_pointer(unsigned int (*fp) (const char*)) const;
+	bool DLLINTERNAL is_valid_code_pointer(int (*fp) ()) const;
+	bool DLLINTERNAL is_valid_code_pointer(int (*fp) (const char*)) const;
+	bool DLLINTERNAL is_valid_code_pointer(void (*fp) (int)) const;
+	bool DLLINTERNAL is_valid_code_pointer(int (*fp) (int)) const;
+	bool DLLINTERNAL is_valid_code_pointer(void (*fp) (int*, int)) const;
+	bool DLLINTERNAL is_valid_code_pointer(void (*fp) ()) const;
+	bool DLLINTERNAL is_valid_code_pointer(void (*fp) (const edict_t*, const char*)) const;
+	bool DLLINTERNAL is_valid_code_pointer(void (*fp) (const edict_t*, const char*, int)) const;
+	bool DLLINTERNAL is_valid_code_pointer(int (*fp) (const char*, char**)) const;
 };
 
 // We probably should run an initialisation here without a reference
@@ -177,72 +177,72 @@ inline bool EngineInfo::is_valid_code_pointer(void* _pMem) const
 	return false;
 }
 
-inline bool EngineInfo::is_valid_code_pointer(const char* (*_fp) (edict_t*))
+inline bool EngineInfo::is_valid_code_pointer(const char* (*_fp) (edict_t*)) const
 {
 	return is_valid_code_pointer((void*)_fp);
 }
 
-inline bool EngineInfo::is_valid_code_pointer(sequenceEntry_s* (*_fp) (const char*, const char*))
+inline bool EngineInfo::is_valid_code_pointer(sequenceEntry_s* (*_fp) (const char*, const char*)) const
 {
 	return is_valid_code_pointer((void*)_fp);
 }
 
-inline bool EngineInfo::is_valid_code_pointer(sentenceEntry_s* (*_fp) (const char*, int, int*))
+inline bool EngineInfo::is_valid_code_pointer(sentenceEntry_s* (*_fp) (const char*, int, int*)) const
 {
 	return is_valid_code_pointer((void*)_fp);
 }
 
-inline bool EngineInfo::is_valid_code_pointer(int (*_fp) (char*))
+inline bool EngineInfo::is_valid_code_pointer(int (*_fp) (char*)) const
 {
 	return is_valid_code_pointer((void*)_fp);
 }
 
-inline bool EngineInfo::is_valid_code_pointer(unsigned int (*_fp) (const char*))
+inline bool EngineInfo::is_valid_code_pointer(unsigned int (*_fp) (const char*)) const
 {
 	return is_valid_code_pointer((void*)_fp);
 }
 
-inline bool EngineInfo::is_valid_code_pointer(int (*_fp) ())
+inline bool EngineInfo::is_valid_code_pointer(int (*_fp) ()) const
 {
 	return is_valid_code_pointer((void*)_fp);
 }
 
-inline bool EngineInfo::is_valid_code_pointer(int (*_fp) (const char*))
+inline bool EngineInfo::is_valid_code_pointer(int (*_fp) (const char*)) const
 {
 	return is_valid_code_pointer((void*)_fp);
 }
 
-inline bool EngineInfo::is_valid_code_pointer(void (*_fp) (int))
+inline bool EngineInfo::is_valid_code_pointer(void (*_fp) (int)) const
 {
 	return is_valid_code_pointer((void*)_fp);
 }
 
-inline bool EngineInfo::is_valid_code_pointer(int (*_fp) (int))
+inline bool EngineInfo::is_valid_code_pointer(int (*_fp) (int)) const
 {
 	return is_valid_code_pointer((void*)_fp);
 }
 
-inline bool EngineInfo::is_valid_code_pointer(void (*_fp) (int*, int))
+inline bool EngineInfo::is_valid_code_pointer(void (*_fp) (int*, int)) const
 {
 	return is_valid_code_pointer((void*)_fp);
 }
 
-inline bool EngineInfo::is_valid_code_pointer(void (*_fp) ())
+inline bool EngineInfo::is_valid_code_pointer(void (*_fp) ()) const
 {
 	return is_valid_code_pointer((void*)_fp);
 }
 
-inline bool EngineInfo::is_valid_code_pointer(void (*_fp) (const edict_t*, const char*))
+inline bool EngineInfo::is_valid_code_pointer(void (*_fp) (const edict_t*, const char*)) const
 {
 	return is_valid_code_pointer((void*)_fp);
 }
 
-inline bool EngineInfo::is_valid_code_pointer(void (*_fp) (const edict_t*, const char*, int))
+inline bool EngineInfo::is_valid_code_pointer(void (*_fp) (const edict_t*, const char*, int)) const
 {
 	return is_valid_code_pointer((void*)_fp);
 }
 
-inline bool EngineInfo::is_valid_code_pointer(int (*_fp) (const char*, char**))
+inline bool EngineInfo::is_valid_code_pointer(int (*_fp) (const char*, char**)) const
 {
 	return is_valid_code_pointer((void*)_fp);
 }

@@ -62,7 +62,7 @@ public:
 	MPluginList(const char* ifile) DLLINTERNAL;
 
 	// functions:
-	void DLLINTERNAL reset_plugin(MPlugin* pl_find);
+	void DLLINTERNAL reset_plugin(MPlugin* pl_find) const;
 	MPlugin* DLLINTERNAL find(int pindex);			// find by index
 	MPlugin* DLLINTERNAL find(const char* findpath); 	// find by pathname
 	MPlugin* DLLINTERNAL find(plid_t id);			// find by plid_t
@@ -85,9 +85,9 @@ public:
 	mBOOL DLLINTERNAL refresh(PLUG_LOADTIME now);		// update from re-read inifile
 	void DLLINTERNAL unpause_all();			// unpause any paused plugins
 	void DLLINTERNAL retry_all(PLUG_LOADTIME now);		// retry any pending plugin actions
-	void DLLINTERNAL show(int source_index);		// list plugins to console
-	void DLLINTERNAL show() { show(-1); };		// list plugins to console
-	void DLLINTERNAL show_client(edict_t* pEntity);		// list plugins to player client
+	void DLLINTERNAL show(int source_index) const;		// list plugins to console
+	void DLLINTERNAL show() const { show(-1); } // list plugins to console
+	void DLLINTERNAL show_client(edict_t* pEntity) const;		// list plugins to player client
 };
 
 #endif /* MLIST_H */

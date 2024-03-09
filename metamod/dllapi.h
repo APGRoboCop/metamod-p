@@ -92,19 +92,19 @@ typedef void (*FN_SPECTATORDISCONNECT)  (edict_t* pEntity);
 typedef void (*FN_SPECTATORTHINK)  (edict_t* pEntity);
 typedef void (*FN_SYS_ERROR) (const char* error_string);
 
-typedef void (*FN_PM_MOVE) (struct playermove_s* ppmove, int server);
-typedef void (*FN_PM_INIT) (struct playermove_s* ppmove);
+typedef void (*FN_PM_MOVE) (playermove_s* ppmove, int server);
+typedef void (*FN_PM_INIT) (playermove_s* ppmove);
 typedef char (*FN_PM_FINDTEXTURETYPE) (char* name);
 
 typedef void (*FN_SETUPVISIBILITY) (edict_t* pViewEntity, edict_t* pClient, unsigned char** pvs, unsigned char** pas);
-typedef void (*FN_UPDATECLIENTDATA)  (const struct edict_s* ent, int sendweapons, struct clientdata_s* cd);
-typedef int (*FN_ADDTOFULLPACK) (struct entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet);
-typedef void (*FN_CREATEBASELINE) (int player, int eindex, struct entity_state_s* baseline, struct edict_s* entity, int playermodelindex, vec3_t player_mins, vec3_t player_maxs);
+typedef void (*FN_UPDATECLIENTDATA)  (const edict_s* ent, int sendweapons, clientdata_s* cd);
+typedef int (*FN_ADDTOFULLPACK) (entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet);
+typedef void (*FN_CREATEBASELINE) (int player, int eindex, entity_state_s* baseline, edict_s* entity, int playermodelindex, vec3_t player_mins, vec3_t player_maxs);
 typedef void (*FN_REGISTERENCODERS) ();
-typedef int (*FN_GETWEAPONDATA) (struct edict_s* player, struct weapon_data_s* info);
-typedef void (*FN_CMDSTART) (const edict_t* player, const struct usercmd_s* cmd, unsigned int random_seed);
+typedef int (*FN_GETWEAPONDATA) (edict_s* player, weapon_data_s* info);
+typedef void (*FN_CMDSTART) (const edict_t* player, const usercmd_s* cmd, unsigned int random_seed);
 typedef void (*FN_CMDEND)  (const edict_t* player);
-typedef int (*FN_CONNECTIONLESSPACKET) (const struct netadr_s* net_from, const char* args, char* response_buffer, int* response_buffer_size);
+typedef int (*FN_CONNECTIONLESSPACKET) (const netadr_s* net_from, const char* args, char* response_buffer, int* response_buffer_size);
 typedef int (*FN_GETHULLBOUNDS) (int hullnumber, float* mins, float* maxs);
 typedef void (*FN_CREATEINSTANCEDBASELINES)  ();
 typedef int (*FN_INCONSISTENTFILE) (const edict_t* player, const char* filename, char* disconnect_message);

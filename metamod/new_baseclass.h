@@ -40,7 +40,7 @@
 class class_metamod_new {
 public:
 	// Construction
-	class_metamod_new() { };
+	class_metamod_new() = default;
 
 	// Operators
 	void* operator new(size_t size) {

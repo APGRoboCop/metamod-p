@@ -113,8 +113,8 @@ static IMAGE_EXPORT_DIRECTORY* DLLINTERNAL_NOVIS get_export_table(HMODULE module
 //
 static int sort_names_list(const sort_names_t* A, const sort_names_t* B)
 {
-	const auto* str_A = (const char*)A->name;
-	const auto* str_B = (const char*)B->name;
+	const char* str_A = (const char*)A->name;
+	const char* str_B = (const char*)B->name;
 
 	return(mm_strcmp(str_A, str_B));
 }
@@ -168,7 +168,7 @@ static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMOD
 		newFunctions[funcCount + i] = rva_to_va(moduleGame, ((unsigned long*)rva_to_va(moduleGame, exportGame->AddressOfFunctions))[i]);
 	for (i = 0, listFix = 0; i < exportGame->NumberOfNames; i++)
 	{
-		const auto* name = (const char*)rva_to_va(moduleGame, ((unsigned long*)rva_to_va(moduleGame, exportGame->AddressOfNames))[i]);
+		const char* name = (const char*)rva_to_va(moduleGame, ((unsigned long*)rva_to_va(moduleGame, exportGame->AddressOfNames))[i]);
 		//Check if name already in the list
 		for (u = 0; u < nameCount; u++)
 		{

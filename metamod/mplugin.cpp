@@ -484,7 +484,8 @@ mBOOL DLLINTERNAL MPlugin::is_platform_postfix(const char* pf) {
 //  the part up to the last dot, if one exists.
 // meta_errno values:
 //  - none
-mBOOL DLLINTERNAL MPlugin::platform_match(MPlugin* other) {
+mBOOL DLLINTERNAL MPlugin::platform_match(MPlugin* other) const
+{
 	if (status < PL_VALID || other->status < PL_VALID)
 		return(mFALSE);
 
@@ -498,18 +499,18 @@ mBOOL DLLINTERNAL MPlugin::platform_match(MPlugin* other) {
 	if (*desc != '\0' && strcasecmp(desc, other->desc) == 0)
 		return(mTRUE);
 
-	auto* end = strrchr(file, '_');
+	const char* end = strrchr(file, '_');
 	if (end == nullptr || !is_platform_postfix(end))
 		end = strrchr(file, '.');
 
-	auto* other_end = strrchr(other->file, '_');
+	const char* other_end = strrchr(other->file, '_');
 	if (other_end == nullptr || !is_platform_postfix(other_end))
 		other_end = strrchr(other->file, '.');
 
 	if (end == nullptr || other_end == nullptr)
 		return(mFALSE);
 
-	const auto prefixlen = end - file;
+	const int prefixlen = end - file;
 	if ((other_end - other->file) != prefixlen)
 		return(mFALSE);
 
@@ -598,7 +599,7 @@ mBOOL DLLINTERNAL MPlugin::load(PLUG_LOADTIME now) {
 	// If not loading at server startup, then need to call plugin's
 	// GameInit, since we've passed that.
 	if (now != PT_STARTUP) {
-		FN_GAMEINIT pfn_gameinit = nullptr;
+		FN_GAMEINIT pfn_gameinit;
 		if (tables.dllapi && (pfn_gameinit = tables.dllapi->pfnGameInit))
 			pfn_gameinit();
 	}
@@ -739,6 +740,11 @@ mBOOL DLLINTERNAL MPlugin::query() {
 				desc, META_INTERFACE_VERSION, mmajor, mminor, info->ifvers, pmajor, pminor);
 	}
 
+	if (!info) {
+		META_WARNING("dll: Failed query plugin '%s'; Empty info structure", desc);
+		// caller will dlclose()
+		RETURN_ERRNO(mFALSE, ME_NULLRESULT);
+	}
 	if (meta_errno == ME_IFVERSION) {
 		META_WARNING("dll: Rejected plugin '%s' due to interface version incompatibility (mm=%s, pl=%s)", desc, META_INTERFACE_VERSION, info->ifvers);
 		// meta_errno is set already above
@@ -748,12 +754,6 @@ mBOOL DLLINTERNAL MPlugin::query() {
 	if (meta_errno != ME_NOERROR) {
 		// some other error, already logged
 		return(mFALSE);
-	}
-
-	if (!info) {
-		META_WARNING("dll: Failed query plugin '%s'; Empty info structure", desc);
-		// caller will dlclose()
-		RETURN_ERRNO(mFALSE, ME_NULLRESULT);
 	}
 	// Replace temporary desc with plugin's internal name.
 	if (desc[0] == '<')
@@ -878,35 +878,35 @@ mBOOL DLLINTERNAL MPlugin::attach(PLUG_LOADTIME now) {
 	GET_FUNC_TABLE_FROM_PLUGIN(pfnGetNewDLLFunctions,
 		"GetNewDLLFunctions", tables.newapi,
 		NEW_DLL_FUNCTIONS_FN, NEW_DLL_FUNCTIONS, sizeof(NEW_DLL_FUNCTIONS),
-		&iface_vers, iface_vers, NEW_DLL_FUNCTIONS_VERSION);
+		&iface_vers, iface_vers, NEW_DLL_FUNCTIONS_VERSION)
 	iface_vers = NEW_DLL_FUNCTIONS_VERSION;
 	GET_FUNC_TABLE_FROM_PLUGIN(pfnGetNewDLLFunctions_Post,
 		"GetNewDLLFunctions_Post", post_tables.newapi,
 		NEW_DLL_FUNCTIONS_FN, NEW_DLL_FUNCTIONS, sizeof(NEW_DLL_FUNCTIONS),
-		&iface_vers, iface_vers, NEW_DLL_FUNCTIONS_VERSION);
+		&iface_vers, iface_vers, NEW_DLL_FUNCTIONS_VERSION)
 
 	// Look for API2 interface in plugin; preferred over API-1.
 	iface_vers = INTERFACE_VERSION;
 	GET_FUNC_TABLE_FROM_PLUGIN(pfnGetEntityAPI2,
 		"GetEntityAPI2", tables.dllapi,
 		APIFUNCTION2, DLL_FUNCTIONS, sizeof(DLL_FUNCTIONS),
-		&iface_vers, iface_vers, INTERFACE_VERSION);
+		&iface_vers, iface_vers, INTERFACE_VERSION)
 	iface_vers = INTERFACE_VERSION;
 	GET_FUNC_TABLE_FROM_PLUGIN(pfnGetEntityAPI2_Post,
 		"GetEntityAPI2_Post", post_tables.dllapi,
 		APIFUNCTION2, DLL_FUNCTIONS, sizeof(DLL_FUNCTIONS),
-		&iface_vers, iface_vers, INTERFACE_VERSION);
+		&iface_vers, iface_vers, INTERFACE_VERSION)
 
 	// Look for old-style API in plugin, if API2 interface wasn't found.
 	if (!tables.dllapi && !post_tables.dllapi) {
 		GET_FUNC_TABLE_FROM_PLUGIN(pfnGetEntityAPI,
 			"GetEntityAPI", tables.dllapi,
 			APIFUNCTION, DLL_FUNCTIONS, sizeof(DLL_FUNCTIONS),
-			INTERFACE_VERSION, INTERFACE_VERSION, INTERFACE_VERSION);
+			INTERFACE_VERSION, INTERFACE_VERSION, INTERFACE_VERSION)
 		GET_FUNC_TABLE_FROM_PLUGIN(pfnGetEntityAPI_Post,
 			"GetEntityAPI_Post", post_tables.dllapi,
 			APIFUNCTION, DLL_FUNCTIONS, sizeof(DLL_FUNCTIONS),
-			INTERFACE_VERSION, INTERFACE_VERSION, INTERFACE_VERSION);
+			INTERFACE_VERSION, INTERFACE_VERSION, INTERFACE_VERSION)
 	}
 
 	// Look for Engine interface.
@@ -914,12 +914,12 @@ mBOOL DLLINTERNAL MPlugin::attach(PLUG_LOADTIME now) {
 	GET_FUNC_TABLE_FROM_PLUGIN(pfnGetEngineFunctions,
 		"GetEngineFunctions", tables.engine,
 		GET_ENGINE_FUNCTIONS_FN, enginefuncs_t, (sizeof(enginefuncs_t) - sizeof(((enginefuncs_t*)0)->extra_functions)),
-		&iface_vers, iface_vers, ENGINE_INTERFACE_VERSION);
+		&iface_vers, iface_vers, ENGINE_INTERFACE_VERSION)
 	iface_vers = ENGINE_INTERFACE_VERSION;
 	GET_FUNC_TABLE_FROM_PLUGIN(pfnGetEngineFunctions_Post,
 		"GetEngineFunctions_Post", post_tables.engine,
 		GET_ENGINE_FUNCTIONS_FN, enginefuncs_t, (sizeof(enginefuncs_t) - sizeof(((enginefuncs_t*)0)->extra_functions)),
-		&iface_vers, iface_vers, ENGINE_INTERFACE_VERSION);
+		&iface_vers, iface_vers, ENGINE_INTERFACE_VERSION)
 
 	if (!tables.dllapi && !post_tables.dllapi
 		&& !tables.newapi && !post_tables.newapi
@@ -1248,7 +1248,7 @@ mBOOL DLLINTERNAL MPlugin::clear() {
 		status = PL_FAILED;
 		RETURN_ERRNO(mFALSE, ME_DLERROR);
 	}
-	handle = nullptr;
+	//handle = nullptr;
 
 	free_api_pointers();
 
@@ -1298,14 +1298,14 @@ void DLLINTERNAL MPlugin::show() {
 
 	if (tables.dllapi) {
 		META_CONS("DLLAPI functions:");
-		SHOW_DEF_DLLAPI(tables.dllapi, "   ", "");
+		SHOW_DEF_DLLAPI(tables.dllapi, "   ", "")
 		META_CONS("%d functions (dllapi)", n);
 	}
 	else
 		META_CONS("No DLLAPI functions.");
 	if (post_tables.dllapi) {
 		META_CONS("DLLAPI-Post functions:");
-		SHOW_DEF_DLLAPI(post_tables.dllapi, "   ", "_Post");
+		SHOW_DEF_DLLAPI(post_tables.dllapi, "   ", "_Post")
 		META_CONS("%d functions (dllapi post)", n);
 	}
 	else
@@ -1313,14 +1313,14 @@ void DLLINTERNAL MPlugin::show() {
 
 	if (tables.newapi) {
 		META_CONS("NEWAPI functions:");
-		SHOW_DEF_NEWAPI(tables.newapi, "   ", "");
+		SHOW_DEF_NEWAPI(tables.newapi, "   ", "")
 		META_CONS("%d functions (newapi)", n);
 	}
 	else
 		META_CONS("No NEWAPI functions.");
 	if (post_tables.newapi) {
 		META_CONS("NEWAPI-Post functions:");
-		SHOW_DEF_NEWAPI(post_tables.newapi, "   ", "_Post");
+		SHOW_DEF_NEWAPI(post_tables.newapi, "   ", "_Post")
 		META_CONS("%d functions (newapi post)", n);
 	}
 	else
@@ -1328,14 +1328,14 @@ void DLLINTERNAL MPlugin::show() {
 
 	if (tables.engine) {
 		META_CONS("Engine functions:");
-		SHOW_DEF_ENGINE(tables.engine, "   ", "");
+		SHOW_DEF_ENGINE(tables.engine, "   ", "")
 		META_CONS("%d functions (engine)", n);
 	}
 	else
 		META_CONS("No Engine functions.");
 	if (post_tables.engine) {
 		META_CONS("Engine-Post functions:");
-		SHOW_DEF_ENGINE(post_tables.engine, "   ", "_Post");
+		SHOW_DEF_ENGINE(post_tables.engine, "   ", "_Post")
 		META_CONS("%d functions (engine post)", n);
 	}
 	else

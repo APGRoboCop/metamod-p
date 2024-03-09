@@ -47,7 +47,7 @@ const char* DLLINTERNAL autodetect_gamedll(const gamedll_t* gamedll, const char*
 	char dllpath[256];
 	char fnpath[256];
 	DIR* dir;
-	struct dirent* ent;
+	dirent* ent;
 
 	// Generate dllpath
 	safevoid_snprintf(buf, sizeof(buf), "%s/dlls", gamedll->gamedir);
@@ -73,22 +73,24 @@ const char* DLLINTERNAL autodetect_gamedll(const gamedll_t* gamedll, const char*
 		return(nullptr);
 	}
 
-	while ((ent = readdir(dir)) != nullptr) {
-		const auto fn_len = strlen(ent->d_name);
+	const size_t dlext_len = strlen(PLATFORM_DLEXT);
+	const size_t metamod_len = strlen("metamod");
 
-		if (fn_len <= strlen(PLATFORM_DLEXT)) {
+	while ((ent = readdir(dir)) != nullptr) {
+		const size_t fn_len = strlen(ent->d_name);
+		if (fn_len <= dlext_len) {
 			// Filename is too short
 			continue;
 		}
 
 		// Compare end of filename with PLATFORM_DLEXT
-		if (!strcasematch(&ent->d_name[fn_len - strlen(PLATFORM_DLEXT)], PLATFORM_DLEXT)) {
+		if (!strcasematch(&ent->d_name[fn_len - dlext_len], PLATFORM_DLEXT)) {
 			// File isn't dll
 			continue;
 		}
 
 		// Exclude all metamods
-		if (strncasematch(ent->d_name, "metamod", strlen("metamod"))) {
+		if (strncasematch(ent->d_name, "metamod", metamod_len)) {
 			continue;
 		}
 

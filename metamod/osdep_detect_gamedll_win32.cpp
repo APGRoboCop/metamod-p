@@ -44,7 +44,7 @@
 
 //
 static unsigned long DLLINTERNAL_NOVIS va_to_mapaddr(void* mapview, IMAGE_SECTION_HEADER* sections, int num_sects, unsigned long vaddr) {
-	for (auto i = 0; i < num_sects; i++)
+	for (int i = 0; i < num_sects; i++)
 		if (vaddr >= sections[i].VirtualAddress && vaddr < sections[i].VirtualAddress + sections[i].SizeOfRawData)
 			return(rva_to_va(mapview, (vaddr - sections[i].VirtualAddress + sections[i].PointerToRawData)));
 
@@ -146,7 +146,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 	}
 
 	//
-	auto* exports = get_export_table(mapview, ntheaders, sections, num_sects);
+	const IMAGE_EXPORT_DIRECTORY* exports = get_export_table(mapview, ntheaders, sections, num_sects);
 	if (!exports) {
 		META_DEBUG(3, ("is_gamedll(%s): get_export_table() failed.", filename));
 		UnmapViewOfFile(mapview);
@@ -156,7 +156,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 	}
 
 	//
-	auto* names = (unsigned long*)va_to_mapaddr(mapview, sections, num_sects, exports->AddressOfNames);
+	const unsigned long* names = (unsigned long*)va_to_mapaddr(mapview, sections, num_sects, exports->AddressOfNames);
 	if (IsBadReadPtr(names, exports->NumberOfNames * sizeof(unsigned long))) {
 		META_DEBUG(3, ("is_gamedll(%s): Pointer to exported function names is invalid.", filename));
 		UnmapViewOfFile(mapview);
@@ -167,7 +167,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 
 	for (unsigned int i = 0; i < exports->NumberOfNames; i++) {
 		//get function name with valid address
-		auto* funcname = (char*)va_to_mapaddr(mapview, sections, num_sects, names[i]);
+		char* funcname = (char*)va_to_mapaddr(mapview, sections, num_sects, names[i]);
 		if (IsBadStringPtrA(funcname, 128))
 			continue;
 

@@ -64,7 +64,8 @@ MPluginList::MPluginList(const char* ifile)
 }
 
 // Resets plugin to empty
-void DLLINTERNAL MPluginList::reset_plugin(MPlugin* pl_find) {
+void DLLINTERNAL MPluginList::reset_plugin(MPlugin* pl_find) const
+{
 	//calculate index
 	const auto i = pl_find - &plist[0];
 
@@ -233,10 +234,12 @@ MPlugin* DLLINTERNAL MPluginList::find_match(const char* prefix) {
 	if (!prefix)
 		RETURN_ERRNO(NULL, ME_ARGUMENT);
 	MPlugin* pfound = nullptr;
-	const int len = strlen(prefix);
+	const size_t len = strlen(prefix);
 	safevoid_snprintf(buf, sizeof(buf), "mm_%s", prefix);
-	for (auto i = 0; i < endlist; i++) {
-		auto* iplug = &plist[i];
+	const size_t buf_len = strlen(buf);
+
+	for (int i = 0; i < endlist; i++) {
+		MPlugin* iplug = &plist[i];
 		if (iplug->status < PL_VALID)
 			continue;
 		if (iplug->info && strncasecmp(iplug->info->name, prefix, len) == 0) {
@@ -257,7 +260,7 @@ MPlugin* DLLINTERNAL MPluginList::find_match(const char* prefix) {
 			pfound = iplug;
 			continue;
 		}
-		if (strncasecmp(iplug->file, buf, strlen(buf)) == 0) {
+		if (strncasecmp(iplug->file, buf, buf_len) == 0) {
 			if (pfound)
 				RETURN_ERRNO(NULL, ME_NOTUNIQ);
 			pfound = iplug;
@@ -799,8 +802,9 @@ void DLLINTERNAL MPluginList::retry_all(PLUG_LOADTIME now) {
 // List plugins and information about them in a formatted table.
 // meta_errno values:
 //  - none
-void DLLINTERNAL MPluginList::show(int source_index) {
-	auto n = 0, r = 0;
+void DLLINTERNAL MPluginList::show(int source_index) const
+{
+	int n = 0, r = 0;
 	char desc[15 + 1], file[16 + 1], vers[7 + 1];		// plus 1 for term null
 
 	if (source_index <= 0)
@@ -816,8 +820,8 @@ void DLLINTERNAL MPluginList::show(int source_index) {
 		2 + WIDTH_MAX_PLUGINS, "src",
 		"load ", "unlod");
 
-	for (auto i = 0; i < endlist; i++) {
-		auto* pl = &plist[i];
+	for (int i = 0; i < endlist; i++) {
+		const MPlugin* pl = &plist[i];
 		if (pl->status < PL_VALID)
 			continue;
 		if (source_index > 0 && pl->source_plugin_index != source_index)
@@ -850,11 +854,12 @@ void DLLINTERNAL MPluginList::show(int source_index) {
 //    etc).
 // meta_errno values:
 //  - none
-void DLLINTERNAL MPluginList::show_client(edict_t* pEntity) {
-	auto n = 0;
+void DLLINTERNAL MPluginList::show_client(edict_t* pEntity) const
+{
+	int n = 0;
 	META_CLIENT(pEntity, "Currently running plugins:");
-	for (auto i = 0; i < endlist; i++) {
-		auto* pl = &plist[i];
+	for (int i = 0; i < endlist; i++) {
+		const MPlugin* pl = &plist[i];
 		if (pl->status != PL_RUNNING || !pl->info)
 			continue;
 		n++;

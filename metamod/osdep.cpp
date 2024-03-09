@@ -60,17 +60,17 @@ mBOOL dlclose_handle_invalid;
 // here.  This may or may not operate exactly like strtok_r(), but does
 // what we need it it do.
 char* DLLINTERNAL my_strtok_r(char* s, const char* delim, char** ptrptr) {
-	char* begin = nullptr;
+	char* begin;
 	if (s)
 		begin = s;
 	else
 		begin = *ptrptr;
 	if (!begin)
 		return(nullptr);
-	auto* end = strpbrk(begin, delim);
+	char* end = strpbrk(begin, delim);
 	if (end) {
 		*end = '\0';
-		auto* rest = end + 1;
+		char* rest = end + 1;
 		*ptrptr = rest + strspn(rest, delim);
 	}
 	else
@@ -101,7 +101,7 @@ char* DLLINTERNAL my_strlwr(char* s) {
 int DLLINTERNAL safe_vsnprintf(char* s, size_t n, const char* format, va_list src_ap) {
 	va_list ap;
 	int res;
-	auto bufsize = n;
+	size_t bufsize = n;
 
 	if (s && n > 0)
 		s[0] = 0;
@@ -142,7 +142,7 @@ int DLLINTERNAL safe_vsnprintf(char* s, size_t n, const char* format, va_list sr
 	if (bufsize < 1024)
 		bufsize = 1024;
 
-	auto* tmpbuf = (char*)malloc(bufsize * sizeof(char));
+	char* tmpbuf = (char*)malloc(bufsize * sizeof(char));
 	if (!tmpbuf)
 		return(-1);
 
@@ -155,7 +155,7 @@ int DLLINTERNAL safe_vsnprintf(char* s, size_t n, const char* format, va_list sr
 	// fail well before INT_MAX.
 	while (res < 0 && bufsize <= INT_MAX) {
 		bufsize *= 2;
-		auto* newbuf = (char*)realloc(tmpbuf, bufsize * sizeof(char));
+		char* newbuf = (char*)realloc(tmpbuf, bufsize * sizeof(char));
 
 		if (!newbuf)
 			break;
@@ -184,7 +184,7 @@ int DLLINTERNAL safe_snprintf(char* s, size_t n, const char* format, ...) {
 	va_list ap;
 
 	va_start(ap, format);
-	const auto res = safe_vsnprintf(s, n, format, ap);
+	const int res = safe_vsnprintf(s, n, format, ap);
 	va_end(ap);
 
 	return(res);
@@ -201,7 +201,7 @@ void DLLINTERNAL safevoid_vsnprintf(char* s, size_t n, const char* format, va_li
 		return;
 	}
 
-	const auto res = vsnprintf(s, n, format, ap);
+	const int res = vsnprintf(s, n, format, ap);
 
 	// w32api returns -1 on too long write, glibc returns number of bytes it could have written if there were enough space
 	// w32api doesn't write null at all, some buggy glibc don't either
@@ -304,9 +304,9 @@ const char* DLLINTERNAL DLFNAME(void* memptr) {
 //    and pathnames are case-sensitive.
 void DLLINTERNAL normalize_pathname(char* path) {
 	META_DEBUG(8, ("normalize: %s", path));
-	for (auto* cp = path; *cp; cp++) {
+	for (char* cp = path; *cp; cp++) {
 		/*if(isupper(*cp))*/
-		*cp = tolower(*cp);
+		*cp = (char)tolower(*cp);
 
 		if (*cp == '\\')
 			*cp = '/';

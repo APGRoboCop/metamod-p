@@ -177,7 +177,7 @@ public:
 	MRegMsg* DLLINTERNAL add(const char* addname, int addmsgid, int addsize);
 	MRegMsg* DLLINTERNAL find(const char* findname);
 	MRegMsg* DLLINTERNAL find(int findmsgid);
-	void DLLINTERNAL show();						// list all msgs to console
+	void DLLINTERNAL show() const;						// list all msgs to console
 };
 
 #endif /* MREG_H */

@@ -118,7 +118,7 @@ void DLLHIDDEN meta_command_handler() {
 // string.  The function pointer handed to the engine is actually a pointer
 // to a generic command-handler function (see above).
 void DLLHIDDEN meta_AddServerCommand(char* cmd_name, void (*function) ()) {
-	MPlugin* iplug = nullptr;
+	const MPlugin* iplug;
 
 	META_DEBUG(4, ("called: meta_AddServerCommand; cmd_name=%s, function=%d", cmd_name, function));
 
@@ -165,12 +165,12 @@ void DLLHIDDEN meta_AddServerCommand(char* cmd_name, void (*function) ()) {
 // code tries to _directly_ read/set the fields of its own cvar structures,
 // it will fail to work properly.
 void DLLHIDDEN meta_CVarRegister(cvar_t* pCvar) {
-	MPlugin* iplug = nullptr;
+	const MPlugin* iplug;
 
 	META_DEBUG(4, ("called: meta_CVarRegister; name=%s", pCvar->name));
 
 	// try to find which plugin is registering this cvar
-	if (!(iplug = Plugins->find_memloc((void*)pCvar))) {
+	if (!(iplug = Plugins->find_memloc(pCvar))) {
 		// if this isn't supported on this OS, don't log an error
 		if (meta_errno != ME_OSNOTSUP)
 			// Note: if cvar_t was malloc'd by the plugin, we can't

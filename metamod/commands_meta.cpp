@@ -75,7 +75,8 @@ void DLLINTERNAL meta_register_cmdcvar() {
 
 	meta_debug_value = (int)meta_debug.value;
 
-	REG_SVR_COMMAND("meta", svr_meta);
+	char meta[] = "meta";
+	REG_SVR_COMMAND(meta, svr_meta);
 }
 
 // Parse "meta" console command.
@@ -389,7 +390,7 @@ void DLLINTERNAL cmd_doplug(PLUG_CMD pcmd) {
 		return;
 	}
 	// i=2 to skip first arg, as that's the "cmd"
-	for (auto i = 2; i < argc; i++) {
+	for (int i = 2; i < argc; i++) {
 		char* endptr;
 
 		const char* arg = CMD_ARGV(i);

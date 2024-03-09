@@ -57,7 +57,7 @@ typedef void (*pdummyfunc)();
 // meta_new_dll_functions_t
 // --------------------------------------------------------------------
 
-struct meta_new_dll_functions_t : public NEW_DLL_FUNCTIONS {
+struct meta_new_dll_functions_t : NEW_DLL_FUNCTIONS {
 	// Array of five dummy function pointers. Must be filled with NULL.
 	pdummyfunc dummies[c_NumDummies];
 
@@ -79,7 +79,7 @@ struct meta_new_dll_functions_t : public NEW_DLL_FUNCTIONS {
 	void DLLINTERNAL set_from(NEW_DLL_FUNCTIONS* pFuncs);
 
 	// Copy the pointers from this object to a NEW_DLL_FUNCTIONS struct.
-	void DLLINTERNAL copy_to(NEW_DLL_FUNCTIONS* pFuncs);
+	void DLLINTERNAL copy_to(NEW_DLL_FUNCTIONS* pFuncs) const;
 
 	// return the engine's version of NEW_DLL_FUNCTIONS
 	static int DLLINTERNAL version();
@@ -244,12 +244,12 @@ struct meta_enginefuncs_t : public enginefuncs_t {
 		void             (*_pfnFreeEntPrivateData)              (edict_t*),
 		const char* (*_pfnSzFromIndex)                     (int),
 		int              (*_pfnAllocString)	                    (const char*),
-		struct entvars_s* (*_pfnGetVarsOfEnt)                    (edict_t*),
+		entvars_s* (*_pfnGetVarsOfEnt)                    (edict_t*),
 		edict_t* (*_pfnPEntityOfEntOffset)              (int),
 		int              (*_pfnEntOffsetOfPEntity)              (const edict_t*),
 		int              (*_pfnIndexOfEdict)                    (const edict_t*),
 		edict_t* (*_pfnPEntityOfEntIndex)               (int),
-		edict_t* (*_pfnFindEntityByVars)                (struct entvars_s*),
+		edict_t* (*_pfnFindEntityByVars)                (entvars_s*),
 		void* (*_pfnGetModelPtr)                     (edict_t*),
 		int              (*_pfnRegUserMsg)                      (const char*, int),
 		void             (*_pfnAnimationAutomove)               (const edict_t*, float),
@@ -303,17 +303,17 @@ struct meta_enginefuncs_t : public enginefuncs_t {
 		unsigned char* (*_pfnSetFatPVS)                       (float*),
 		unsigned char* (*_pfnSetFatPAS)                       (float*),
 		int              (*_pfnCheckVisibility)                 (const edict_t*, unsigned char*),
-		void             (*_pfnDeltaSetField)                   (struct delta_s*, const char*),
-		void             (*_pfnDeltaUnsetField)                 (struct delta_s*, const char*),
-		void             (*_pfnDeltaAddEncoder)                 (char*, void (*)(struct delta_s*, const unsigned char*, const unsigned char*)),
+		void             (*_pfnDeltaSetField)                   (delta_s*, const char*),
+		void             (*_pfnDeltaUnsetField)                 (delta_s*, const char*),
+		void             (*_pfnDeltaAddEncoder)                 (char*, void (*)(delta_s*, const unsigned char*, const unsigned char*)),
 		int              (*_pfnGetCurrentPlayer)                (),
 		int              (*_pfnCanSkipPlayer)                   (const edict_t*),
-		int              (*_pfnDeltaFindField)                  (struct delta_s*, const char*),
-		void             (*_pfnDeltaSetFieldByIndex)            (struct delta_s*, int),
-		void             (*_pfnDeltaUnsetFieldByIndex)          (struct delta_s*, int),
+		int              (*_pfnDeltaFindField)                  (delta_s*, const char*),
+		void             (*_pfnDeltaSetFieldByIndex)            (delta_s*, int),
+		void             (*_pfnDeltaUnsetFieldByIndex)          (delta_s*, int),
 		void             (*_pfnSetGroupMask)                    (int, int),
-		int              (*_pfnCreateInstancedBaseline)         (int, struct entity_state_s*),
-		void             (*_pfnCvar_DirectSet)                  (struct cvar_s*, char*),
+		int              (*_pfnCreateInstancedBaseline)         (int, entity_state_s*),
+		void             (*_pfnCvar_DirectSet)                  (cvar_s*, char*),
 		void             (*_pfnForceUnmodified)                 (FORCE_TYPE, float*, float*, const char*),
 		void             (*_pfnGetPlayerStats)                  (const edict_t*, int*, int*),
 		void             (*_pfnAddServerCommand)                (char*, void (*) ()),
@@ -438,8 +438,8 @@ private:
 	// functions :
 
 	// Moving copy_to() and set_from() to the private space.
-	void DLLINTERNAL set_from(enginefuncs_t* pFuncs) { meta_enginefuncs_t::set_from(pFuncs); };
-	void DLLINTERNAL copy_to(enginefuncs_t* pFuncs) { meta_enginefuncs_t::copy_to(pFuncs); };
+	void DLLINTERNAL set_from(enginefuncs_t* pFuncs) { meta_enginefuncs_t::set_from(pFuncs); }
+	void DLLINTERNAL copy_to(enginefuncs_t* pFuncs) const { meta_enginefuncs_t::copy_to(pFuncs); }
 
 	// Determine the version of the engine interface from the
 	// enginefuncs signature.
@@ -450,6 +450,6 @@ private:
 	void DLLINTERNAL fixup_engine_interface();
 };
 
-inline HL_enginefuncs_t::HL_enginefuncs_t() : meta_enginefuncs_t() { };
+inline HL_enginefuncs_t::HL_enginefuncs_t() = default;
 
 #endif /* META_EIFACE_H */

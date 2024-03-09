@@ -58,8 +58,8 @@
 
 typedef void * (*dlsym_func)(void * module, const char * funcname);
 
-static void * gamedll_module_handle = 0;
-static void * metamod_module_handle = 0;
+static void * gamedll_module_handle = nullptr;
+static void * metamod_module_handle = nullptr;
 
 //pointer to original dlsym
 static dlsym_func dlsym_original;
@@ -95,7 +95,7 @@ inline void * extract_function_pointer_from_trampoline_jmp(void *x)
 //
 //restores old dlsym
 //
-inline void DLLINTERNAL restore_original_dlsym(void)
+inline void DLLINTERNAL restore_original_dlsym()
 {
 	//Copy old dlsym bytes back
 	memcpy((void*)dlsym_original, dlsym_old_bytes, BYTES_SIZE);
@@ -104,7 +104,7 @@ inline void DLLINTERNAL restore_original_dlsym(void)
 //
 //resets new dlsym
 //
-inline void DLLINTERNAL reset_dlsym_hook(void)
+inline void DLLINTERNAL reset_dlsym_hook()
 {
 	//Copy new dlsym bytes back
 	memcpy((void*)dlsym_original, dlsym_new_bytes, BYTES_SIZE);
@@ -119,7 +119,7 @@ static void * __replacement_dlsym(void * module, const char * funcname)
 	//it but some LD_PRELOADed library that hooks dlsym might actually
 	//do so.
 	static int is_original_restored = 0;
-	int was_original_restored = is_original_restored;
+	const int was_original_restored = is_original_restored;
 	
 	//Lock before modifing original dlsym
 	pthread_mutex_lock(&mutex_replacement_dlsym);
@@ -202,11 +202,11 @@ int DLLINTERNAL init_linkent_replacement(DLHANDLE MetamodHandle, DLHANDLE GameDl
 	memcpy(dlsym_old_bytes, (void*)dlsym_original, BYTES_SIZE);
 	
 	//Construct new bytes: "jmp offset[replacement_sendto] @ sendto_original"
-	construct_jmp_instruction((void*)&dlsym_new_bytes[0], (void*)dlsym_original, (void*)&__replacement_dlsym);
+	construct_jmp_instruction(&dlsym_new_bytes[0], (void*)dlsym_original, (void*)&__replacement_dlsym);
 	
 	//Check if bytes overlap page border.	
-	unsigned long start_of_page = PAGE_ALIGN((long)dlsym_original) - PAGE_SIZE;
-	unsigned long size_of_pages = 0;
+	const unsigned long start_of_page = PAGE_ALIGN((long)dlsym_original) - PAGE_SIZE;
+	unsigned long size_of_pages;
 	
 	if((unsigned long)dlsym_original + BYTES_SIZE > PAGE_ALIGN((unsigned long)dlsym_original))
 	{

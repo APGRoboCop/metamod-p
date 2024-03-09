@@ -159,7 +159,7 @@ public:
 	char* DLLINTERNAL resolve_suffix(const char* path) const;
 	static mBOOL DLLINTERNAL is_platform_postfix(const char* pf);
 
-	mBOOL DLLINTERNAL platform_match(MPlugin* plugin);
+	mBOOL DLLINTERNAL platform_match(MPlugin* plugin) const;
 
 	mBOOL DLLINTERNAL load(PLUG_LOADTIME now);
 	mBOOL DLLINTERNAL unload(PLUG_LOADTIME now, PL_UNLOAD_REASON reason, PL_UNLOAD_REASON real_reason);
@@ -182,36 +182,37 @@ public:
 	const char* DLLINTERNAL str_reason(PL_UNLOAD_REASON preason, PL_UNLOAD_REASON preal_reason) const;
 	static const char* DLLINTERNAL str_loadtime(PLUG_LOADTIME pallow, STR_LOADTIME fmt);
 
-	const char* DLLINTERNAL str_status() const { return(str_status(ST_SIMPLE)); };
-	const char* DLLINTERNAL str_action() const { return(str_action(SA_SIMPLE)); };
-	const char* DLLINTERNAL str_source() const { return(str_source(SO_SIMPLE)); };
+	const char* DLLINTERNAL str_status() const { return(str_status(ST_SIMPLE)); }
+	const char* DLLINTERNAL str_action() const { return(str_action(SA_SIMPLE)); }
+	const char* DLLINTERNAL str_source() const { return(str_source(SO_SIMPLE)); }
 
 	const char* DLLINTERNAL str_loadable() const
 	{
 		return(info ? str_loadtime(info->loadable, SL_SIMPLE) : " -");
-	};
+	}
 
 	const char* DLLINTERNAL str_unloadable() const
 	{
 		return(info ? str_loadtime(info->unloadable, SL_SIMPLE) : " -");
-	};
+	}
 
 	const char* DLLINTERNAL str_loadable(STR_LOADTIME fmt) const
 	{
 		return(info ? str_loadtime(info->loadable, fmt) : " -");
-	};
+	}
 
 	const char* DLLINTERNAL str_unloadable(STR_LOADTIME fmt) const
 	{
 		return(info ? str_loadtime(info->unloadable, fmt) : " -");
-	};
+	}
+
 private:
 	mBOOL DLLINTERNAL query();
 	mBOOL DLLINTERNAL attach(PLUG_LOADTIME now);
 	mBOOL DLLINTERNAL detach(PLUG_LOADTIME now, PL_UNLOAD_REASON reason);
 
-	gamedll_funcs_t gamedll_funcs;
-	mutil_funcs_t mutil_funcs;
+	gamedll_funcs_t gamedll_funcs = {};
+	mutil_funcs_t mutil_funcs = {};
 };
 
 // Macros used by MPlugin::show(), to list the functions that the plugin

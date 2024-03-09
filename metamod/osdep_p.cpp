@@ -68,7 +68,7 @@ DIR* DLLINTERNAL my_opendir(const char* path)
 	return(dir);
 }
 
-struct dirent* DLLINTERNAL my_readdir(DIR* dir)
+dirent* DLLINTERNAL my_readdir(DIR* dir)
 {
 	// If not found stop
 	if (!dir || dir->not_found)

@@ -51,7 +51,7 @@ const char* DLLINTERNAL META_UTIL_VarArgs(const char* format, ...)
 
 short DLLINTERNAL FixedSigned16(float value, float scale)
 {
-	auto output = (int)(value * scale);
+	int output = (int)(value * scale);
 
 	if (output > 32767)
 		output = 32767;
@@ -64,7 +64,7 @@ short DLLINTERNAL FixedSigned16(float value, float scale)
 
 unsigned short DLLINTERNAL FixedUnsigned16(float value, float scale)
 {
-	auto output = (int)(value * scale);
+	int output = (int)(value * scale);
 	if (output < 0)
 		output = 0;
 	if (output > 0xFFFF)

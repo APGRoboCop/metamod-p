@@ -81,7 +81,7 @@ static void mutil_LogMessage(plid_t plid, const char* fmt, ...) {
 	va_list ap;
 	char buf[MAX_LOGMSG_LEN];
 
-	auto* plinfo = (plugin_info_t*)plid;
+	const plugin_info_t* plinfo = plid;
 	va_start(ap, fmt);
 	safevoid_vsnprintf(buf, sizeof(buf), fmt, ap);
 	va_end(ap);
@@ -93,7 +93,7 @@ static void mutil_LogError(plid_t plid, const char* fmt, ...) {
 	va_list ap;
 	char buf[MAX_LOGMSG_LEN];
 
-	auto* plinfo = (plugin_info_t*)plid;
+	const plugin_info_t* plinfo = plid;
 	va_start(ap, fmt);
 	safevoid_vsnprintf(buf, sizeof(buf), fmt, ap);
 	va_end(ap);
@@ -108,7 +108,7 @@ static void mutil_LogDeveloper(plid_t plid, const char* fmt, ...) {
 	if ((int)CVAR_GET_FLOAT("developer") == 0)
 		return;
 
-	auto* plinfo = (plugin_info_t*)plid;
+	const plugin_info_t* plinfo = plid;
 	va_start(ap, fmt);
 	safevoid_vsnprintf(buf, sizeof(buf), fmt, ap);
 	va_end(ap);
@@ -125,8 +125,8 @@ static void mutil_CenterSayVarargs(plid_t plid, hudtextparms_t const tparms,
 	safevoid_vsnprintf(buf, sizeof(buf), fmt, ap);
 
 	mutil_LogMessage(plid, "(centersay) %s", buf);
-	for (auto n = 1; n <= gpGlobals->maxClients; n++) {
-		auto* pEntity = INDEXENT(n);
+	for (int n = 1; n <= gpGlobals->maxClients; n++) {
+		edict_t* pEntity = INDEXENT(n);
 		META_UTIL_HudMessage(pEntity, tparms, buf);
 	}
 }
@@ -152,7 +152,7 @@ static void mutil_CenterSayParms(plid_t plid, hudtextparms_t const tparms, const
 // particular, calling "player()" as needed by most Bots.  Suggested by
 // Jussi Kivilinna.
 static qboolean mutil_CallGameEntity(plid_t plid, const char* entStr, entvars_t* pev) {
-	auto* plinfo = (plugin_info_t*)plid;
+	const plugin_info_t* plinfo = plid;
 	META_DEBUG(8, ("Looking up game entity '%s' for plugin '%s'", entStr,
 		plinfo->name));
 	const auto pfnEntity = (ENTITY_FN)DLSYM(GameDLL.handle, entStr);
@@ -169,10 +169,10 @@ static qboolean mutil_CallGameEntity(plid_t plid, const char* entStr, entvars_t*
 // Find a usermsg, registered by the gamedll, with the corresponding
 // msgname, and return remaining info about it (msgid, size).
 static int mutil_GetUserMsgID(plid_t plid, const char* msgname, int* size) {
-	auto* plinfo = plid;
+	const plugin_info_t* plinfo = plid;
 	META_DEBUG(8, ("Looking up usermsg name '%s' for plugin '%s'", msgname,
 		plinfo->name));
-	auto* umsg = RegMsgs->find(msgname);
+	const MRegMsg* umsg = RegMsgs->find(msgname);
 	if (umsg) {
 		if (size)
 			*size = umsg->size;
@@ -184,7 +184,7 @@ static int mutil_GetUserMsgID(plid_t plid, const char* msgname, int* size) {
 // Find a usermsg, registered by the gamedll, with the corresponding
 // msgid, and return remaining info about it (msgname, size).
 static const char* mutil_GetUserMsgName(plid_t plid, int msgid, int* size) {
-	auto* plinfo = plid;
+	const plugin_info_t* plinfo = plid;
 	META_DEBUG(8, ("Looking up usermsg id '%d' for plugin '%s'", msgid,
 		plinfo->name));
 	// Guess names for any built-in Engine messages mentioned in the SDK;
@@ -211,7 +211,7 @@ static const char* mutil_GetUserMsgName(plid_t plid, int msgid, int* size) {
 			return("director?");
 		}
 	}
-	auto* umsg = RegMsgs->find(msgid);
+	const MRegMsg* umsg = RegMsgs->find(msgid);
 	if (umsg) {
 		if (size)
 			*size = umsg->size;
@@ -226,7 +226,7 @@ static const char* mutil_GetUserMsgName(plid_t plid, int msgid, int* size) {
 static const char* mutil_GetPluginPath(plid_t plid) {
 	static char buf[PATH_MAX];
 
-	auto* plug = Plugins->find(plid);
+	const MPlugin* plug = Plugins->find(plid);
 	if (!plug) {
 		META_WARNING("GetPluginPath: couldn't find plugin '%s'",
 			plid->name);
@@ -289,7 +289,7 @@ static int mutil_LoadMetaPlugin(plid_t plid, const char* fname, PLUG_LOADTIME no
 
 static int mutil_UnloadMetaPlugin(plid_t plid, const char* fname, PLUG_LOADTIME now, PL_UNLOAD_REASON reason)
 {
-	MPlugin* findp = nullptr;
+	MPlugin* findp;
 	char* endptr;
 
 	if (nullptr == fname) {

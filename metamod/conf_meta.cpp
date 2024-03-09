@@ -46,7 +46,7 @@
 
 MConfig::MConfig()
 	: list(nullptr), filename(nullptr), debuglevel(0), gamedll(nullptr),
-	plugins_file(nullptr), exec_cfg(nullptr)
+	  plugins_file(nullptr), exec_cfg(nullptr), autodetect(0), clientmeta(0)
 {
 }
 
@@ -54,7 +54,7 @@ MConfig::MConfig()
 // _after_ constructor, so that all the fields are allocated (d'oh).
 void DLLINTERNAL MConfig::init(option_t* global_options) {
 	list = global_options;
-	for (auto* optp = list; optp->name; optp++)
+	for (option_t* optp = list; optp->name; optp++)
 		set(optp, optp->init);
 }
 
@@ -70,7 +70,7 @@ option_t* DLLINTERNAL MConfig::find(const char* lookup) const
 
 mBOOL DLLINTERNAL MConfig::set(const char* key, const char* value) const
 {
-	auto* optp = find(key);
+	option_t* optp = find(key);
 	if (optp)
 		return(set(optp, value));
 	RETURN_ERRNO(mFALSE, ME_NOTFOUND);
@@ -78,8 +78,8 @@ mBOOL DLLINTERNAL MConfig::set(const char* key, const char* value) const
 
 mBOOL DLLINTERNAL MConfig::set(option_t* setp, const char* setstr) {
 	char pathbuf[PATH_MAX];
-	auto* optval = (int*)setp->dest;
-	auto* optstr = (char**)setp->dest;
+	int* optval = (int*)setp->dest;
+	char** optstr = (char**)setp->dest;
 	// cvar_t *optcvar = (cvar_t *) setp->dest;
 	// SETOPT_FN optcmd = (SETOPT_FN) setp->dest;
 
@@ -156,7 +156,7 @@ mBOOL DLLINTERNAL MConfig::load(const char* fn) {
 	// backslashes, etc).
 	full_gamedir_path(fn, loadfile);
 
-	auto* fp = fopen(loadfile, "r");
+	FILE* fp = fopen(loadfile, "r");
 	if (!fp) {
 		META_WARNING("unable to open config file '%s': %s", loadfile,
 			strerror(errno));
@@ -164,7 +164,7 @@ mBOOL DLLINTERNAL MConfig::load(const char* fn) {
 	}
 
 	META_DEBUG(2, ("Loading from config file: %s", loadfile));
-	for (auto ln = 1; !feof(fp) && fgets(line, sizeof(line), fp); ln++) {
+	for (int ln = 1; !feof(fp) && fgets(line, sizeof(line), fp); ln++) {
 		if (line[0] == '#')
 			continue;
 		if (line[0] == ';')
@@ -205,9 +205,9 @@ void DLLINTERNAL MConfig::show() const
 		META_CONS("%s and %s:", "Config options from localinfo", filename);
 	else
 		META_CONS("%s:", "Config options from localinfo");
-	for (auto* optp = list; optp->name; optp++) {
-		auto* optval = (int*)optp->dest;
-		auto* optstr = (char**)optp->dest;
+	for (option_t* optp = list; optp->name; optp++) {
+		const int* optval = (int*)optp->dest;
+		char** optstr = (char**)optp->dest;
 		// cvar_t *optcvar = (cvar_t *) optp->dest;
 		// SETOPT_FN optcmd = (SETOPT_FN) optp->dest;
 		switch (optp->type) {
