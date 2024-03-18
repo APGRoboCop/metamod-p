@@ -23,9 +23,9 @@ typedef void* MemAddr;
 
 // What we return in is_valid_code_pointer() when the EngineInfo object is
 // in an INVALID state, i.e. no code address range could be determined.
-static const bool c_DefaultReturnOnInvalidState = true;
+static constexpr bool c_DefaultReturnOnInvalidState = true;
 
-static const int  c_EngineInfo__typeLen = 10;
+static constexpr int  c_EngineInfo__typeLen = 10;
 
 class EngineInfo : public class_metamod_new
 {

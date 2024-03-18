@@ -39,11 +39,11 @@ endif
 #############################################################################
 
 # TARGET amd64 disabled since Valve has dropped support for x86-64 server
-#ifeq "$(TARGET)" "amd64"
-#	TARGETTYPE = amd64
-#else
+ifeq "$(TARGET)" "amd64"
+	TARGETTYPE = amd64
+else
 	TARGETTYPE = i386
-#endif
+endif
 
 # set paths for your environment
 ifeq "$(OS)" "linux"
@@ -120,9 +120,9 @@ ifeq "$(HOST)" "cygwin"
 	endif
 else
 	ifeq "$(TARGETTYPE)" "amd64"
-		CC=gcc -m64
+		CC=clang -m64
 	else
-		CC=gcc -m32
+		CC=clang -m32
 	endif
 endif
 
@@ -158,14 +158,14 @@ endif
 CCOPT = $(CCO) $(CCOPT_ARCH) -fno-exceptions -fno-rtti
 
 # optimization level; overridden for certain problematic files
-CCO = -O2 -fomit-frame-pointer -funsafe-math-optimizations
-CCO += -flto -fvisibility=hidden -fno-aggressive-loop-optimizations
+CCO = -O2 -fomit-frame-pointer -funsafe-math-optimizations -flto
+CCO += -fvisibility=hidden -mtune=generic -mmmx -msse -msse2 -mfpmath=sse
 
 # architecture tuning by target type
 ifeq "$(TARGETTYPE)" "amd64"
-	CCOPT_ARCH =
+	CCOPT_ARCH = -march=x86-64
 else
-	CCOPT_ARCH = -march=i686 -mtune=generic -mmmx -msse -msse2 -mfpmath=sse
+	CCOPT_ARCH = -march=i686
 endif
 
 # debugging; halt on warnings
@@ -182,7 +182,7 @@ FILES_ALL = *.cpp *.h [A-Z]* *.rc
 
 CFLAGS=-Wall -Wno-unknown-pragmas -Wno-attributes -Wno-write-strings
 
-CFLAGS+=-std=gnu++14
+CFLAGS+=-std=gnu++17
 
 #CFLAGS += -DTEST
 

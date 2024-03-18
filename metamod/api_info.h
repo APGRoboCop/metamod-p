@@ -41,10 +41,13 @@
 #include "types_meta.h"			// mBOOL
 #include "ret_type.h"
 
-#define P_PRE 0		// plugin function called before gamedll
-#define P_POST 1	// plugin function called after gamedll
+enum
+{
+	P_PRE = 0,	// plugin function called before gamedll
+	P_POST = 1	// plugin function called after gamedll
+};
 
- // API selector
+// API selector
 typedef enum enum_api_t {
 	e_api_engine = 0,
 	e_api_dllapi = 1,

@@ -135,7 +135,7 @@ inline int DLLINTERNAL strncasematch(const char* s1, const char* s2, size_t n) {
 
 inline int DLLINTERNAL old_valid_file(char* path) {
 	int len, ret;
-	char* cp = (char*)LOAD_FILE_FOR_ME(path, &len);
+	char* cp = reinterpret_cast<char*>(LOAD_FILE_FOR_ME(path, &len));
 	if (cp && len)
 		ret = 1;
 	else
@@ -153,10 +153,16 @@ char* DLLINTERNAL full_gamedir_path(const char* path, char* fullpath);
 #define STRINGIZE(name, len)		(#name+(len))
 
 // Max description length for plugins.ini and other places.
-#define MAX_DESC_LEN 256
+enum
+{
+	MAX_DESC_LEN = 256
+};
 
 // For various character string buffers.
-#define MAX_STRBUF_LEN 1024
+enum
+{
+	MAX_STRBUF_LEN = 1024
+};
 
 // Smallest of two
 #define MIN(x, y) (((x)<(y))?(x):(y))

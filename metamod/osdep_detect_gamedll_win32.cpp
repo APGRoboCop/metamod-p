@@ -60,7 +60,7 @@ static IMAGE_NT_HEADERS* DLLINTERNAL_NOVIS get_ntheaders(void* mapview) {
 	} mem;
 
 	//Check if valid dos header
-	mem.mem = (unsigned long)mapview;
+	mem.mem = reinterpret_cast<unsigned long>(mapview);
 	if (IsBadReadPtr(mem.dos, sizeof(*mem.dos)) || mem.dos->e_magic != IMAGE_DOS_SIGNATURE)
 		return(nullptr);
 
@@ -157,7 +157,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 	}
 
 	//
-	const unsigned long* names = (unsigned long*)va_to_mapaddr(mapview, sections, num_sects, exports->AddressOfNames);
+	const unsigned long* names = reinterpret_cast<unsigned long*>(va_to_mapaddr(mapview, sections, num_sects, exports->AddressOfNames));
 	if (IsBadReadPtr(names, exports->NumberOfNames * sizeof(unsigned long))) {
 		META_DEBUG(3, ("is_gamedll(%s): Pointer to exported function names is invalid.", filename));
 		UnmapViewOfFile(mapview);
@@ -168,7 +168,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 
 	for (unsigned int i = 0; i < exports->NumberOfNames; i++) {
 		//get function name with valid address
-		char* funcname = (char*)va_to_mapaddr(mapview, sections, num_sects, names[i]);
+		char* funcname = reinterpret_cast<char*>(va_to_mapaddr(mapview, sections, num_sects, names[i]));
 		if (IsBadStringPtrA(funcname, 128))
 			continue;
 

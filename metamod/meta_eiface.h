@@ -50,7 +50,7 @@
  // dll overwriting our memory when using an old Metamod with a new game
  // dll.
 
-const int c_NumDummies = 5;
+constexpr int c_NumDummies = 5;
 typedef void (*pdummyfunc)();
 
 // --------------------------------------------------------------------
@@ -165,7 +165,7 @@ inline int meta_new_dll_functions_t::version()
 // meta_enginefuncs_t
 // --------------------------------------------------------------------
 
-struct meta_enginefuncs_t : public enginefuncs_t {
+struct meta_enginefuncs_t : enginefuncs_t {
 	// data :
 
 	// Array of five dummy function pointers. Must be filled with NULL.

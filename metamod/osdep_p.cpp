@@ -53,7 +53,7 @@ DIR* DLLINTERNAL my_opendir(const char* path)
 	safevoid_snprintf(search_path, sizeof(search_path), "%s\\*.*", path);
 
 	// Get memory for new DIR object
-	DIR* dir = (DIR*)calloc(1, sizeof(DIR));
+	DIR* dir = static_cast<my_DIR*>(calloc(1, sizeof(DIR)));
 
 	// Start searching
 	dir->handle = FindFirstFileA(search_path, &dir->find_data);
@@ -117,6 +117,6 @@ DLHANDLE DLLINTERNAL get_module_handle_of_memptr(void* memptr)
 	if (!MBI.AllocationBase)
 		return(nullptr);
 
-	return((DLHANDLE)MBI.AllocationBase);
+	return static_cast<DLHANDLE>(MBI.AllocationBase);
 }
 #endif /* linux */

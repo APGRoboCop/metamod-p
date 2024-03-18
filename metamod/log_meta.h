@@ -85,10 +85,16 @@
 #endif
 
 // max buffer size for printed messages
-#define MAX_LOGMSG_LEN	1024
+enum
+{
+	MAX_LOGMSG_LEN = 1024
+};
 
 // max buffer size for client messages
-#define MAX_CLIENTMSG_LEN 128
+enum
+{
+	MAX_CLIENTMSG_LEN = 128
+};
 
 extern cvar_t meta_debug DLLHIDDEN;
 extern int meta_debug_value DLLHIDDEN;

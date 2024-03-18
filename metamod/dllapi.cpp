@@ -173,14 +173,13 @@ static void mm_ClientUserInfoChanged(edict_t* pEntity, char* infobuffer) {
 	RETURN_API_void()
 }
 bool shouldExpensiveHooksBeEnabled(const char* gameMap) {
-	FILE* fp;
 	char loadfile[PATH_MAX];
 	char line[MAX_MAPNAME_LENGTH];
 
 	// Make full pathname (from gamedir if relative, collapse "..", backslashes, etc).
 	full_gamedir_path(Config->slowhooks_whitelist, loadfile);
 
-	fp = fopen(loadfile, "r");
+	FILE* fp = fopen(loadfile, "r");
 	if (!fp) {
 		META_WARNING("unable to open slowhook whitelist file '%s': %s", loadfile, strerror(errno));
 		return false;
@@ -210,7 +209,7 @@ bool shouldExpensiveHooksBeEnabled(const char* gameMap) {
 static void mm_ServerActivate(edict_t* pEdictList, int edictCount, int clientMax) {
 
 	if (!Config->slowhooks) {
-		GIVE_ENGINE_FUNCTIONS_FN pfn_give_engfuncs = (GIVE_ENGINE_FUNCTIONS_FN)DLSYM(GameDLL.handle, "GiveFnptrsToDll");
+		const GIVE_ENGINE_FUNCTIONS_FN pfn_give_engfuncs = reinterpret_cast<GIVE_ENGINE_FUNCTIONS_FN>(DLSYM(GameDLL.handle, "GiveFnptrsToDll"));
 
 		if (shouldExpensiveHooksBeEnabled(STRING(gpGlobals->mapname))) {
 			META_DEBUG(3, ("Expensive metamod hooks enabled."));
@@ -258,7 +257,7 @@ static void mm_PlayerPostThink(edict_t* pEntity) {
 	RETURN_API_void()
 }
 static void mm_StartFrame() {
-	meta_debug_value = (int)meta_debug.value;
+	meta_debug_value = static_cast<int>(meta_debug.value);
 
 	META_DLLAPI_HANDLE_void(FN_STARTFRAME, pfnStartFrame, void, (VOID_ARG))
 	RETURN_API_void()

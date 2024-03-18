@@ -105,7 +105,7 @@ static void mutil_LogDeveloper(plid_t plid, const char* fmt, ...) {
 	va_list ap;
 	char buf[MAX_LOGMSG_LEN];
 
-	if ((int)CVAR_GET_FLOAT("developer") == 0)
+	if (static_cast<int>(CVAR_GET_FLOAT("developer")) == 0)
 		return;
 
 	const plugin_info_t* plinfo = plid;
@@ -155,7 +155,7 @@ static qboolean mutil_CallGameEntity(plid_t plid, const char* entStr, entvars_t*
 	const plugin_info_t* plinfo = plid;
 	META_DEBUG(8, ("Looking up game entity '%s' for plugin '%s'", entStr,
 		plinfo->name));
-	const ENTITY_FN pfnEntity = (ENTITY_FN)DLSYM(GameDLL.handle, entStr);
+	const ENTITY_FN pfnEntity = reinterpret_cast<ENTITY_FN>(DLSYM(GameDLL.handle, entStr));
 	if (!pfnEntity) {
 		META_WARNING("Couldn't find game entity '%s' in game DLL '%s' for plugin '%s'", entStr, GameDLL.name, plinfo->name);
 		return(false);
@@ -283,7 +283,7 @@ static int mutil_LoadMetaPlugin(plid_t plid, const char* fname, PLUG_LOADTIME no
 		return(meta_errno);
 	}
 	if (plugin_handle)
-		*plugin_handle = (void*)pl_loaded->handle;
+		*plugin_handle = static_cast<void*>(pl_loaded->handle);
 	return(0);
 }
 
@@ -321,7 +321,7 @@ static int mutil_UnloadMetaPluginByHandle(plid_t plid, void* plugin_handle, PLUG
 		return(ME_ARGUMENT);
 	}
 
-	if (!(findp = Plugins->find((DLHANDLE)plugin_handle)))
+	if (!(findp = Plugins->find(static_cast<DLHANDLE>(plugin_handle))))
 		return(ME_NOTFOUND);
 
 	meta_errno = ME_NOERROR;

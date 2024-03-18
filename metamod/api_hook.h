@@ -58,7 +58,10 @@ void* DLLINTERNAL main_hook_function(class_ret_t ret_init, unsigned int api_info
 
 #define PACK_ARGS_END };
 
-#define VOID_ARG 0
+enum
+{
+	VOID_ARG = 0
+};
 
 PACK_ARGS_CLASS_HEADER(void, (int)) {}
 PACK_ARGS_END

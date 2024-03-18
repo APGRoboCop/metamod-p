@@ -63,12 +63,12 @@ static unsigned int call_count = 0;
 
 // get function pointer from api table by function pointer offset
 inline void* DLLINTERNAL get_api_function(const void* api_table, unsigned int func_offset) {
-	return(*(void**)((unsigned long)api_table + func_offset));
+	return(*reinterpret_cast<void**>(reinterpret_cast<unsigned long>(api_table) + func_offset));
 }
 
 // get data pointer from api_info table by function offset
 inline const api_info_t* DLLINTERNAL get_api_info(enum_api_t api, unsigned int api_info_offset) {
-	return((const api_info_t*)((unsigned long)api_info_tables[api] + api_info_offset));
+	return reinterpret_cast<const api_info_t*>(reinterpret_cast<unsigned long>(api_info_tables[api]) + api_info_offset);
 }
 
 // simplified 'void' version of main hook function
@@ -91,7 +91,7 @@ void DLLINTERNAL main_hook_function_void(unsigned int api_info_offset, enum_api_
 	const int loglevel = api_info->loglevel;
 	auto mres = MRES_UNSET;
 	auto status = MRES_UNSET;
-	const void* pfn_routine;
+	void* pfn_routine;
 
 	//Pre plugin functions
 	auto prev_mres = MRES_UNSET;
@@ -407,10 +407,10 @@ void* DLLINTERNAL main_hook_function(const class_ret_t ret_init,
 
 	//return value is passed through ret_init!
 	if (likely(status != MRES_OVERRIDE)) {
-		return(*(void**)orig_ret.getptr());
+		return(*static_cast<void**>(orig_ret.getptr()));
 	}
 	META_DEBUG(loglevel, ("Returning (override) %s()", api_info->name));
-	return(*(void**)override_ret.getptr());
+	return(*static_cast<void**>(override_ret.getptr()));
 }
 
 //

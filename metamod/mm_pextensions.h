@@ -93,7 +93,10 @@
  //	pfnUnloadMetaPluginByName
  //	pfnUnloadMetaPluginByHandle
  //  v2 is locked now. Don't modify old functions. If you add new functions, increase META_PEXT_VERSION.
-#define META_PEXT_VERSION 2
+enum
+{
+	META_PEXT_VERSION = 2
+};
 
 // Meta PExtension Function table type.
 typedef struct pextension_funcs_s {

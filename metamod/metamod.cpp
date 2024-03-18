@@ -125,7 +125,7 @@ int DLLINTERNAL metamod_startup() {
 
 	// If running with "+developer", allow an opportunity to break in with
 	// a debugger.
-	if ((int)CVAR_GET_FLOAT("developer") != 0)
+	if (static_cast<int>(CVAR_GET_FLOAT("developer")) != 0)
 		sleep(1);
 
 	// Get gamedir, very early on, because it seems we need it all over the
@@ -154,8 +154,8 @@ int DLLINTERNAL metamod_startup() {
 
 	// Set a slight debug level for developer mode, if debug level not
 	// already set.
-	if ((int)CVAR_GET_FLOAT("developer") != 0 && (int)meta_debug.value == 0) {
-		CVAR_SET_FLOAT("meta_debug", (float)(meta_debug_value = 3));
+	if (static_cast<int>(CVAR_GET_FLOAT("developer")) != 0 && static_cast<int>(meta_debug.value) == 0) {
+		CVAR_SET_FLOAT("meta_debug", static_cast<float>(meta_debug_value = 3));
 	}
 
 	// Init default values
@@ -213,7 +213,7 @@ int DLLINTERNAL metamod_startup() {
 	// Check for an initial debug level, since cfg files don't get exec'd
 	// until later.
 	if (Config->debuglevel != 0) {
-		CVAR_SET_FLOAT("meta_debug", (float)(meta_debug_value = Config->debuglevel));
+		CVAR_SET_FLOAT("meta_debug", static_cast<float>(meta_debug_value = Config->debuglevel));
 	}
 
 	// Prepare for registered commands from plugins.
@@ -388,7 +388,7 @@ mBOOL DLLINTERNAL meta_load_gamedll() {
 	// wanted to catch one of the functions, but now that plugins are
 	// dynamically loadable at any time, we have to always pass our table,
 	// so that any plugin loaded later can catch what they need to.
-	if ((pfn_give_engfuncs = (GIVE_ENGINE_FUNCTIONS_FN)DLSYM(GameDLL.handle, "GiveFnptrsToDll")))
+	if ((pfn_give_engfuncs = reinterpret_cast<GIVE_ENGINE_FUNCTIONS_FN>(DLSYM(GameDLL.handle, "GiveFnptrsToDll"))))
 	{
 		if (!Config->slowhooks) {
 			memcpy(&g_slow_hooks_table_engine, &meta_engfuncs, sizeof(meta_enginefuncs_t));
