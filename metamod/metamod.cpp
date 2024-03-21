@@ -115,7 +115,7 @@ int DLLINTERNAL metamod_startup() {
 	META_CONS("   under certain conditions; type `meta gpl' for details.");
 	META_CONS("   ");
 
-	META_LOG("%s v%s  %s", VNAME, VVERSION, VDATE);
+	META_LOG("%s v%s  %s", VNAME, VVERSION, __DATE__);
 	META_LOG("by %s", VAUTHOR);
 	META_LOG("   %s", VURL);
 	META_LOG(" Patch: %s v%d", VPATCH_NAME, VPATCH_IVERSION);

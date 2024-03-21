@@ -197,7 +197,7 @@ void DLLINTERNAL cmd_meta_version() {
 		META_CONS("usage: meta version");
 		return;
 	}
-	META_CONS("%s v%s  %s (%s)", VNAME, VVERSION, VDATE, META_INTERFACE_VERSION);
+	META_CONS("%s v%s  %s (%s)", VNAME, VVERSION, __DATE__, META_INTERFACE_VERSION);
 	META_CONS("by %s", VAUTHOR);
 	META_CONS("   %s", VURL);
 	META_CONS(" Patch: %s v%d", VPATCH_NAME, VPATCH_IVERSION);
@@ -212,7 +212,7 @@ void DLLINTERNAL client_meta_version(edict_t* pEntity) {
 		META_CLIENT(pEntity, "usage: meta version");
 		return;
 	}
-	META_CLIENT(pEntity, "%s v%s  %s (%s)", VNAME, VVERSION, VDATE, META_INTERFACE_VERSION);
+	META_CLIENT(pEntity, "%s v%s  %s (%s)", VNAME, VVERSION, __DATE__, META_INTERFACE_VERSION);
 	META_CLIENT(pEntity, "by %s", VAUTHOR);
 	META_CLIENT(pEntity, "   %s", VURL);
 	META_CLIENT(pEntity, " Patch: %s v%d", VPATCH_NAME, VPATCH_IVERSION);
@@ -224,7 +224,7 @@ void DLLINTERNAL client_meta_version(edict_t* pEntity) {
 
 // "meta gpl" console command.
 void DLLINTERNAL cmd_meta_gpl() {
-	META_CONS("%s version %s  %s", VNAME, VVERSION, VDATE);
+	META_CONS("%s version %s  %s", VNAME, VVERSION, __DATE__);
 	META_CONS("Copyright (c) 2001-%s %s", COPYRIGHT_YEAR, VAUTHOR);
 	META_CONS("");
 	META_CONS("   %s is free software; you can redistribute it and/or", VNAME);

@@ -14,3 +14,10 @@ What is special in this version of metamod?
 - Better performance/less CPU usage than original Metamod (by reducing executable size and therefore CPU cache pressure).
 
 Metamod-P version by Jussi Kivilinna
+
+Special thanks to:
+-------
+- Frisasky
+- Nikita Pushchin
+- Duk0
+- w00tguy

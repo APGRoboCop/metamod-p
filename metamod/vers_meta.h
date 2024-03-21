@@ -42,7 +42,7 @@
 #define OPT_TYPE	"default"
 #endif /* not OPT_TYPE */
 
-#define VDATE 			"2024/03/18"
+//#define VDATE 			"2024/03/18"
 #define VPATCH_COPYRIGHT_YEAR   "2024"
 #define VMETA_VERSION		"1.21"
 
