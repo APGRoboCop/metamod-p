@@ -182,9 +182,7 @@ void DLLINTERNAL MRegCmdList::show() const
 		const MRegCmd* icmd = &mlist[i];
 
 		if (icmd->status == RG_VALID) {
-			const MPlugin* iplug = Plugins->find(icmd->plugid);
-
-			if (iplug)
+			if (const MPlugin* iplug = Plugins->find(icmd->plugid))
 				STRNCPY(bplug, iplug->desc, sizeof(bplug));
 			else
 				STRNCPY(bplug, "(unknown)", sizeof(bplug));
@@ -367,8 +365,7 @@ void DLLINTERNAL MRegCvarList::show() const
 	for (int i = 0; i < endlist; i++) {
 		const MRegCvar* icvar = &vlist[i];
 		if (icvar->status == RG_VALID) {
-			const MPlugin* iplug = Plugins->find(icvar->plugid);
-			if (iplug)
+			if (const MPlugin* iplug = Plugins->find(icvar->plugid))
 				STRNCPY(bplug, iplug->desc, sizeof(bplug));
 			else
 				STRNCPY(bplug, "(unknown)", sizeof(bplug));

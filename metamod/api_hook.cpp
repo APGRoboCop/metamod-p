@@ -76,7 +76,7 @@ void DLLINTERNAL main_hook_function_void(unsigned int api_info_offset, enum_api_
 	int i;
 	MPlugin* iplug;
 	const void* api_table;
-	meta_globals_t backup_meta_globals[1];
+	meta_globals_t backup_meta_globals[1]{};
 
 	//passing offset from api wrapper function makes code faster/smaller
 	const api_info_t* api_info = get_api_info(api, api_info_offset);
@@ -228,7 +228,7 @@ void* DLLINTERNAL main_hook_function(const class_ret_t ret_init,
 	void* pfn_routine;
 	int loglevel;
 	const void* api_table;
-	meta_globals_t backup_meta_globals[1];
+	meta_globals_t backup_meta_globals[1]{};
 
 	//passing offset from api wrapper function makes code faster/smaller
 	api_info = get_api_info(api, api_info_offset);

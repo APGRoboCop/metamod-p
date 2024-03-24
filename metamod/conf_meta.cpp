@@ -71,8 +71,7 @@ option_t* DLLINTERNAL MConfig::find(const char* lookup) const
 
 mBOOL DLLINTERNAL MConfig::set(const char* key, const char* value) const
 {
-	option_t* optp = find(key);
-	if (optp)
+	if (option_t* optp = find(key))
 		return(set(optp, value));
 	RETURN_ERRNO(mFALSE, ME_NOTFOUND);
 }

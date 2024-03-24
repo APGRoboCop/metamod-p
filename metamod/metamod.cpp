@@ -162,7 +162,7 @@ int DLLINTERNAL metamod_startup() {
 	Config->init(global_options);
 	// Find config file
 	char* cfile = CONFIG_INI;
-	if ((cp = LOCALINFO("mm_configfile")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_configfile"))) && *cp != '\0') {
 		META_LOG("Configfile specified via localinfo: %s", cp);
 		if (valid_gamedir_file(cp))
 			cfile = cp;
@@ -177,37 +177,37 @@ int DLLINTERNAL metamod_startup() {
 		META_DEBUG(2, ("No config.ini file found: %s", CONFIG_INI));
 
 	// Now, override config options with localinfo commandline options.
-	if ((cp = LOCALINFO("mm_debug")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_debug"))) && *cp != '\0') {
 		META_LOG("Debuglevel specified via localinfo: %s", cp);
-		Config->set("debuglevel", cp);
+		return Config->set("debuglevel", cp);
 	}
-	if ((cp = LOCALINFO("mm_gamedll")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_gamedll"))) && *cp != '\0') {
 		META_LOG("Gamedll specified via localinfo: %s", cp);
-		Config->set("gamedll", cp);
+		return Config->set("gamedll", cp);
 	}
-	if ((cp = LOCALINFO("mm_pluginsfile")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_pluginsfile"))) && *cp != '\0') {
 		META_LOG("Pluginsfile specified via localinfo: %s", cp);
-		Config->set("plugins_file", cp);
+		return Config->set("plugins_file", cp);
 	}
-	if ((cp = LOCALINFO("mm_execcfg")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_execcfg"))) && *cp != '\0') {
 		META_LOG("Execcfg specified via localinfo: %s", cp);
-		Config->set("exec_cfg", cp);
+		return Config->set("exec_cfg", cp);
 	}
-	if ((cp = LOCALINFO("mm_autodetect")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_autodetect"))) && *cp != '\0') {
 		META_LOG("Autodetect specified via localinfo: %s", cp);
-		Config->set("autodetect", cp);
+		return Config->set("autodetect", cp);
 	}
-	if ((cp = LOCALINFO("mm_clientmeta")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_clientmeta"))) && *cp != '\0') {
 		META_LOG("Clientmeta specified via localinfo: %s", cp);
-		Config->set("clientmeta", cp);
+		return Config->set("clientmeta", cp);
 	}
-	if ((cp = LOCALINFO("mm_slowhooks")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_slowhooks"))) && *cp != '\0') {
 		META_LOG("Slowhooks specified via localinfo: %s", cp);
-		Config->set("slowhooks", cp);
+		return Config->set("slowhooks", cp);
 	}
-	if ((cp = LOCALINFO("mm_slowhooks_whitelist")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_slowhooks_whitelist"))) && *cp != '\0') {
 		META_LOG("Slowhooks whitelist specified via localinfo: %s", cp);
-		Config->set("slowhooks_whitelist", cp);
+		return Config->set("slowhooks_whitelist", cp);
 	}
 
 	// Check for an initial debug level, since cfg files don't get exec'd

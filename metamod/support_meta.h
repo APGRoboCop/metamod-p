@@ -114,22 +114,22 @@ inline char* DLLINTERNAL STRNCPY(char* dst, const char* src, int size) {
 // Renamed string functions to be clearer.
 inline int DLLINTERNAL strmatch(const char* s1, const char* s2) {
 	if (likely(s1) && likely(s2))
-		return(!mm_strcmp(s1, s2));
+		return(~mm_strcmp(s1, s2));
 	return(0);
 }
 inline int DLLINTERNAL strnmatch(const char* s1, const char* s2, size_t n) {
 	if (likely(s1) && likely(s2))
-		return(!mm_strncmp(s1, s2, n));
+		return(~mm_strncmp(s1, s2, n));
 	return(0);
 }
 inline int DLLINTERNAL strcasematch(const char* s1, const char* s2) {
 	if (likely(s1) && likely(s2))
-		return(!strcasecmp(s1, s2));
+		return(~strcasecmp(s1, s2));
 	return(0);
 }
 inline int DLLINTERNAL strncasematch(const char* s1, const char* s2, size_t n) {
 	if (likely(s1) && likely(s2))
-		return(!strncasecmp(s1, s2, n));
+		return(~strncasecmp(s1, s2, n));
 	return(0);
 }
 
@@ -150,7 +150,7 @@ char* DLLINTERNAL full_gamedir_path(const char* path, char* fullpath);
 // stripping off the leading "len" characters.  Useful for things like
 // turning 'pfnClientCommand' into "ClientCommand" so we don't have to
 // specify strings used for all the debugging/log messages.
-#define STRINGIZE(name, len)		(#name+(len))
+#define STRINGIZE(name, len) (#name)
 
 // Max description length for plugins.ini and other places.
 enum

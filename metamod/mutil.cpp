@@ -172,8 +172,7 @@ static int mutil_GetUserMsgID(plid_t plid, const char* msgname, int* size) {
 	const plugin_info_t* plinfo = plid;
 	META_DEBUG(8, ("Looking up usermsg name '%s' for plugin '%s'", msgname,
 		plinfo->name));
-	const MRegMsg* umsg = RegMsgs->find(msgname);
-	if (umsg) {
+	if (const MRegMsg* umsg = RegMsgs->find(msgname)) {
 		if (size)
 			*size = umsg->size;
 		return(umsg->msgid);
@@ -211,8 +210,7 @@ static const char* mutil_GetUserMsgName(plid_t plid, int msgid, int* size) {
 			return("director?");
 		}
 	}
-	const MRegMsg* umsg = RegMsgs->find(msgid);
-	if (umsg) {
+	if (const MRegMsg* umsg = RegMsgs->find(msgid)) {
 		if (size)
 			*size = umsg->size;
 		// 'name' is assumed to be a constant string, allocated in the
@@ -277,7 +275,7 @@ static int mutil_LoadMetaPlugin(plid_t plid, const char* fname, PLUG_LOADTIME no
 	}
 
 	meta_errno = ME_NOERROR;
-	if (!(pl_loaded = Plugins->plugin_addload(plid, fname, now))) {
+	if (!((pl_loaded = Plugins->plugin_addload(plid, fname, now)))) {
 		if (plugin_handle)
 			*plugin_handle = nullptr;
 		return(meta_errno);
@@ -321,7 +319,7 @@ static int mutil_UnloadMetaPluginByHandle(plid_t plid, void* plugin_handle, PLUG
 		return(ME_ARGUMENT);
 	}
 
-	if (!(findp = Plugins->find(static_cast<DLHANDLE>(plugin_handle))))
+	if (!((findp = Plugins->find(static_cast<DLHANDLE>(plugin_handle)))))
 		return(ME_NOTFOUND);
 
 	meta_errno = ME_NOERROR;

@@ -67,8 +67,7 @@ char* DLLINTERNAL my_strtok_r(char* s, const char* delim, char** ptrptr) {
 		begin = *ptrptr;
 	if (!begin)
 		return(nullptr);
-	char* end = strpbrk(begin, delim);
-	if (end) {
+	if (char* end = strpbrk(begin, delim)) {
 		*end = '\0';
 		char* rest = end + 1;
 		*ptrptr = rest + strspn(rest, delim);
@@ -359,7 +358,7 @@ mBOOL DLLINTERNAL IS_VALID_PTR(void* memptr) {
 // meta_errno values:
 //  - ME_BADMEMPTR	not a valid memory pointer
 mBOOL DLLINTERNAL IS_VALID_PTR(void* memptr) {
-	if (IsBadCodePtr((FARPROC)memptr))
+	if (IsBadCodePtr(static_cast<FARPROC>(memptr)))
 		RETURN_ERRNO(mFALSE, ME_BADMEMPTR);
 	return(mTRUE);
 }

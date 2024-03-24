@@ -460,8 +460,7 @@ static int mm_RegUserMsg(const char* pszName, int iSize) {
 
 	// Add the msgid, name, and size to our saved list, if we haven't
 	// already.
-	const MRegMsg* nmsg = RegMsgs->find(imsgid);
-	if (nmsg) {
+	if (const MRegMsg* nmsg = RegMsgs->find(imsgid)) {
 		if (FStrEq(pszName, nmsg->name))
 			// This name/msgid pair was already registered.
 			META_DEBUG(3, ("user message registered again: name=%s, msgid=%d", pszName, imsgid));

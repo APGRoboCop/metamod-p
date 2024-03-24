@@ -133,7 +133,7 @@
 	{ "tod",               "hl" MODARCH ".so",           "hl.dll",            "Tour of Duty" },
 	{ "trainhunters",      "th" MODARCH ".so",           "th.dll",            "Train Hunters" },
 	{ "trevenge",          "trevenge.so",              "trevenge.dll",      "The Terrorist Revenge" },
-	{ "ts",                "ts" MODARCH ".so",           "mp.dll",            "The Specialists" },
+	{ "ts",                "ts_i686.so",           "mp.dll",            "The Specialists" },
 	{ "tt",                "tt" MODARCH ".so",           "tt.dll",            "The Trenches" },
 	{ "underworld",        "uw" MODARCH ".so",           "uw.dll",            "Underworld Bloodline" },
 	{ "valve",             "hl" MODARCH ".so",           "hl.dll",            "Half-Life Deathmatch" },
