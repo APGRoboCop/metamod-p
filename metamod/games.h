@@ -43,10 +43,10 @@
 #  define MODARCH "_i386"
 #endif
 
-	{ "action", "ahl" MODARCH ".so", "ahl.dll", "Action Half-Life"},
+	{ "action",				"ahl" MODARCH ".so",	"ahl.dll",			"Action Half-Life" },
 	{ "ag",                "ag_i386.so",           "ag.dll",            "Adrenaline Gamer Steam" },
 	{ "ag",                "ag.so",                    "ag.dll",                    "Adrenaline Gamer (OpenAG)" },
-	{ "ag3",               "hl" MODARCH".so",           "hl.dll",            "Adrenalinegamer 3.x" },
+	{ "ag3",               "hl" MODARCH ".so",           "hl.dll",            "Adrenalinegamer 3.x" },
 	{ "aghl",              "ag" MODARCH ".so",           "ag.dll",            "Adrenalinegamer 4.x" },
 	{ "arg",               "arg" MODARCH ".so",          "hl.dll",            "Arg!" },
 	{ "asheep",            "hl" MODARCH ".so",           "hl.dll",            "Azure Sheep" },
@@ -67,7 +67,7 @@
 	{ "csv15",             "cs" MODARCH ".so",           "mp.dll",            "CS 1.5 for Steam" },
 	{ "czero",             "cs" MODARCH ".so",           "mp.dll",            "Counter-Strike:Condition Zero" },
 	{ "dcrisis",           "dc" MODARCH ".so",           "dc.dll",            "Desert Crisis" },
-	{ "decay",              none,                    "decay.dll",                 "Half-Life: Decay" }
+	{ "decay",              "none",                    "decay.dll",                 "Half-Life: Decay" },
 	{ "dmc",			"dmc" MODARCH ".so",		"dmc.dll",				"Deathmatch Classic" },
 	{ "dod",               "dod" MODARCH ".so",          "dod.dll",           "Day of Defeat" },
 	{ "dpb",               "pb.i386.so",               "pb.dll",            "Digital Paintball" },
