@@ -600,7 +600,7 @@ mBOOL DLLINTERNAL MPlugin::load(PLUG_LOADTIME now) {
 	// GameInit, since we've passed that.
 	if (now != PT_STARTUP) {
 		FN_GAMEINIT pfn_gameinit;
-		if (tables.dllapi && (pfn_gameinit = tables.dllapi->pfnGameInit))
+		if (tables.dllapi && ((pfn_gameinit = tables.dllapi->pfnGameInit)))
 			pfn_gameinit();
 	}
 	// If loading during map, then I'd like to call plugin's
@@ -630,7 +630,7 @@ mBOOL DLLINTERNAL MPlugin::query() {
 	GIVE_ENGINE_FUNCTIONS_FN pfn_give_engfuncs;
 
 	// open the plugin DLL
-	if (!(handle = DLOPEN(pathname))) {
+	if (!((handle = DLOPEN(pathname)))) {
 		META_WARNING("dll: Failed query plugin '%s'; Couldn't open file '%s': %s",
 			desc, pathname, DLERROR());
 		RETURN_ERRNO(mFALSE, ME_DLOPEN);
@@ -646,7 +646,7 @@ mBOOL DLLINTERNAL MPlugin::query() {
 	// GiveFnptrsToDll before Meta_Query, because the latter typically uses
 	// engine functions like AlertMessage, which have to be passed along via
 	// GiveFnptrsToDll.
-	const META_QUERY_FN pfn_query = (META_QUERY_FN)DLSYM(handle, "Meta_Query");
+	const META_QUERY_FN pfn_query = META_QUERY_FN(DLSYM(handle, "Meta_Query"));
 	if (!pfn_query) {
 		META_WARNING("dll: Failed query plugin '%s'; Couldn't find Meta_Query(): %s", desc, DLERROR());
 		// caller will dlclose()
@@ -667,8 +667,7 @@ mBOOL DLLINTERNAL MPlugin::query() {
 	// This passes nothing and returns nothing, and the routine in the
 	// plugin can NOT use any Engine functions, as they haven't been
 	// provided yet (done next, in GiveFnptrsToDll).
-	const META_INIT_FN pfn_init = (META_INIT_FN)DLSYM(handle, "Meta_Init");
-	if (pfn_init) {
+	if (const META_INIT_FN pfn_init = META_INIT_FN(DLSYM(handle, "Meta_Init"))) {
 		pfn_init();
 		META_DEBUG(6, ("dll: Plugin '%s': Called Meta_Init()", desc));
 	}
@@ -678,10 +677,10 @@ mBOOL DLLINTERNAL MPlugin::query() {
 	}
 
 	// pass on engine function table and globals to plugin
-	if (!(pfn_give_engfuncs = (GIVE_ENGINE_FUNCTIONS_FN)DLSYM(handle, "GiveFnptrsToDll"))) {
+	if (!((pfn_give_engfuncs = GIVE_ENGINE_FUNCTIONS_FN(DLSYM(handle, "GiveFnptrsToDll"))))) {
 
 		// this magic "@8" code from hzqst fixes plugins not loading -w00tguy
-		pfn_give_engfuncs = (GIVE_ENGINE_FUNCTIONS_FN)DLSYM(handle, "_GiveFnptrsToDll@8");
+		pfn_give_engfuncs = GIVE_ENGINE_FUNCTIONS_FN(DLSYM(handle, "_GiveFnptrsToDll@8"));
 
 		if (!pfn_give_engfuncs)
 		{
@@ -770,7 +769,7 @@ mBOOL DLLINTERNAL MPlugin::query() {
 	// Give plugin the p-series extension function table.
 	// Check for version differences!
 	//
-	if (nullptr != (pfn_give_pext_funcs = (META_GIVE_PEXT_FUNCTIONS_FN)DLSYM(handle, "Meta_PExtGiveFnptrs"))) {
+	if (nullptr != (pfn_give_pext_funcs = META_GIVE_PEXT_FUNCTIONS_FN(DLSYM(handle, "Meta_PExtGiveFnptrs")))) {
 		const int plugin_pext_version = (*pfn_give_pext_funcs)(
 			META_PEXT_VERSION, (pextension_funcs_t*)(&(mutil_funcs.pfnLoadPlugin)));
 
@@ -837,7 +836,7 @@ mBOOL DLLINTERNAL MPlugin::attach(PLUG_LOADTIME now) {
 		else
 			memset(gamedll_funcs.newapi_table, 0, sizeof(NEW_DLL_FUNCTIONS));
 	}
-	if (!(pfn_attach = (META_ATTACH_FN)DLSYM(handle, "Meta_Attach"))) {
+	if (!((pfn_attach = META_ATTACH_FN(DLSYM(handle, "Meta_Attach"))))) {
 		META_WARNING("dll: Failed attach plugin '%s': Couldn't find Meta_Attach(): %s", desc, DLERROR());
 		// caller will dlclose()
 		RETURN_ERRNO(mFALSE, ME_DLMISSING);
@@ -946,7 +945,7 @@ mBOOL DLLINTERNAL MPlugin::plugin_unload(plid_t plid, PLUG_LOADTIME now, PL_UNLO
 	MPlugin* pl_unloader;
 
 	// try find unloader
-	if (!(pl_unloader = Plugins->find(plid))) {
+	if (!((pl_unloader = Plugins->find(plid)))) {
 		META_WARNING("dll: Not unloading plugin '%s'; plugin that requested unload is not found.", desc);
 		RETURN_ERRNO(mFALSE, ME_BADREQ);
 	}
@@ -1096,7 +1095,7 @@ mBOOL DLLINTERNAL MPlugin::detach(PLUG_LOADTIME now, PL_UNLOAD_REASON reason) {
 	if (!handle)
 		return(mTRUE);
 
-	if (!(pfn_detach = (META_DETACH_FN)DLSYM(handle, "Meta_Detach"))) {
+	if (!((pfn_detach = META_DETACH_FN(DLSYM(handle, "Meta_Detach"))))) {
 		META_WARNING("dll: Error detach plugin '%s': Couldn't find Meta_Detach(): %s", desc, DLERROR());
 		// caller will dlclose()
 		RETURN_ERRNO(mFALSE, ME_DLMISSING);
@@ -1278,7 +1277,7 @@ mBOOL DLLINTERNAL MPlugin::clear() {
 void DLLINTERNAL MPlugin::show() {
 	char* cp;
 	int n;
-	const int width = 13;
+	constexpr int width = 13;
 	META_CONS("%*s: %s", width, "name", info ? info->name : "(nil)");
 	META_CONS("%*s: %s", width, "desc", desc);
 	META_CONS("%*s: %s", width, "status", str_status());

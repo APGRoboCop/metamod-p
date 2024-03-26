@@ -51,7 +51,7 @@ const char* DLLINTERNAL META_UTIL_VarArgs(const char* format, ...)
 
 short DLLINTERNAL FixedSigned16(float value, float scale)
 {
-	int output = (int)(value * scale);
+	int output = int(value * scale);
 
 	if (output > 32767)
 		output = 32767;
@@ -59,18 +59,18 @@ short DLLINTERNAL FixedSigned16(float value, float scale)
 	if (output < -32768)
 		output = -32768;
 
-	return((short)output);
+	return short(output);
 }
 
 unsigned short DLLINTERNAL FixedUnsigned16(float value, float scale)
 {
-	int output = (int)(value * scale);
+	int output = int(value * scale);
 	if (output < 0)
 		output = 0;
 	if (output > 0xFFFF)
 		output = 0xFFFF;
 
-	return((unsigned short)output);
+	return static_cast<unsigned short>(output);
 }
 
 void DLLINTERNAL META_UTIL_HudMessage(edict_t* pEntity, const hudtextparms_t& textparms, const char* pMessage)

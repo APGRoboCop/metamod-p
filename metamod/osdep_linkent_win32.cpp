@@ -182,7 +182,7 @@ static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMOD
 			continue;
 
 		newSort[nameCount + i + listFix].name = (unsigned long)name;
-		newSort[nameCount + i + listFix].nameOrdinal = (unsigned short)funcCount + ((unsigned short*)rva_to_va(moduleGame, exportGame->AddressOfNameOrdinals))[i];
+		newSort[nameCount + i + listFix].nameOrdinal = static_cast<unsigned short>(funcCount) + ((unsigned short*)rva_to_va(moduleGame, exportGame->AddressOfNameOrdinals))[i];
 	}
 
 	//set new number
@@ -209,7 +209,7 @@ static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMOD
 	for (i = 0; i < newNumberOfNames; i++)
 	{
 		newNames[i] = va_to_rva(moduleMM, newNames[i]);
-		newNameOrdinals[i] = (unsigned short)va_to_rva(moduleMM, newNameOrdinals[i]);
+		newNameOrdinals[i] = static_cast<unsigned short>(va_to_rva(moduleMM, newNameOrdinals[i]));
 	}
 
 	DWORD OldProtect;
@@ -222,9 +222,9 @@ static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMOD
 	exportMM->Base = 1;
 	exportMM->NumberOfFunctions = newNumberOfFunctions;
 	exportMM->NumberOfNames = newNumberOfNames;
-	*(unsigned long*)&(exportMM->AddressOfFunctions) = va_to_rva(moduleMM, newFunctions);
-	*(unsigned long*)&(exportMM->AddressOfNames) = va_to_rva(moduleMM, newNames);
-	*(unsigned long*)&(exportMM->AddressOfNameOrdinals) = va_to_rva(moduleMM, newNameOrdinals);
+	exportMM->AddressOfFunctions = va_to_rva(moduleMM, newFunctions);
+	exportMM->AddressOfNames = va_to_rva(moduleMM, newNames);
+	exportMM->AddressOfNameOrdinals = va_to_rva(moduleMM, newNameOrdinals);
 
 	VirtualProtect(exportMM, sizeof(*exportMM), OldProtect, &OldProtect);
 	return(1);

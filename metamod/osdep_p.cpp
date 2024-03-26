@@ -117,6 +117,6 @@ DLHANDLE DLLINTERNAL get_module_handle_of_memptr(void* memptr)
 	if (!MBI.AllocationBase)
 		return(nullptr);
 
-	return((DLHANDLE)MBI.AllocationBase);
+	return DLHANDLE(MBI.AllocationBase);
 }
 #endif /* linux */

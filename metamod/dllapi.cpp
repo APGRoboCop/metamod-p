@@ -210,7 +210,7 @@ bool shouldExpensiveHooksBeEnabled(const char* gameMap) {
 static void mm_ServerActivate(edict_t* pEdictList, int edictCount, int clientMax) {
 
 	if (!Config->slowhooks) {
-		GIVE_ENGINE_FUNCTIONS_FN pfn_give_engfuncs = (GIVE_ENGINE_FUNCTIONS_FN)DLSYM(GameDLL.handle, "GiveFnptrsToDll");
+		const GIVE_ENGINE_FUNCTIONS_FN pfn_give_engfuncs = GIVE_ENGINE_FUNCTIONS_FN(DLSYM(GameDLL.handle, "GiveFnptrsToDll"));
 
 		if (shouldExpensiveHooksBeEnabled(STRING(gpGlobals->mapname))) {
 			META_DEBUG(3, ("Expensive metamod hooks enabled."));
@@ -258,7 +258,7 @@ static void mm_PlayerPostThink(edict_t* pEntity) {
 	RETURN_API_void()
 }
 static void mm_StartFrame() {
-	meta_debug_value = (int)meta_debug.value;
+	meta_debug_value = int(meta_debug.value);
 
 	META_DLLAPI_HANDLE_void(FN_STARTFRAME, pfnStartFrame, void, (VOID_ARG))
 	RETURN_API_void()

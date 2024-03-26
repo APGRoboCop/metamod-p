@@ -125,7 +125,7 @@ int DLLINTERNAL metamod_startup() {
 
 	// If running with "+developer", allow an opportunity to break in with
 	// a debugger.
-	if ((int)CVAR_GET_FLOAT("developer") != 0)
+	if (int(CVAR_GET_FLOAT("developer")) != 0)
 		sleep(1);
 
 	// Get gamedir, very early on, because it seems we need it all over the
@@ -154,15 +154,15 @@ int DLLINTERNAL metamod_startup() {
 
 	// Set a slight debug level for developer mode, if debug level not
 	// already set.
-	if ((int)CVAR_GET_FLOAT("developer") != 0 && (int)meta_debug.value == 0) {
-		CVAR_SET_FLOAT("meta_debug", (float)(meta_debug_value = 3));
+	if (int(CVAR_GET_FLOAT("developer")) != 0 && int(meta_debug.value) == 0) {
+		CVAR_SET_FLOAT("meta_debug", float(meta_debug_value = 3));
 	}
 
 	// Init default values
 	Config->init(global_options);
 	// Find config file
-	char* cfile = CONFIG_INI;
-	if ((cp = LOCALINFO("mm_configfile")) && *cp != '\0') {
+	const char* cfile = CONFIG_INI;
+	if (((cp = LOCALINFO("mm_configfile"))) && *cp != '\0') {
 		META_LOG("Configfile specified via localinfo: %s", cp);
 		if (valid_gamedir_file(cp))
 			cfile = cp;
@@ -177,35 +177,35 @@ int DLLINTERNAL metamod_startup() {
 		META_DEBUG(2, ("No config.ini file found: %s", CONFIG_INI));
 
 	// Now, override config options with localinfo commandline options.
-	if ((cp = LOCALINFO("mm_debug")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_debug"))) && *cp != '\0') {
 		META_LOG("Debuglevel specified via localinfo: %s", cp);
 		Config->set("debuglevel", cp);
 	}
-	if ((cp = LOCALINFO("mm_gamedll")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_gamedll"))) && *cp != '\0') {
 		META_LOG("Gamedll specified via localinfo: %s", cp);
 		Config->set("gamedll", cp);
 	}
-	if ((cp = LOCALINFO("mm_pluginsfile")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_pluginsfile"))) && *cp != '\0') {
 		META_LOG("Pluginsfile specified via localinfo: %s", cp);
 		Config->set("plugins_file", cp);
 	}
-	if ((cp = LOCALINFO("mm_execcfg")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_execcfg"))) && *cp != '\0') {
 		META_LOG("Execcfg specified via localinfo: %s", cp);
 		Config->set("exec_cfg", cp);
 	}
-	if ((cp = LOCALINFO("mm_autodetect")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_autodetect"))) && *cp != '\0') {
 		META_LOG("Autodetect specified via localinfo: %s", cp);
 		Config->set("autodetect", cp);
 	}
-	if ((cp = LOCALINFO("mm_clientmeta")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_clientmeta"))) && *cp != '\0') {
 		META_LOG("Clientmeta specified via localinfo: %s", cp);
 		Config->set("clientmeta", cp);
 	}
-	if ((cp = LOCALINFO("mm_slowhooks")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_slowhooks"))) && *cp != '\0') {
 		META_LOG("Slowhooks specified via localinfo: %s", cp);
 		Config->set("slowhooks", cp);
 	}
-	if ((cp = LOCALINFO("mm_slowhooks_whitelist")) && *cp != '\0') {
+	if (((cp = LOCALINFO("mm_slowhooks_whitelist"))) && *cp != '\0') {
 		META_LOG("Slowhooks whitelist specified via localinfo: %s", cp);
 		Config->set("slowhooks_whitelist", cp);
 	}
@@ -213,7 +213,7 @@ int DLLINTERNAL metamod_startup() {
 	// Check for an initial debug level, since cfg files don't get exec'd
 	// until later.
 	if (Config->debuglevel != 0) {
-		CVAR_SET_FLOAT("meta_debug", (float)(meta_debug_value = Config->debuglevel));
+		CVAR_SET_FLOAT("meta_debug", float(meta_debug_value = Config->debuglevel));
 	}
 
 	// Prepare for registered commands from plugins.
@@ -263,7 +263,7 @@ int DLLINTERNAL metamod_startup() {
 	// In fact, we need gamedir even earlier, so moved up above.
 
 	// Fall back to old plugins filename, if configured one isn't found.
-	char* mmfile = PLUGINS_INI;
+	const char* mmfile = PLUGINS_INI;
 	if (!valid_gamedir_file(PLUGINS_INI) && valid_gamedir_file(OLD_PLUGINS_INI))
 		mmfile = OLD_PLUGINS_INI;
 	if (valid_gamedir_file(Config->plugins_file))
@@ -378,7 +378,7 @@ mBOOL DLLINTERNAL meta_load_gamedll() {
 	}
 
 	// open the game DLL
-	if (!(GameDLL.handle = DLOPEN(GameDLL.pathname))) {
+	if (!((GameDLL.handle = DLOPEN(GameDLL.pathname)))) {
 		META_WARNING("dll: Couldn't load game DLL %s: %s", GameDLL.pathname,
 			DLERROR());
 		RETURN_ERRNO(mFALSE, ME_DLOPEN);
@@ -388,7 +388,7 @@ mBOOL DLLINTERNAL meta_load_gamedll() {
 	// wanted to catch one of the functions, but now that plugins are
 	// dynamically loadable at any time, we have to always pass our table,
 	// so that any plugin loaded later can catch what they need to.
-	if ((pfn_give_engfuncs = (GIVE_ENGINE_FUNCTIONS_FN)DLSYM(GameDLL.handle, "GiveFnptrsToDll")))
+	if ((pfn_give_engfuncs = GIVE_ENGINE_FUNCTIONS_FN(DLSYM(GameDLL.handle, "GiveFnptrsToDll"))))
 	{
 		if (!Config->slowhooks) {
 			memcpy(&g_slow_hooks_table_engine, &meta_engfuncs, sizeof(meta_enginefuncs_t));

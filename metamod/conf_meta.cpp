@@ -172,18 +172,18 @@ mBOOL DLLINTERNAL MConfig::load(const char* fn) {
 			continue;
 		if (strnmatch(line, "//", 2))
 			continue;
-		if (!(optname = strtok(line, " \t\r\n"))) {
+		if (!((optname = strtok(line, " \t\r\n")))) {
 			META_WARNING("'%s' line %d: bad config format: missing option",
 				loadfile, ln);
 			continue;
 		}
-		if (!(optval = strtok(nullptr, "\r\n"))) {
+		if (!((optval = strtok(nullptr, "\r\n")))) {
 			META_WARNING("'%s' line %d: bad config format: missing value",
 				loadfile, ln);
 			continue;
 		}
 
-		if (!(optp = find(optname))) {
+		if (!((optp = find(optname)))) {
 			META_WARNING("'%s' line %d: unknown option name '%s'",
 				loadfile, ln, optname);
 			continue;

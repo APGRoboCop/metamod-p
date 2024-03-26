@@ -454,7 +454,7 @@ mBOOL DLLINTERNAL MPluginList::ini_refresh() {
 		}
 		// Try to find plugin with this pathname in the current list of
 		// plugins.
-		if (!(pl_found = find(pl_temp.pathname))) {
+		if (!((pl_found = find(pl_temp.pathname)))) {
 			// Check for a matching platform with higher platform specifics
 			// level.
 			if (nullptr != (pl_found = find_match(&pl_temp))) {
@@ -540,7 +540,7 @@ MPlugin* DLLINTERNAL MPluginList::plugin_addload(plid_t plid, const char* fname,
 	MPlugin* pl_found, * pl_added, * pl_loader;
 
 	// Find loader plugin
-	if (!(pl_loader = find(plid))) {
+	if (!((pl_loader = find(plid)))) {
 		// Couldn't find a matching file on disk
 		META_DEBUG(1, ("Couldn't find plugin that gave this loading request!"));
 		// meta_errno should be already set in resolve()
@@ -573,7 +573,7 @@ MPlugin* DLLINTERNAL MPluginList::plugin_addload(plid_t plid, const char* fname,
 		RETURN_ERRNO(NULL, ME_ALREADY);
 	}
 	// new plugin; add to list
-	if (!(pl_added = add(&pl_temp))) {
+	if (!((pl_added = add(&pl_temp)))) {
 		META_DEBUG(1, ("Couldn't add plugin '%s' to list; see log", pl_temp.desc));
 		// meta_errno should be already set in add()
 		return(nullptr);
@@ -641,7 +641,7 @@ mBOOL DLLINTERNAL MPluginList::cmd_addload(const char* args) {
 		RETURN_ERRNO(mFALSE, ME_ALREADY);
 	}
 	// new plugin; add to list
-	if (!(pl_added = add(&pl_temp))) {
+	if (!((pl_added = add(&pl_temp)))) {
 		META_CONS("Couldn't add plugin '%s' to list; see log", pl_temp.desc);
 		// meta_errno should be already set in add()
 		return(mFALSE);

@@ -138,13 +138,13 @@ int DLLINTERNAL EngineInfo::nthdr_module_name()
 	unsigned char* pBaseAddr = (unsigned char*)hModule;
 
 	// Check if we find a DOS header
-	const _IMAGE_DOS_HEADER* const pDosHeader = (PIMAGE_DOS_HEADER)hModule;
+	const _IMAGE_DOS_HEADER* const pDosHeader = PIMAGE_DOS_HEADER(hModule);
 	if (pDosHeader->e_magic != IMAGE_DOS_SIGNATURE) {
 		return INVALID_DOS_SIGN;
 	}
 
 	// Check if we find a PE header
-	_IMAGE_NT_HEADERS* const pNTHeader = (PIMAGE_NT_HEADERS)(pBaseAddr + pDosHeader->e_lfanew);
+	_IMAGE_NT_HEADERS* const pNTHeader = PIMAGE_NT_HEADERS(pBaseAddr + pDosHeader->e_lfanew);
 	if (pNTHeader->Signature != IMAGE_NT_SIGNATURE) {
 		return INVALID_NT_SIGN;
 	}

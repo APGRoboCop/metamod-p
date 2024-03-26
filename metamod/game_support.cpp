@@ -262,7 +262,7 @@ mBOOL DLLINTERNAL setup_gamedll(gamedll_t* gamedll) {
 
 	// Then, autodetect gamedlls in "gamedir/dlls/"
 	// autodetect_gamedll returns 0 if knownfn exists and is valid gamedll.
-	if (Config->autodetect && (autofn = autodetect_gamedll(gamedll, knownfn))) {
+	if (Config->autodetect && ((autofn = autodetect_gamedll(gamedll, knownfn)))) {
 		// If knownfn is set and autodetect_gamedll returns non-null
 		// then knownfn doesn't exists and we should use autodetected
 		// dll instead.

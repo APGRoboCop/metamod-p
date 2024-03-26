@@ -306,7 +306,7 @@ MRegCvar* DLLINTERNAL MRegCvarList::add(const char* addname) {
 	//    happen).
 	//  - Can't point to memory in vlist which might get moved later by
 	//    realloc (again, segv).
-	icvar->data = (cvar_t*)calloc(1, sizeof(cvar_t));
+	icvar->data = static_cast<cvar_t*>(calloc(1, sizeof(cvar_t)));
 	if (!icvar->data) {
 		META_WARNING("Couldn't malloc cvar for adding reg cvar name '%s': %s",
 			addname, strerror(errno));

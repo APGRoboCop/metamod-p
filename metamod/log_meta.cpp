@@ -83,7 +83,7 @@ void DLLINTERNAL META_DEV(const char* fmt, ...) {
 	va_list ap;
 
 	if (nullptr != g_engfuncs.pfnCVarGetFloat) {
-		const int dev = (int)CVAR_GET_FLOAT("developer");
+		const int dev = int(CVAR_GET_FLOAT("developer"));
 		if (dev == 0) return;
 	}
 
@@ -219,7 +219,7 @@ static void buffered_ALERT(MLOG_SERVICE service, ALERT_TYPE atype, const char* p
 // jumptable is set. Don't call it if it isn't set.
 void DLLINTERNAL flush_ALERT_buffer() {
 	BufferedMessage* msg = messageQueueStart;
-	const int dev = (int)CVAR_GET_FLOAT("developer");
+	const int dev = int(CVAR_GET_FLOAT("developer"));
 
 	while (nullptr != msg) {
 		if (msg->service == mlsDEV && dev == 0) {
