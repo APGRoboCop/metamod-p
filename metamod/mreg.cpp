@@ -99,7 +99,7 @@ mBOOL DLLINTERNAL MRegCmd::call() {
 MRegCmdList::MRegCmdList()
 	: mlist(nullptr), size(REG_CMD_GROWSIZE), endlist(0)
 {
-	mlist = static_cast<MRegCmd*>(calloc(1, size * sizeof(MRegCmd)));
+	mlist = (MRegCmd*)calloc(1, size * sizeof(MRegCmd));
 	// initialize array
 	for (int i = 0; i < size; i++)
 		mlist[i].init(i + 1);		// 1-based index
@@ -127,7 +127,7 @@ MRegCmd* DLLINTERNAL MRegCmdList::add(const char* addname) {
 	if (endlist == size) {
 		const int newsize = size + REG_CMD_GROWSIZE;
 		META_DEBUG(6, ("Growing reg cmd list from %d to %d", size, newsize));
-		MRegCmd* temp = static_cast<MRegCmd*>(realloc(mlist, newsize * sizeof(MRegCmd)));
+		MRegCmd* temp = (MRegCmd*)realloc(mlist, newsize * sizeof(MRegCmd));
 		if (!temp) {
 			META_WARNING("Couldn't grow registered command list to %d for '%s': %s", newsize, addname, strerror(errno));
 			RETURN_ERRNO(NULL, ME_NOMEM);
@@ -182,7 +182,9 @@ void DLLINTERNAL MRegCmdList::show() const
 		const MRegCmd* icmd = &mlist[i];
 
 		if (icmd->status == RG_VALID) {
-			if (const MPlugin* iplug = Plugins->find(icmd->plugid))
+			const MPlugin* iplug = Plugins->find(icmd->plugid);
+
+			if (iplug)
 				STRNCPY(bplug, iplug->desc, sizeof(bplug));
 			else
 				STRNCPY(bplug, "(unknown)", sizeof(bplug));
@@ -267,7 +269,7 @@ mBOOL DLLINTERNAL MRegCvar::set(cvar_t* src) const
 MRegCvarList::MRegCvarList()
 	: vlist(nullptr), size(REG_CVAR_GROWSIZE), endlist(0)
 {
-	vlist = static_cast<MRegCvar*>(calloc(1, size * sizeof(MRegCvar)));
+	vlist = (MRegCvar*)calloc(1, size * sizeof(MRegCvar));
 	// initialize array
 	for (int i = 0; i < size; i++)
 		vlist[i].init(i + 1);		// 1-based
@@ -283,7 +285,7 @@ MRegCvar* DLLINTERNAL MRegCvarList::add(const char* addname) {
 	if (endlist == size) {
 		const int newsize = size + REG_CVAR_GROWSIZE;
 		META_DEBUG(6, ("Growing reg cvar list from %d to %d", size, newsize));
-		MRegCvar* temp = static_cast<MRegCvar*>(realloc(vlist, newsize * sizeof(MRegCvar)));
+		MRegCvar* temp = (MRegCvar*)realloc(vlist, newsize * sizeof(MRegCvar));
 		if (!temp) {
 			META_WARNING("Couldn't grow registered cvar list to %d for '%s'; %s", newsize, addname, strerror(errno));
 			RETURN_ERRNO(NULL, ME_NOMEM);
@@ -304,7 +306,7 @@ MRegCvar* DLLINTERNAL MRegCvarList::add(const char* addname) {
 	//    happen).
 	//  - Can't point to memory in vlist which might get moved later by
 	//    realloc (again, segv).
-	icvar->data = static_cast<cvar_t*>(calloc(1, sizeof(cvar_t)));
+	icvar->data = (cvar_t*)calloc(1, sizeof(cvar_t));
 	if (!icvar->data) {
 		META_WARNING("Couldn't malloc cvar for adding reg cvar name '%s': %s",
 			addname, strerror(errno));
@@ -365,7 +367,8 @@ void DLLINTERNAL MRegCvarList::show() const
 	for (int i = 0; i < endlist; i++) {
 		const MRegCvar* icvar = &vlist[i];
 		if (icvar->status == RG_VALID) {
-			if (const MPlugin* iplug = Plugins->find(icvar->plugid))
+			const MPlugin* iplug = Plugins->find(icvar->plugid);
+			if (iplug)
 				STRNCPY(bplug, iplug->desc, sizeof(bplug));
 			else
 				STRNCPY(bplug, "(unknown)", sizeof(bplug));

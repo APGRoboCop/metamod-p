@@ -123,11 +123,11 @@ public:
 	api_tables_t post_tables;
 
 	DLLINTERNAL void* get_api_table(enum_api_t api) {
-		return(reinterpret_cast<void**>(&tables)[api]);
+		return(((void**)&tables)[api]);
 	}
 
 	DLLINTERNAL void* get_api_post_table(enum_api_t api) {
-		return(reinterpret_cast<void**>(&post_tables)[api]);
+		return(((void**)&post_tables)[api]);
 	}
 
 	int index;					// 1-based

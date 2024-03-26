@@ -89,12 +89,12 @@ void DLLINTERNAL main_hook_function_void(unsigned int api_info_offset, enum_api_
 
 	//Setup
 	const int loglevel = api_info->loglevel;
-	auto mres = MRES_UNSET;
-	auto status = MRES_UNSET;
+	META_RES mres;
+	META_RES status = MRES_UNSET;
 	void* pfn_routine;
 
 	//Pre plugin functions
-	auto prev_mres = MRES_UNSET;
+	META_RES prev_mres = MRES_UNSET;
 	for (i = 0; likely(i < Plugins->endlist); i++) {
 		iplug = &Plugins->plist[i];
 

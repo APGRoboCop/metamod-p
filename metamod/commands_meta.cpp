@@ -73,7 +73,7 @@ void DLLINTERNAL meta_register_cmdcvar() {
 	CVAR_REGISTER(&meta_debug);
 	CVAR_REGISTER(&meta_version);
 
-	meta_debug_value = static_cast<int>(meta_debug.value);
+	meta_debug_value = (int)meta_debug.value;
 
 	char meta[] = "meta";
 	REG_SVR_COMMAND(meta, svr_meta);

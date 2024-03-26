@@ -105,7 +105,7 @@ static void mutil_LogDeveloper(plid_t plid, const char* fmt, ...) {
 	va_list ap;
 	char buf[MAX_LOGMSG_LEN];
 
-	if (static_cast<int>(CVAR_GET_FLOAT("developer")) == 0)
+	if ((int)CVAR_GET_FLOAT("developer") == 0)
 		return;
 
 	const plugin_info_t* plinfo = plid;
@@ -155,7 +155,7 @@ static qboolean mutil_CallGameEntity(plid_t plid, const char* entStr, entvars_t*
 	const plugin_info_t* plinfo = plid;
 	META_DEBUG(8, ("Looking up game entity '%s' for plugin '%s'", entStr,
 		plinfo->name));
-	const ENTITY_FN pfnEntity = reinterpret_cast<ENTITY_FN>(DLSYM(GameDLL.handle, entStr));
+	const ENTITY_FN pfnEntity = (ENTITY_FN)DLSYM(GameDLL.handle, entStr);
 	if (!pfnEntity) {
 		META_WARNING("Couldn't find game entity '%s' in game DLL '%s' for plugin '%s'", entStr, GameDLL.name, plinfo->name);
 		return(false);
@@ -172,7 +172,8 @@ static int mutil_GetUserMsgID(plid_t plid, const char* msgname, int* size) {
 	const plugin_info_t* plinfo = plid;
 	META_DEBUG(8, ("Looking up usermsg name '%s' for plugin '%s'", msgname,
 		plinfo->name));
-	if (const MRegMsg* umsg = RegMsgs->find(msgname)) {
+	const MRegMsg* umsg = RegMsgs->find(msgname);
+	if (umsg) {
 		if (size)
 			*size = umsg->size;
 		return(umsg->msgid);
@@ -210,7 +211,8 @@ static const char* mutil_GetUserMsgName(plid_t plid, int msgid, int* size) {
 			return("director?");
 		}
 	}
-	if (const MRegMsg* umsg = RegMsgs->find(msgid)) {
+	const MRegMsg* umsg = RegMsgs->find(msgid);
+	if (umsg) {
 		if (size)
 			*size = umsg->size;
 		// 'name' is assumed to be a constant string, allocated in the
@@ -275,13 +277,13 @@ static int mutil_LoadMetaPlugin(plid_t plid, const char* fname, PLUG_LOADTIME no
 	}
 
 	meta_errno = ME_NOERROR;
-	if (!((pl_loaded = Plugins->plugin_addload(plid, fname, now)))) {
+	if (!(pl_loaded = Plugins->plugin_addload(plid, fname, now))) {
 		if (plugin_handle)
 			*plugin_handle = nullptr;
 		return(meta_errno);
 	}
 	if (plugin_handle)
-		*plugin_handle = static_cast<void*>(pl_loaded->handle);
+		*plugin_handle = (void*)pl_loaded->handle;
 	return(0);
 }
 
@@ -319,7 +321,7 @@ static int mutil_UnloadMetaPluginByHandle(plid_t plid, void* plugin_handle, PLUG
 		return(ME_ARGUMENT);
 	}
 
-	if (!((findp = Plugins->find(static_cast<DLHANDLE>(plugin_handle)))))
+	if (!(findp = Plugins->find((DLHANDLE)plugin_handle)))
 		return(ME_NOTFOUND);
 
 	meta_errno = ME_NOERROR;

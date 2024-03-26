@@ -71,15 +71,16 @@ option_t* DLLINTERNAL MConfig::find(const char* lookup) const
 
 mBOOL DLLINTERNAL MConfig::set(const char* key, const char* value) const
 {
-	if (option_t* optp = find(key))
+	option_t* optp = find(key);
+	if (optp)
 		return(set(optp, value));
 	RETURN_ERRNO(mFALSE, ME_NOTFOUND);
 }
 
 mBOOL DLLINTERNAL MConfig::set(option_t* setp, const char* setstr) {
 	char pathbuf[PATH_MAX];
-	int* optval = static_cast<int*>(setp->dest);
-	char** optstr = static_cast<char**>(setp->dest);
+	int* optval = (int*)setp->dest;
+	char** optstr = (char**)setp->dest;
 	// cvar_t *optcvar = (cvar_t *) setp->dest;
 	// SETOPT_FN optcmd = (SETOPT_FN) setp->dest;
 
@@ -206,8 +207,8 @@ void DLLINTERNAL MConfig::show() const
 	else
 		META_CONS("%s:", "Config options from localinfo");
 	for (option_t* optp = list; optp->name; optp++) {
-		const int* optval = static_cast<int*>(optp->dest);
-		char** optstr = static_cast<char**>(optp->dest);
+		const int* optval = (int*)optp->dest;
+		char** optstr = (char**)optp->dest;
 		// cvar_t *optcvar = (cvar_t *) optp->dest;
 		// SETOPT_FN optcmd = (SETOPT_FN) optp->dest;
 		switch (optp->type) {

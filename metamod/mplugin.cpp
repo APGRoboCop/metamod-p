@@ -291,7 +291,7 @@ mBOOL DLLINTERNAL MPlugin::resolve() {
 	else
 		file = pathname;
 	// store pathname: the gamedir relative path, or an absolute path
-	const size_t len = strlen(GameDLL.gamedir);
+	const int len = strlen(GameDLL.gamedir);
 	if (strncasecmp(pathname, GameDLL.gamedir, len) == 0)
 		STRNCPY(filename, pathname + len + 1, sizeof(filename));
 	else
@@ -646,7 +646,7 @@ mBOOL DLLINTERNAL MPlugin::query() {
 	// GiveFnptrsToDll before Meta_Query, because the latter typically uses
 	// engine functions like AlertMessage, which have to be passed along via
 	// GiveFnptrsToDll.
-	const META_QUERY_FN pfn_query = reinterpret_cast<META_QUERY_FN>(DLSYM(handle, "Meta_Query"));
+	const META_QUERY_FN pfn_query = (META_QUERY_FN)DLSYM(handle, "Meta_Query");
 	if (!pfn_query) {
 		META_WARNING("dll: Failed query plugin '%s'; Couldn't find Meta_Query(): %s", desc, DLERROR());
 		// caller will dlclose()
@@ -667,7 +667,7 @@ mBOOL DLLINTERNAL MPlugin::query() {
 	// This passes nothing and returns nothing, and the routine in the
 	// plugin can NOT use any Engine functions, as they haven't been
 	// provided yet (done next, in GiveFnptrsToDll).
-	const META_INIT_FN pfn_init = reinterpret_cast<META_INIT_FN>(DLSYM(handle, "Meta_Init"));
+	const META_INIT_FN pfn_init = (META_INIT_FN)DLSYM(handle, "Meta_Init");
 	if (pfn_init) {
 		pfn_init();
 		META_DEBUG(6, ("dll: Plugin '%s': Called Meta_Init()", desc));
@@ -678,10 +678,10 @@ mBOOL DLLINTERNAL MPlugin::query() {
 	}
 
 	// pass on engine function table and globals to plugin
-	if (!(pfn_give_engfuncs = reinterpret_cast<GIVE_ENGINE_FUNCTIONS_FN>(DLSYM(handle, "GiveFnptrsToDll")))) {
+	if (!(pfn_give_engfuncs = (GIVE_ENGINE_FUNCTIONS_FN)DLSYM(handle, "GiveFnptrsToDll"))) {
 
 		// this magic "@8" code from hzqst fixes plugins not loading -w00tguy
-		pfn_give_engfuncs = reinterpret_cast<GIVE_ENGINE_FUNCTIONS_FN>(DLSYM(handle, "_GiveFnptrsToDll@8"));
+		pfn_give_engfuncs = (GIVE_ENGINE_FUNCTIONS_FN)DLSYM(handle, "_GiveFnptrsToDll@8");
 
 		if (!pfn_give_engfuncs)
 		{
@@ -770,9 +770,9 @@ mBOOL DLLINTERNAL MPlugin::query() {
 	// Give plugin the p-series extension function table.
 	// Check for version differences!
 	//
-	if (nullptr != (pfn_give_pext_funcs = reinterpret_cast<META_GIVE_PEXT_FUNCTIONS_FN>(DLSYM(handle, "Meta_PExtGiveFnptrs")))) {
+	if (nullptr != (pfn_give_pext_funcs = (META_GIVE_PEXT_FUNCTIONS_FN)DLSYM(handle, "Meta_PExtGiveFnptrs"))) {
 		const int plugin_pext_version = (*pfn_give_pext_funcs)(
-			META_PEXT_VERSION, reinterpret_cast<pextension_funcs_t*>(&(mutil_funcs.pfnLoadPlugin)));
+			META_PEXT_VERSION, (pextension_funcs_t*)(&(mutil_funcs.pfnLoadPlugin)));
 
 		//if plugin is newer, we got incompatibility problem!
 		if (plugin_pext_version > META_PEXT_VERSION) {
@@ -816,7 +816,7 @@ mBOOL DLLINTERNAL MPlugin::attach(PLUG_LOADTIME now) {
 	// Make copy of gameDLL's function tables for each plugin, so we don't
 	// risk the plugins screwing with the tables everyone uses.
 	if (!gamedll_funcs.dllapi_table) {
-		gamedll_funcs.dllapi_table = static_cast<DLL_FUNCTIONS*>(calloc(1, sizeof(DLL_FUNCTIONS)));
+		gamedll_funcs.dllapi_table = (DLL_FUNCTIONS*)calloc(1, sizeof(DLL_FUNCTIONS));
 		if (!gamedll_funcs.dllapi_table) {
 			META_WARNING("dll: Failed attach plugin '%s': Failed malloc() for dllapi_table");
 			RETURN_ERRNO(mFALSE, ME_NOMEM);
@@ -827,7 +827,7 @@ mBOOL DLLINTERNAL MPlugin::attach(PLUG_LOADTIME now) {
 			memset(gamedll_funcs.dllapi_table, 0, sizeof(DLL_FUNCTIONS));
 	}
 	if (!gamedll_funcs.newapi_table) {
-		gamedll_funcs.newapi_table = static_cast<NEW_DLL_FUNCTIONS*>(calloc(1, sizeof(NEW_DLL_FUNCTIONS)));
+		gamedll_funcs.newapi_table = (NEW_DLL_FUNCTIONS*)calloc(1, sizeof(NEW_DLL_FUNCTIONS));
 		if (!gamedll_funcs.newapi_table) {
 			META_WARNING("dll: Failed attach plugin '%s': Failed malloc() for newapi_table");
 			RETURN_ERRNO(mFALSE, ME_NOMEM);
@@ -837,7 +837,7 @@ mBOOL DLLINTERNAL MPlugin::attach(PLUG_LOADTIME now) {
 		else
 			memset(gamedll_funcs.newapi_table, 0, sizeof(NEW_DLL_FUNCTIONS));
 	}
-	if (!(pfn_attach = reinterpret_cast<META_ATTACH_FN>(DLSYM(handle, "Meta_Attach")))) {
+	if (!(pfn_attach = (META_ATTACH_FN)DLSYM(handle, "Meta_Attach"))) {
 		META_WARNING("dll: Failed attach plugin '%s': Couldn't find Meta_Attach(): %s", desc, DLERROR());
 		// caller will dlclose()
 		RETURN_ERRNO(mFALSE, ME_DLMISSING);
@@ -1096,7 +1096,7 @@ mBOOL DLLINTERNAL MPlugin::detach(PLUG_LOADTIME now, PL_UNLOAD_REASON reason) {
 	if (!handle)
 		return(mTRUE);
 
-	if (!(pfn_detach = reinterpret_cast<META_DETACH_FN>(DLSYM(handle, "Meta_Detach")))) {
+	if (!(pfn_detach = (META_DETACH_FN)DLSYM(handle, "Meta_Detach"))) {
 		META_WARNING("dll: Error detach plugin '%s': Couldn't find Meta_Detach(): %s", desc, DLERROR());
 		// caller will dlclose()
 		RETURN_ERRNO(mFALSE, ME_DLMISSING);
@@ -1278,7 +1278,7 @@ mBOOL DLLINTERNAL MPlugin::clear() {
 void DLLINTERNAL MPlugin::show() {
 	char* cp;
 	int n;
-	constexpr int width = 13;
+	const int width = 13;
 	META_CONS("%*s: %s", width, "name", info ? info->name : "(nil)");
 	META_CONS("%*s: %s", width, "desc", desc);
 	META_CONS("%*s: %s", width, "status", str_status());

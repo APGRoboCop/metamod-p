@@ -67,7 +67,7 @@ static IMAGE_NT_HEADERS* DLLINTERNAL_NOVIS get_ntheaders(HMODULE module)
 	} mem;
 
 	//Check if valid dos header
-	mem.mem = reinterpret_cast<unsigned long>(module);
+	mem.mem = (unsigned long)module;
 	if (IsBadReadPtr(mem.dos, sizeof(*mem.dos)) || mem.dos->e_magic != IMAGE_DOS_SIGNATURE)
 		return(nullptr);
 
@@ -113,8 +113,8 @@ static IMAGE_EXPORT_DIRECTORY* DLLINTERNAL_NOVIS get_export_table(HMODULE module
 //
 static int sort_names_list(const sort_names_t* A, const sort_names_t* B)
 {
-	const char* str_A = reinterpret_cast<const char*>(A->name);
-	const char* str_B = reinterpret_cast<const char*>(B->name);
+	const char* str_A = (const char*)A->name;
+	const char* str_B = (const char*)B->name;
 
 	return(mm_strcmp(str_A, str_B));
 }
@@ -149,8 +149,8 @@ static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMOD
 	unsigned long newNumberOfNames = exportMM->NumberOfNames + exportGame->NumberOfNames;
 
 	//alloc lists
-	*reinterpret_cast<void**>(&newFunctions) = calloc(1, newNumberOfFunctions * sizeof(*newFunctions));
-	*reinterpret_cast<void**>(&newSort) = calloc(1, newNumberOfNames * sizeof(*newSort));
+	*(void**)&newFunctions = calloc(1, newNumberOfFunctions * sizeof(*newFunctions));
+	*(void**)&newSort = calloc(1, newNumberOfNames * sizeof(*newSort));
 
 	//copy moduleMM to new export
 	for (funcCount = 0; funcCount < exportMM->NumberOfFunctions; funcCount++)
@@ -160,7 +160,7 @@ static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMOD
 		//fix name address
 		newSort[nameCount].name = rva_to_va(moduleMM, ((unsigned long*)rva_to_va(moduleMM, exportMM->AddressOfNames))[nameCount]);
 		//ordinal is index to function list
-		newSort[nameCount].nameOrdinal = reinterpret_cast<unsigned short*>(rva_to_va(moduleMM, exportMM->AddressOfNameOrdinals))[nameCount];
+		newSort[nameCount].nameOrdinal = ((unsigned short*)rva_to_va(moduleMM, exportMM->AddressOfNameOrdinals))[nameCount];
 	}
 
 	//copy moduleGame to new export
@@ -168,12 +168,11 @@ static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMOD
 		newFunctions[funcCount + i] = rva_to_va(moduleGame, ((unsigned long*)rva_to_va(moduleGame, exportGame->AddressOfFunctions))[i]);
 	for (i = 0, listFix = 0; i < exportGame->NumberOfNames; i++)
 	{
-		const char* name = reinterpret_cast<const char*>(rva_to_va(
-			moduleGame, ((unsigned long*)rva_to_va(moduleGame, exportGame->AddressOfNames))[i]));
+		const char* name = (const char*)rva_to_va(moduleGame, ((unsigned long*)rva_to_va(moduleGame, exportGame->AddressOfNames))[i]);
 		//Check if name already in the list
 		for (u = 0; u < nameCount; u++)
 		{
-			if (!strcasecmp(name, reinterpret_cast<const char*>(newSort[u].name)))
+			if (!strcasecmp(name, (const char*)newSort[u].name))
 			{
 				listFix -= 1;
 				break;
@@ -182,19 +181,19 @@ static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMOD
 		if (u < nameCount) //already in the list.. skip
 			continue;
 
-		newSort[nameCount + i + listFix].name = reinterpret_cast<unsigned long>(name);
-		newSort[nameCount + i + listFix].nameOrdinal = static_cast<unsigned short>(funcCount) + reinterpret_cast<unsigned short*>(rva_to_va(moduleGame, exportGame->AddressOfNameOrdinals))[i];
+		newSort[nameCount + i + listFix].name = (unsigned long)name;
+		newSort[nameCount + i + listFix].nameOrdinal = (unsigned short)funcCount + ((unsigned short*)rva_to_va(moduleGame, exportGame->AddressOfNameOrdinals))[i];
 	}
 
 	//set new number
 	newNumberOfNames = nameCount + i + listFix;
 
 	//sort names list
-	qsort(newSort, newNumberOfNames, sizeof(*newSort), reinterpret_cast<int(*)(const void*, const void*)>(&sort_names_list));
+	qsort(newSort, newNumberOfNames, sizeof(*newSort), (int(*)(const void*, const void*)) & sort_names_list);
 
 	//make newNames and newNameOrdinals lists (VirtualAlloc so we dont waste heap memory to stuff that isn't freed)
-	*reinterpret_cast<void**>(&newNames) = VirtualAlloc(nullptr, newNumberOfNames * sizeof(*newNames), MEM_COMMIT, PAGE_READWRITE);
-	*reinterpret_cast<void**>(&newNameOrdinals) = VirtualAlloc(nullptr, newNumberOfNames * sizeof(*newNameOrdinals), MEM_COMMIT, PAGE_READWRITE);
+	*(void**)&newNames = VirtualAlloc(nullptr, newNumberOfNames * sizeof(*newNames), MEM_COMMIT, PAGE_READWRITE);
+	*(void**)&newNameOrdinals = VirtualAlloc(nullptr, newNumberOfNames * sizeof(*newNameOrdinals), MEM_COMMIT, PAGE_READWRITE);
 
 	for (i = 0; i < newNumberOfNames; i++)
 	{
@@ -210,7 +209,7 @@ static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMOD
 	for (i = 0; i < newNumberOfNames; i++)
 	{
 		newNames[i] = va_to_rva(moduleMM, newNames[i]);
-		newNameOrdinals[i] = static_cast<unsigned short>(va_to_rva(moduleMM, newNameOrdinals[i]));
+		newNameOrdinals[i] = (unsigned short)va_to_rva(moduleMM, newNameOrdinals[i]);
 	}
 
 	DWORD OldProtect;
@@ -223,9 +222,9 @@ static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMOD
 	exportMM->Base = 1;
 	exportMM->NumberOfFunctions = newNumberOfFunctions;
 	exportMM->NumberOfNames = newNumberOfNames;
-	exportMM->AddressOfFunctions = va_to_rva(moduleMM, newFunctions);
-	exportMM->AddressOfNames = va_to_rva(moduleMM, newNames);
-	exportMM->AddressOfNameOrdinals = va_to_rva(moduleMM, newNameOrdinals);
+	*(unsigned long*)&(exportMM->AddressOfFunctions) = va_to_rva(moduleMM, newFunctions);
+	*(unsigned long*)&(exportMM->AddressOfNames) = va_to_rva(moduleMM, newNames);
+	*(unsigned long*)&(exportMM->AddressOfNameOrdinals) = va_to_rva(moduleMM, newNameOrdinals);
 
 	VirtualProtect(exportMM, sizeof(*exportMM), OldProtect, &OldProtect);
 	return(1);

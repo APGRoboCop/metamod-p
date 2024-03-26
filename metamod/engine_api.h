@@ -45,10 +45,7 @@ typedef int (*GET_ENGINE_FUNCTIONS_FN) (enginefuncs_t* pengfuncsFromEngine, int*
 // According to SDK engine/eiface.h:
 //! enginefuncs_t
 //! ONLY ADD NEW FUNCTIONS TO THE END OF THIS STRUCT.  INTERFACE VERSION IS FROZEN AT 138
-enum
-{
-	ENGINE_INTERFACE_VERSION = 138
-};
+#define ENGINE_INTERFACE_VERSION 138
 
 // Protect against other projects which use this include file but use the
 // normal enginefuncs_t type for their meta_engfuncs.

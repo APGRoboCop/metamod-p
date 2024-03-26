@@ -372,14 +372,14 @@ static const char* mm_CVarGetString(const char* szVarName) {
 static void mm_CVarSetFloat(const char* szVarName, float flValue) {
 	META_ENGINE_HANDLE_void(FN_CVARSETFLOAT, pfnCVarSetFloat, pf, (szVarName, flValue))
 
-	meta_debug_value = static_cast<int>(meta_debug.value);
+	meta_debug_value = (int)meta_debug.value;
 
 	RETURN_API_void()
 }
 static void mm_CVarSetString(const char* szVarName, const char* szValue) {
 	META_ENGINE_HANDLE_void(FN_CVARSETSTRING, pfnCVarSetString, 2p, (szVarName, szValue))
 
-	meta_debug_value = static_cast<int>(meta_debug.value);
+	meta_debug_value = (int)meta_debug.value;
 
 	RETURN_API_void()
 }
@@ -460,7 +460,8 @@ static int mm_RegUserMsg(const char* pszName, int iSize) {
 
 	// Add the msgid, name, and size to our saved list, if we haven't
 	// already.
-	if (const MRegMsg* nmsg = RegMsgs->find(imsgid)) {
+	const MRegMsg* nmsg = RegMsgs->find(imsgid);
+	if (nmsg) {
 		if (FStrEq(pszName, nmsg->name))
 			// This name/msgid pair was already registered.
 			META_DEBUG(3, ("user message registered again: name=%s, msgid=%d", pszName, imsgid));
@@ -765,7 +766,7 @@ static int mm_engCreateInstancedBaseline(int classname, entity_state_s* baseline
 static void mm_Cvar_DirectSet(cvar_s* var, char* value) {
 	META_ENGINE_HANDLE_void(FN_CVAR_DIRECTSET, pfnCvar_DirectSet, 2p, (var, value))
 
-	meta_debug_value = static_cast<int>(meta_debug.value);
+	meta_debug_value = (int)meta_debug.value;
 
 	RETURN_API_void()
 }

@@ -28,15 +28,10 @@
 // Current mask for checking engine function addresses
 // in VAC protected engine dlls on Win32. This is gonna fail
 // on Win64.
-/*const unsigned long c_VacDllEngineFuncsRangeMask = 0xFFF00000;
+const unsigned long c_VacDllEngineFuncsRangeMask = 0xFFF00000;
 const unsigned long c_VacDllEngineFuncsRangeMark = 0x01D00000;
 void* const c_VacDllEngineFuncsRangeStart = (void*)0x01D00000;
-void* const c_VacDllEngineFuncsRangeEnd = (void*)0x01E00000;*/
-
-unsigned long c_VacDllEngineFuncsRangeMask = 0xFFF00000;
-unsigned long c_VacDllEngineFuncsRangeMark = 0x01D00000;
-void* c_VacDllEngineFuncsRangeStart = reinterpret_cast<void*>(0x01D00000);
-void* c_VacDllEngineFuncsRangeEnd = reinterpret_cast<void*>(0x01E00000);
+void* const c_VacDllEngineFuncsRangeEnd = (void*)0x01E00000;
 
 bool DLLINTERNAL EngineInfo::check_for_engine_module(const char* _pName)
 {
@@ -140,16 +135,16 @@ int DLLINTERNAL EngineInfo::nthdr_module_name()
 	// This is also the modules base address.
 	HINSTANCE__* const hModule = GetModuleHandle(pName);
 
-	unsigned char* pBaseAddr = reinterpret_cast<unsigned char*>(hModule);
+	unsigned char* pBaseAddr = (unsigned char*)hModule;
 
 	// Check if we find a DOS header
-	const _IMAGE_DOS_HEADER* const pDosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(hModule);
+	const _IMAGE_DOS_HEADER* const pDosHeader = (PIMAGE_DOS_HEADER)hModule;
 	if (pDosHeader->e_magic != IMAGE_DOS_SIGNATURE) {
 		return INVALID_DOS_SIGN;
 	}
 
 	// Check if we find a PE header
-	_IMAGE_NT_HEADERS* const pNTHeader = reinterpret_cast<PIMAGE_NT_HEADERS>(pBaseAddr + pDosHeader->e_lfanew);
+	_IMAGE_NT_HEADERS* const pNTHeader = (PIMAGE_NT_HEADERS)(pBaseAddr + pDosHeader->e_lfanew);
 	if (pNTHeader->Signature != IMAGE_NT_SIGNATURE) {
 		return INVALID_NT_SIGN;
 	}
@@ -177,7 +172,7 @@ int DLLINTERNAL EngineInfo::vac_pe_approx(enginefuncs_t* _pFuncs)
 	// If we find functions outside this range we can't determine a valid
 	// range and have to just give up.
 
-	unsigned long* pengfuncs = reinterpret_cast<unsigned long*>(_pFuncs);
+	unsigned long* pengfuncs = (unsigned long*)_pFuncs;
 	unsigned int i, invals = 0;
 	for (i = 0, pengfuncs += i; i < 140; i++, pengfuncs++) {
 		if (((*pengfuncs) & c_VacDllEngineFuncsRangeMask) != c_VacDllEngineFuncsRangeMark) {

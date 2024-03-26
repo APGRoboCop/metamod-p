@@ -76,20 +76,20 @@ static pthread_mutex_t mutex_replacement_dlsym = PTHREAD_RECURSIVE_MUTEX_INITIAL
 //constructs new jmp forwarder
 inline void construct_jmp_instruction(void *x, void *place, void* target)
 {
-	static_cast<unsigned char*>(x)[0] = 0xe9;
-	*reinterpret_cast<unsigned long*>(static_cast<char*>(x) + 1) = reinterpret_cast<unsigned long>(target) - (reinterpret_cast<unsigned long>(place) + 5);
+	((unsigned char *)x)[0] = 0xe9;
+	*(unsigned long *)((char *)x + 1) = (unsigned long)target - ((unsigned long)place + 5);
 }
 
 //checks if pointer x points to jump forwarder
 inline bool is_code_trampoline_jmp_opcode(void *x) 
 { 
-	return (static_cast<unsigned char*>(x)[0] == 0xff || static_cast<unsigned char*>(x)[1] == 0x25); 
+	return (((unsigned char *)x)[0] == 0xff || ((unsigned char *)x)[1] == 0x25); 
 }
 
 //extracts pointer from "jmp dword ptr[pointer]"
 inline void * extract_function_pointer_from_trampoline_jmp(void *x)
 {
-	return (**reinterpret_cast<void***>(static_cast<char*>(x) + 2));
+	return (**(void***)((char *)(x) + 2));
 }
 
 //
@@ -205,10 +205,10 @@ int DLLINTERNAL init_linkent_replacement(DLHANDLE MetamodHandle, DLHANDLE GameDl
 	construct_jmp_instruction(&dlsym_new_bytes[0], (void*)dlsym_original, (void*)&__replacement_dlsym);
 	
 	//Check if bytes overlap page border.	
-	const unsigned long start_of_page = PAGE_ALIGN(reinterpret_cast<long>(dlsym_original)) - PAGE_SIZE;
+	const unsigned long start_of_page = PAGE_ALIGN((long)dlsym_original) - PAGE_SIZE;
 	unsigned long size_of_pages;
 	
-	if(reinterpret_cast<unsigned long>(dlsym_original) + BYTES_SIZE > PAGE_ALIGN(reinterpret_cast<unsigned long>(dlsym_original)))
+	if((unsigned long)dlsym_original + BYTES_SIZE > PAGE_ALIGN((unsigned long)dlsym_original))
 	{
 		//bytes are located on two pages
 		size_of_pages = PAGE_SIZE*2;
@@ -220,7 +220,7 @@ int DLLINTERNAL init_linkent_replacement(DLHANDLE MetamodHandle, DLHANDLE GameDl
 	}
 	
 	//Remove PROT_READ restriction
-	if(mprotect(reinterpret_cast<void*>(start_of_page), size_of_pages, PROT_READ|PROT_WRITE|PROT_EXEC))
+	if(mprotect((void*)start_of_page, size_of_pages, PROT_READ|PROT_WRITE|PROT_EXEC))
 	{
 		META_ERROR("Couldn't initialize dynamic linkents, mprotect failed: %i.  Exiting...", errno);
 		return(0);

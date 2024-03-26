@@ -64,14 +64,15 @@ const game_modlist_t known_games = {
 
 // Find a modinfo corresponding to the given game name.
 const game_modinfo_t* DLLINTERNAL lookup_game(const char* name) {
+	const game_modinfo_t* imod;
+	char check_path[NAME_MAX];
 	for (int i = 0; known_games[i].name; i++) {
-		const game_modinfo_t* imod = &known_games[i];
+		imod = &known_games[i];
 		// If there are 2 or more same names check next dll file if doesn't exist
 		if (strcasematch(imod->name, name)) {
-			char check_path[NAME_MAX];
 			safevoid_snprintf(check_path, sizeof(check_path), "dlls/%s",
 #ifdef _WIN32
-			                  imod->win_dll);
+				imod->win_dll);
 #elif defined(linux)
 				imod->linux_so);
 #endif
@@ -149,9 +150,9 @@ mBOOL DLLINTERNAL setup_gamedll(gamedll_t* gamedll) {
 	const game_modinfo_t* known;
 
 #ifdef _WIN32
-	const char* cp;
+	char* cp;
 #elif defined(linux)
-	const char* cp, * strippedfn;
+	char* cp, * strippedfn;
 #endif
 
 	const char* autofn = nullptr, * knownfn = nullptr, * usedfn = nullptr;
@@ -168,16 +169,16 @@ mBOOL DLLINTERNAL setup_gamedll(gamedll_t* gamedll) {
 		knownfn = known->linux_so;
 #ifdef __x86_64__
 		//AMD64: convert _i386.so to _amd64.so
-		if (((cp = strstr(knownfn, "_i386.so"))) ||
-			((cp = strstr(knownfn, "_i486.so"))) ||
-			((cp = strstr(knownfn, "_i586.so"))) ||
-			((cp = strstr(knownfn, "_i686.so")))) {
+		if ((cp = strstr(knownfn, "_i386.so")) ||
+			(cp = strstr(knownfn, "_i486.so")) ||
+			(cp = strstr(knownfn, "_i586.so")) ||
+			(cp = strstr(knownfn, "_i686.so"))) {
 			//make sure that it's the ending that has "_iX86.so"
 			if (cp[strlen("_i386.so")] == 0) {
 				STRNCPY(fixname_amd64, known->linux_so,
 					MIN(((size_t)cp - (size_t)knownfn) + 1,
 						sizeof(fixname_amd64)));
-				strncat(fixname_amd64, "_amd64.so", sizeof(fixname_amd64) - strlen(fixname_amd64) - 1);
+				strncat(fixname_amd64, "_amd64.so", sizeof(fixname_amd64));
 
 				knownfn = fixname_amd64;
 			}
@@ -201,21 +202,21 @@ mBOOL DLLINTERNAL setup_gamedll(gamedll_t* gamedll) {
 			STRNCPY(temp_str, knownfn, sizeof(temp_str));
 			strippedfn = temp_str;
 
-			const char* loc = strrchr(strippedfn, '_');
+			char* loc = strrchr(strippedfn, '_');
 
 			// A small safety net here: make sure that we are dealing with
 			// a file name at least four characters long and ending in
 			// '.so'. This way we can be sure that we can safely overwrite
 			// anything from the '_' on with '.so'.
-			unsigned size = 0;
-			const char* ext = nullptr;
-			if (nullptr != loc) {
+			int size = 0;
+			const char* ext;
+			if (0 != loc) {
 				size = strlen(strippedfn);
 				ext = strippedfn + (size - 3);
 			}
 
-			if (nullptr != loc && size > 3 && 0 == strcasecmp(ext, ".so")) {
-				strcpy(const_cast<char*>(loc), ".so");
+			if (0 != loc && size > 3 && 0 == strcasecmp(ext, ".so")) {
+				strcpy(loc, ".so");
 				META_DEBUG(4, ("Checking for new version game DLL name '%s'.\n", strippedfn));
 
 				// Again, as above, I abuse the real_pathname member to store the full pathname
@@ -261,7 +262,7 @@ mBOOL DLLINTERNAL setup_gamedll(gamedll_t* gamedll) {
 
 	// Then, autodetect gamedlls in "gamedir/dlls/"
 	// autodetect_gamedll returns 0 if knownfn exists and is valid gamedll.
-	if (Config->autodetect && ((autofn = autodetect_gamedll(gamedll, knownfn)))) {
+	if (Config->autodetect && (autofn = autodetect_gamedll(gamedll, knownfn))) {
 		// If knownfn is set and autodetect_gamedll returns non-null
 		// then knownfn doesn't exists and we should use autodetected
 		// dll instead.

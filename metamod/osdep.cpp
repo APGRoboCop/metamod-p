@@ -67,7 +67,8 @@ char* DLLINTERNAL my_strtok_r(char* s, const char* delim, char** ptrptr) {
 		begin = *ptrptr;
 	if (!begin)
 		return(nullptr);
-	if (char* end = strpbrk(begin, delim)) {
+	char* end = strpbrk(begin, delim);
+	if (end) {
 		*end = '\0';
 		char* rest = end + 1;
 		*ptrptr = rest + strspn(rest, delim);
@@ -124,7 +125,7 @@ int DLLINTERNAL safe_vsnprintf(char* s, size_t n, const char* format, va_list sr
 		va_end(ap);
 
 		if (res > 0) {
-			if (static_cast<unsigned>(res) == n)
+			if ((unsigned)res == n)
 				s[res - 1] = 0;
 			return(res);
 		}
@@ -141,7 +142,7 @@ int DLLINTERNAL safe_vsnprintf(char* s, size_t n, const char* format, va_list sr
 	if (bufsize < 1024)
 		bufsize = 1024;
 
-	char* tmpbuf = static_cast<char*>(malloc(bufsize * sizeof(char)));
+	char* tmpbuf = (char*)malloc(bufsize * sizeof(char));
 	if (!tmpbuf)
 		return(-1);
 
@@ -154,7 +155,7 @@ int DLLINTERNAL safe_vsnprintf(char* s, size_t n, const char* format, va_list sr
 	// fail well before INT_MAX.
 	while (res < 0 && bufsize <= INT_MAX) {
 		bufsize *= 2;
-		char* newbuf = static_cast<char*>(realloc(tmpbuf, bufsize * sizeof(char)));
+		char* newbuf = (char*)realloc(tmpbuf, bufsize * sizeof(char));
 
 		if (!newbuf)
 			break;
@@ -167,7 +168,7 @@ int DLLINTERNAL safe_vsnprintf(char* s, size_t n, const char* format, va_list sr
 	}
 
 	if (res > 0 && n > 0) {
-		if (n > static_cast<unsigned>(res))
+		if (n > (unsigned)res)
 			memcpy(s, tmpbuf, (res + 1) * sizeof(char));
 		else {
 			memcpy(s, tmpbuf, (n - 1) * sizeof(char));
@@ -204,7 +205,7 @@ void DLLINTERNAL safevoid_vsnprintf(char* s, size_t n, const char* format, va_li
 
 	// w32api returns -1 on too long write, glibc returns number of bytes it could have written if there were enough space
 	// w32api doesn't write null at all, some buggy glibc don't either
-	if (res < 0 || static_cast<size_t>(res) >= n)
+	if (res < 0 || (size_t)res >= n)
 		s[n - 1] = 0;
 }
 
@@ -227,7 +228,7 @@ char* DLLINTERNAL str_GetLastError() {
 	FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		nullptr, GetLastError(),
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), //! Default language
-		reinterpret_cast<LPTSTR>(&buf), MAX_STRBUF_LEN - 1, nullptr);
+		(LPTSTR)&buf, MAX_STRBUF_LEN - 1, nullptr);
 	return(buf);
 }
 #endif /* _WIN32 */
@@ -282,7 +283,7 @@ const char* DLLINTERNAL DLFNAME(void* memptr) {
 
 	// MSDN indicates that GetModuleFileName will leave string
 	// null-terminated, even if it's truncated because buffer is too small.
-	if (!GetModuleFileNameA(static_cast<HMODULE>(MBI.AllocationBase), fname, sizeof(fname) - 1))
+	if (!GetModuleFileNameA((HMODULE)MBI.AllocationBase, fname, sizeof(fname) - 1))
 		RETURN_ERRNO(NULL, ME_NOTFOUND);
 	if (!fname[0])
 		RETURN_ERRNO(NULL, ME_NOTFOUND);
@@ -305,7 +306,7 @@ void DLLINTERNAL normalize_pathname(char* path) {
 	META_DEBUG(8, ("normalize: %s", path));
 	for (char* cp = path; *cp; cp++) {
 		/*if(isupper(*cp))*/
-		*cp = static_cast<char>(tolower(*cp));
+		*cp = (char)tolower(*cp);
 
 		if (*cp == '\\')
 			*cp = '/';
@@ -358,7 +359,7 @@ mBOOL DLLINTERNAL IS_VALID_PTR(void* memptr) {
 // meta_errno values:
 //  - ME_BADMEMPTR	not a valid memory pointer
 mBOOL DLLINTERNAL IS_VALID_PTR(void* memptr) {
-	if (IsBadCodePtr(static_cast<FARPROC>(memptr)))
+	if (IsBadCodePtr((FARPROC)memptr))
 		RETURN_ERRNO(mFALSE, ME_BADMEMPTR);
 	return(mTRUE);
 }

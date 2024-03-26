@@ -44,10 +44,7 @@
 #include "new_baseclass.h" // class_metamod_new
 
  // Numbers of players limit set by the engine
-enum
-{
-	MAX_PLAYERS = 32
-};
+#define MAX_PLAYERS 32
 
 // Info on an individual player
 class MPlayer : public class_metamod_new

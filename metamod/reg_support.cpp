@@ -123,7 +123,7 @@ void DLLHIDDEN meta_AddServerCommand(char* cmd_name, void (*function) ()) {
 	META_DEBUG(4, ("called: meta_AddServerCommand; cmd_name=%s, function=%d", cmd_name, function));
 
 	// try to find which plugin is registering this command
-	if (!((iplug = Plugins->find_memloc((void*)function)))) {
+	if (!(iplug = Plugins->find_memloc((void*)function))) {
 		// if this isn't supported on this OS, don't log an error
 		if (meta_errno != ME_OSNOTSUP)
 			META_WARNING("Failed to find memloc for regcmd '%s'", cmd_name);
@@ -170,7 +170,7 @@ void DLLHIDDEN meta_CVarRegister(cvar_t* pCvar) {
 	META_DEBUG(4, ("called: meta_CVarRegister; name=%s", pCvar->name));
 
 	// try to find which plugin is registering this cvar
-	if (!((iplug = Plugins->find_memloc(pCvar)))) {
+	if (!(iplug = Plugins->find_memloc(pCvar))) {
 		// if this isn't supported on this OS, don't log an error
 		if (meta_errno != ME_OSNOTSUP)
 			// Note: if cvar_t was malloc'd by the plugin, we can't
