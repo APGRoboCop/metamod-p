@@ -458,6 +458,7 @@ mBOOL DLLINTERNAL MPlugin::is_platform_postfix(const char* pf) {
 		{"_i586.", 6},
 		{"_x86_64.", 8},
 		{"_x86-64.", 8},
+		//{".", 1},
 		{nullptr,0},
 	};
 
