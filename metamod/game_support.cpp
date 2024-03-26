@@ -261,9 +261,9 @@ mBOOL DLLINTERNAL setup_gamedll(gamedll_t* gamedll) {
 	const game_modinfo_t* known;
 
 #ifdef _WIN32
-	char* cp;
+	const char* cp;
 #elif defined(linux)
-	char* cp, * strippedfn;
+	const char* cp, * strippedfn;
 #endif
 
 	const char* autofn = nullptr, * knownfn = nullptr, * usedfn = nullptr;
@@ -280,16 +280,16 @@ mBOOL DLLINTERNAL setup_gamedll(gamedll_t* gamedll) {
 		knownfn = known->linux_so;
 #ifdef __x86_64__
 		//AMD64: convert _i386.so to _amd64.so
-		if ((cp = strstr(knownfn, "_i386.so")) ||
-			(cp = strstr(knownfn, "_i486.so")) ||
-			(cp = strstr(knownfn, "_i586.so")) ||
-			(cp = strstr(knownfn, "_i686.so"))) {
+		if (((cp = strstr(knownfn, "_i386.so"))) ||
+			((cp = strstr(knownfn, "_i486.so"))) ||
+			((cp = strstr(knownfn, "_i586.so"))) ||
+			((cp = strstr(knownfn, "_i686.so")))) {
 			//make sure that it's the ending that has "_iX86.so"
 			if (cp[strlen("_i386.so")] == 0) {
 				STRNCPY(fixname_amd64, known->linux_so,
 					MIN(((size_t)cp - (size_t)knownfn) + 1,
 						sizeof(fixname_amd64)));
-				strncat(fixname_amd64, "_amd64.so", sizeof(fixname_amd64));
+				strncat(fixname_amd64, "_amd64.so", sizeof(fixname_amd64) - strlen(fixname_amd64) - 1);
 
 				knownfn = fixname_amd64;
 			}
@@ -313,21 +313,21 @@ mBOOL DLLINTERNAL setup_gamedll(gamedll_t* gamedll) {
 			STRNCPY(temp_str, knownfn, sizeof(temp_str));
 			strippedfn = temp_str;
 
-			char* loc = strrchr(strippedfn, '_');
+			const char* loc = strrchr(strippedfn, '_');
 
 			// A small safety net here: make sure that we are dealing with
 			// a file name at least four characters long and ending in
 			// '.so'. This way we can be sure that we can safely overwrite
 			// anything from the '_' on with '.so'.
-			int size = 0;
-			const char* ext;
-			if (0 != loc) {
+			unsigned size = 0;
+			const char* ext = nullptr;
+			if (nullptr != loc) {
 				size = strlen(strippedfn);
 				ext = strippedfn + (size - 3);
 			}
 
-			if (0 != loc && size > 3 && 0 == strcasecmp(ext, ".so")) {
-				strcpy(loc, ".so");
+			if (nullptr != loc && size > 3 && 0 == strcasecmp(ext, ".so")) {
+				strcpy(const_cast<char*>(loc), ".so");
 				META_DEBUG(4, ("Checking for new version game DLL name '%s'.\n", strippedfn));
 
 				// Again, as above, I abuse the real_pathname member to store the full pathname
