@@ -43,7 +43,7 @@
 #  define MODARCH "_i386"
 #endif
 
-	{ "action",            "ahl" MODARCH ".so",	   "ahl.dll",			"Action Half-Life" },
+	{ "action",            "ahl_i386.so",	   "ahl.dll",			"Action Half-Life" },
 	{ "ag",                "ag_i386.so",           "ag.dll",            "Adrenaline Gamer Steam" },
 	{ "ag",                "ag.so",                    "ag.dll",              "Adrenaline Gamer (OpenAG)" },
 	{ "ag3",               "hl" MODARCH ".so",           "hl.dll",            "Adrenalinegamer 3.x" },

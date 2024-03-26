@@ -150,7 +150,7 @@ char* DLLINTERNAL full_gamedir_path(const char* path, char* fullpath);
 // stripping off the leading "len" characters.  Useful for things like
 // turning 'pfnClientCommand' into "ClientCommand" so we don't have to
 // specify strings used for all the debugging/log messages.
-#define STRINGIZE(name, len)		(#name+(len))
+#define STRINGIZE(name, len)		(#name)
 
 // Max description length for plugins.ini and other places.
 #define MAX_DESC_LEN 256
