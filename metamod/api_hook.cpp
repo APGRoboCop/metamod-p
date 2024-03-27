@@ -63,12 +63,12 @@ static unsigned int call_count = 0;
 
 // get function pointer from api table by function pointer offset
 inline void* DLLINTERNAL get_api_function(const void* api_table, unsigned int func_offset) {
-	return(*reinterpret_cast<void**>(reinterpret_cast<unsigned long>(api_table) + func_offset));
+	return(*(void**)((unsigned long)api_table + func_offset));
 }
 
 // get data pointer from api_info table by function offset
 inline const api_info_t* DLLINTERNAL get_api_info(enum_api_t api, unsigned int api_info_offset) {
-	return reinterpret_cast<const api_info_t*>(reinterpret_cast<unsigned long>(api_info_tables[api]) + api_info_offset);
+	return((const api_info_t*)((unsigned long)api_info_tables[api] + api_info_offset));
 }
 
 // simplified 'void' version of main hook function
@@ -442,16 +442,16 @@ END_API_CALLER_FUNC_void((const void*, const void*, ...), (p->p1, p->p2, p->str)
 
 //-
 BEGIN_API_CALLER_FUNC(void, void)
-END_API_CALLER_FUNC_void((), ())
+END_API_CALLER_FUNC_void((void), ())
 
 BEGIN_API_CALLER_FUNC(ptr, void)
-END_API_CALLER_FUNC(void*, (), ())
+END_API_CALLER_FUNC(void*, (void), ())
 
 BEGIN_API_CALLER_FUNC(int, void)
-END_API_CALLER_FUNC(int, (), ())
+END_API_CALLER_FUNC(int, (void), ())
 
 BEGIN_API_CALLER_FUNC(float, void)
-END_API_CALLER_FUNC(float, (), ())
+END_API_CALLER_FUNC(float, (void), ())
 
 //-
 BEGIN_API_CALLER_FUNC(float, 2f)

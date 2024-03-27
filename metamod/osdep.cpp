@@ -270,9 +270,7 @@ const char* DLLINTERNAL DLFNAME(void* memptr) {
 //  - ME_NOTFOUND	couldn't find a DLL that contains memory location
 const char* DLLINTERNAL DLFNAME(void* memptr) {
 	MEMORY_BASIC_INFORMATION MBI;
-	static char fname[PATH_MAX];
-
-	memset(fname, 0, sizeof(fname));
+	static char fname[PATH_MAX] = {};
 
 	if (!VirtualQuery(memptr, &MBI, sizeof(MBI)))
 		RETURN_ERRNO(NULL, ME_NOTFOUND);

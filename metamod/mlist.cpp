@@ -73,9 +73,8 @@ void DLLINTERNAL MPluginList::reset_plugin(MPlugin* pl_find) const
 	pl_find->free_api_pointers();
 
 	//set zero
-	memset(pl_find, 0, sizeof(*pl_find));
-
-	pl_find->index = i + 1;		// 1-based
+	*pl_find = MPlugin();
+	pl_find->index = i + 1;     // 1-based
 }
 
 // Find a plugin based on the plugin index #.
@@ -425,7 +424,7 @@ mBOOL DLLINTERNAL MPluginList::ini_startup() {
 mBOOL DLLINTERNAL MPluginList::ini_refresh() {
 	char line[MAX_STRBUF_LEN];
 	int n, ln;
-	MPlugin pl_temp;
+	MPlugin pl_temp = MPlugin(); // value-initialization
 	MPlugin* pl_found, * pl_added;
 
 	FILE* fp = fopen(inifile, "r");
@@ -444,8 +443,11 @@ mBOOL DLLINTERNAL MPluginList::ini_refresh() {
 			*cp = '\0';
 		if ((cp = strrchr(line, '\n')))
 			*cp = '\0';
+
+		// No need for memset now
+		//memset(&pl_temp, 0, sizeof(pl_temp));
+
 		// Parse into a temp plugin
-		memset(&pl_temp, 0, sizeof(pl_temp));
 		if (!pl_temp.ini_parseline(line)) {
 			if (meta_errno == ME_FORMAT)
 				META_WARNING("ini: Skipping malformed line %d of %s",
@@ -536,7 +538,7 @@ mBOOL DLLINTERNAL MPluginList::ini_refresh() {
 //  - errno's from add()
 //  - errno's from load()
 MPlugin* DLLINTERNAL MPluginList::plugin_addload(plid_t plid, const char* fname, PLUG_LOADTIME now) {
-	MPlugin pl_temp;
+	MPlugin pl_temp = MPlugin(); // value-initialization
 	MPlugin* pl_found, * pl_added, * pl_loader;
 
 	// Find loader plugin
@@ -547,7 +549,8 @@ MPlugin* DLLINTERNAL MPluginList::plugin_addload(plid_t plid, const char* fname,
 		RETURN_ERRNO(NULL, ME_BADREQ);
 	}
 
-	memset(&pl_temp, 0, sizeof(pl_temp));
+	// No need for memset now
+	// memset(&pl_temp, 0, sizeof(pl_temp));
 
 	// copy filename
 	if (!pl_temp.plugin_parseline(fname, pl_loader->index)) {
@@ -608,10 +611,11 @@ MPlugin* DLLINTERNAL MPluginList::plugin_addload(plid_t plid, const char* fname,
 //  - errno's from add()
 //  - errno's from load()
 mBOOL DLLINTERNAL MPluginList::cmd_addload(const char* args) {
-	MPlugin pl_temp;
+	MPlugin pl_temp = MPlugin(); // value-initialization
 	MPlugin* pl_found, * pl_added;
 
-	memset(&pl_temp, 0, sizeof(pl_temp));
+	// No need for memset now
+	// memset(&pl_temp, 0, sizeof(pl_temp));
 
 	// XXX move back to comands_meta ?
 
