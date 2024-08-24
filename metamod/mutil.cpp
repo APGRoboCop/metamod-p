@@ -117,7 +117,7 @@ static void mutil_LogDeveloper(plid_t plid, const char* fmt, ...) {
 
 // Print a center-message, with text parameters and varargs.  Provides
 // functionality to the above center_say interfaces.
-static void mutil_CenterSayVarargs(plid_t plid, hudtextparms_t const tparms,
+static void mutil_CenterSayVarargs(plid_t plid, hudtextparms_t const& tparms,
 	const char* fmt, va_list ap)
 {
 	char buf[MAX_LOGMSG_LEN];
@@ -141,7 +141,7 @@ static void mutil_CenterSay(plid_t plid, const char* fmt, ...) {
 }
 
 // Print a center-message, with given text parameters.
-static void mutil_CenterSayParms(plid_t plid, hudtextparms_t const tparms, const char* fmt, ...) {
+static void mutil_CenterSayParms(plid_t plid, hudtextparms_t const& tparms, const char* fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
 	mutil_CenterSayVarargs(plid, tparms, fmt, ap);
@@ -343,7 +343,7 @@ static int mutil_MakeRequestID(plid_t /*plid*/) {
 }
 
 //
-static void mutil_GetHookTables(plid_t plid, enginefuncs_t** peng, DLL_FUNCTIONS** pdll, NEW_DLL_FUNCTIONS** pnewdll) {
+static void mutil_GetHookTables(plid_t /*plid*/, enginefuncs_t** peng, DLL_FUNCTIONS** pdll, NEW_DLL_FUNCTIONS** pnewdll) {
 	if (peng)
 		*peng = &meta_engfuncs;
 	if (pdll)

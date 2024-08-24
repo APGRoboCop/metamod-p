@@ -44,7 +44,7 @@
 // documentation indicates it's actually optional.  We keep it, though, for
 // completeness.
 // Note! 'extern "C"' needed for mingw compile.
-extern "C" BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+extern "C" BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID /*lpvReserved*/)
 {
 	if (fdwReason == DLL_PROCESS_ATTACH) {
 		metamod_handle = hinstDLL;

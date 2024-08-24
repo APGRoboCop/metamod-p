@@ -44,7 +44,7 @@
 void DLLINTERNAL main_hook_function_void(unsigned int api_info_offset, enum_api_t api, unsigned int func_offset, const void* packed_args);
 
 // full return typed version of main hook function
-void* DLLINTERNAL main_hook_function(class_ret_t ret_init, unsigned int api_info_offset, enum_api_t api, unsigned int func_offset, const void* packed_args);
+void* DLLINTERNAL main_hook_function(const class_ret_t& ret_init, unsigned int api_info_offset, enum_api_t api, unsigned int func_offset, const void* packed_args);
 
 //
 // API function args structures/classes
@@ -135,8 +135,8 @@ PACK_ARGS_END
 PACK_ARGS_CLASS_HEADER(2p3fus2uc, (const void* _p1, const void* _p2, float _f1, float _f2, float _f3, unsigned short _us1, unsigned char _uc1, unsigned char _uc2)) : p1(_p1), p2(_p2), f1(_f1), f2(_f2), f3(_f3), us1(_us1), uc1(_uc1), uc2(_uc2) {}
 const void* p1, * p2;
 float f1, f2, f3;
-unsigned int us1;
-unsigned int uc1, uc2;
+unsigned short us1;
+unsigned char uc1, uc2;
 PACK_ARGS_END
 
 PACK_ARGS_CLASS_HEADER(2pf, (const void* _p1, const void* _p2, float _f1)) : p1(_p1), p2(_p2), f1(_f1) {}
@@ -193,7 +193,7 @@ PACK_ARGS_END
 PACK_ARGS_CLASS_HEADER(ipusf2p2f4i, (int _i1, const void* _p1, unsigned short _us1, float _f1, const void* _p2, const void* _p3, float _f2, float _f3, int _i2, int _i3, int _i4, int _i5)) : i1(_i1), p1(_p1), us1(_us1), f1(_f1), p2(_p2), p3(_p3), f2(_f2), f3(_f3), i2(_i2), i3(_i3), i4(_i4), i5(_i5) {}
 int i1;
 const void* p1;
-unsigned int us1;
+unsigned short us1;
 float f1;
 const void* p2, * p3;
 float f2, f3;
@@ -257,7 +257,7 @@ PACK_ARGS_END
 
 PACK_ARGS_CLASS_HEADER(puc, (const void* _p1, unsigned char _uc1)) : p1(_p1), uc1(_uc1) {}
 const void* p1;
-unsigned int uc1;
+unsigned char uc1;
 PACK_ARGS_END
 
 PACK_ARGS_CLASS_HEADER(2i2pi2p, (int _i1, int _i2, const void* _p1, const void* _p2, int _i3, const void* _p3, const void* _p4)) : i1(_i1), i2(_i2), p1(_p1), p2(_p2), i3(_i3), p3(_p3), p4(_p4) {}

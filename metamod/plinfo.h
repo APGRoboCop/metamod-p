@@ -58,10 +58,10 @@ typedef enum {
 	PNL_CMD_FORCED,			// forced by server/console command
 	PNL_DELAYED,			// delayed from previous request; can't tell origin
 //only used for 'real_reason' on MPlugin::unload()
-PNL_PLUGIN,			// requested by plugin function call
-PNL_PLG_FORCED,			// forced by plugin function call
+	PNL_PLUGIN,			// requested by plugin function call
+	PNL_PLG_FORCED,			// forced by plugin function call
 //only used internally for 'meta reload'
-PNL_RELOAD,			// forced unload by reload()
+	PNL_RELOAD,			// forced unload by reload()
 } PL_UNLOAD_REASON;
 
 // Information plugin provides about itself.

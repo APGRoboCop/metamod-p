@@ -81,7 +81,7 @@ const dllapi_info_t dllapi_info = {
 	{ mFALSE,  12,	api_caller_void_args_4p,	"SetupVisibility" },	// pfnSetupVisibility
 	{ mFALSE,  12,	api_caller_void_args_pip,	"UpdateClientData" },	// pfnUpdateClientData
 	{ mFALSE,  16,	api_caller_int_args_pi2p2ip,	"AddToFullPack" },		// pfnAddToFullPack
-	{ mFALSE,  9,   api_caller_void_args_2i2pi2v3, "CreateBaseline" },		// pfnCreateBaseline
+	{ mFALSE,  9,	api_caller_void_args_2i2pi2v3, "CreateBaseline" },		// pfnCreateBaseline
 	{ mFALSE,  9,	api_caller_void_args_void,	"RegisterEncoders" },	// pfnRegisterEncoders
 	{ mFALSE,  9,	api_caller_int_args_2p,		"GetWeaponData" },		// pfnGetWeaponData
 	{ mFALSE,  15,	api_caller_void_args_2pui,	"CmdStart" },			// pfnCmdStart

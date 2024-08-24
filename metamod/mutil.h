@@ -62,9 +62,9 @@ typedef struct meta_util_funcs_s {
 	void		(*pfnLogError)			(plid_t plid, const char* fmt, ...);
 	void		(*pfnLogDeveloper)		(plid_t plid, const char* fmt, ...);
 	void		(*pfnCenterSay)			(plid_t plid, const char* fmt, ...);
-	void		(*pfnCenterSayParms)	(plid_t plid, hudtextparms_t tparms,
+	void		(*pfnCenterSayParms)	(plid_t plid, hudtextparms_t const& tparms,
 		const char* fmt, ...);
-	void		(*pfnCenterSayVarargs)	(plid_t plid, hudtextparms_t tparms,
+	void		(*pfnCenterSayVarargs)	(plid_t plid, hudtextparms_t const& tparms,
 		const char* fmt, va_list ap);
 	qboolean(*pfnCallGameEntity)	(plid_t plid, const char* entStr,
 		entvars_t* pev);

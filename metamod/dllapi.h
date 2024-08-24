@@ -99,7 +99,7 @@ typedef char (*FN_PM_FINDTEXTURETYPE) (char* name);
 typedef void (*FN_SETUPVISIBILITY) (edict_t* pViewEntity, edict_t* pClient, unsigned char** pvs, unsigned char** pas);
 typedef void (*FN_UPDATECLIENTDATA)  (const edict_s* ent, int sendweapons, clientdata_s* cd);
 typedef int (*FN_ADDTOFULLPACK) (entity_state_s* state, int e, edict_t* ent, edict_t* host, int hostflags, int player, unsigned char* pSet);
-typedef void (*FN_CREATEBASELINE) (int player, int eindex, entity_state_s* baseline, edict_s* entity, int playermodelindex, vec3_t player_mins, vec3_t player_maxs);
+typedef void (*FN_CREATEBASELINE) (int player, int eindex, entity_state_s* baseline, edict_s* entity, int playermodelindex, const Vector& player_mins, const Vector& player_maxs);
 typedef void (*FN_REGISTERENCODERS) ();
 typedef int (*FN_GETWEAPONDATA) (edict_s* player, weapon_data_s* info);
 typedef void (*FN_CMDSTART) (const edict_t* player, const usercmd_s* cmd, unsigned int random_seed);

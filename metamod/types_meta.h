@@ -39,7 +39,7 @@
 
 #include "comp_dep.h"
 
- // Our own boolean type, for stricter type matching.
+// Our own boolean type, for stricter type matching.
 typedef enum mBOOL {
 	mFALSE = 0,
 	mTRUE,

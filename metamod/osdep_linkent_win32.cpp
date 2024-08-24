@@ -124,10 +124,10 @@ static int sort_names_list(const sort_names_t* A, const sort_names_t* B)
 //
 static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMODULE moduleGame)
 {
-	unsigned long* newFunctions;
-	unsigned long* newNames;
-	unsigned short* newNameOrdinals;
-	sort_names_t* newSort;
+	unsigned long* newFunctions = nullptr;
+	unsigned long* newNames = nullptr;
+	unsigned short* newNameOrdinals = nullptr;
+	sort_names_t* newSort = nullptr;
 
 	unsigned long i;
 	unsigned long u;

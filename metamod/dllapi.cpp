@@ -323,9 +323,9 @@ static int mm_AddToFullPack(entity_state_s* state, int e, edict_t* ent, edict_t*
 	META_DLLAPI_HANDLE(int, 0, FN_ADDTOFULLPACK, pfnAddToFullPack, pi2p2ip, (state, e, ent, host, hostflags, player, pSet))
 	RETURN_API(int)
 }
-static void mm_CreateBaseline(int player, int eindex, entity_state_s *baseline, edict_s *entity, int playermodelindex, const Vector player_mins, const Vector player_maxs) {
+static void mm_CreateBaseline(int player, int eindex, entity_state_s *baseline, edict_s *entity, int playermodelindex, const Vector& player_mins, const Vector& player_maxs) {
 	META_DLLAPI_HANDLE_void(FN_CREATEBASELINE, pfnCreateBaseline, 2i2pi2v3, (player, eindex, baseline, entity, playermodelindex, player_mins, player_maxs))
-	RETURN_API_void()
+		RETURN_API_void()
 }
 static void mm_RegisterEncoders() {
 	META_DLLAPI_HANDLE_void(FN_REGISTERENCODERS, pfnRegisterEncoders, void, (VOID_ARG))
