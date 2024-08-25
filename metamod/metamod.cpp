@@ -369,7 +369,6 @@ mBOOL DLLINTERNAL meta_load_gamedll() {
 	GIVE_ENGINE_FUNCTIONS_FN pfn_give_engfuncs;
 	GETNEWDLLFUNCTIONS_FN pfn_getapinew;
 	GETENTITYAPI2_FN pfn_getapi2;
-	GETENTITYAPI_FN pfn_getapi;
 
 	if (!setup_gamedll(&GameDLL)) {
 		META_WARNING("dll: Unrecognized game: %s", GameDLL.name);
@@ -391,7 +390,7 @@ mBOOL DLLINTERNAL meta_load_gamedll() {
 	if ((pfn_give_engfuncs = GIVE_ENGINE_FUNCTIONS_FN(DLSYM(GameDLL.handle, "GiveFnptrsToDll"))))
 	{
 		if (!Config->slowhooks) {
-			memcpy(&g_slow_hooks_table_engine, &meta_engfuncs, sizeof(meta_enginefuncs_t));
+			g_slow_hooks_table_engine = meta_engfuncs;
 			// disabling expensive hooks to improve linux performance
 			meta_engfuncs.pfnCheckVisibility = Engine.funcs->pfnCheckVisibility;
 			meta_engfuncs.pfnIndexOfEdict = Engine.funcs->pfnIndexOfEdict;
@@ -509,7 +508,10 @@ mBOOL DLLINTERNAL meta_load_gamedll() {
 			meta_engfuncs.pfnQueryClientCvarValue2 = Engine.funcs->pfnQueryClientCvarValue2;
 			meta_engfuncs.pfnEngCheckParm = Engine.funcs->pfnEngCheckParm;
 
-			memcpy(&g_fast_hooks_table_engine, &meta_engfuncs, sizeof(meta_enginefuncs_t));
+			// Assuming g_fast_hooks_table_engine is an object
+			g_fast_hooks_table_engine = meta_engfuncs;
+			// If g_fast_hooks_table_engine is a pointer
+			//*g_fast_hooks_table_engine = meta_engfuncs;
 		}
 
 		pfn_give_engfuncs(&meta_engfuncs, gpGlobals);
@@ -581,6 +583,7 @@ mBOOL DLLINTERNAL meta_load_gamedll() {
 
 	// Look for API-1 in plugin, if API2 interface wasn't found.
 	if (!found) {
+		GETENTITYAPI_FN pfn_getapi;
 		found = 0;
 		GET_FUNC_TABLE_FROM_GAME(GameDLL, pfn_getapi, "GetEntityAPI", dllapi_table,
 			GETENTITYAPI_FN, DLL_FUNCTIONS,

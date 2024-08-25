@@ -169,7 +169,7 @@ else
 endif
 
 # debugging; halt on warnings
-CCDEBUG+= -ggdb3
+CCDEBUG+= -ggdb3 -g3
 
 
 #############################################################################

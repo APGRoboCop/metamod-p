@@ -175,15 +175,14 @@ const game_modlist_t known_games = {
 
 // Find a modinfo corresponding to the given game name.
 const game_modinfo_t* DLLINTERNAL lookup_game(const char* name) {
-	const game_modinfo_t* imod;
-	char check_path[NAME_MAX];
 	for (int i = 0; known_games[i].name; i++) {
-		imod = &known_games[i];
+		const game_modinfo_t* imod = &known_games[i];
 		// If there are 2 or more same names check next dll file if doesn't exist
 		if (strcasematch(imod->name, name)) {
+			char check_path[NAME_MAX];
 			safevoid_snprintf(check_path, sizeof(check_path), "dlls/%s",
 #ifdef _WIN32
-				imod->win_dll);
+			                  imod->win_dll);
 #elif defined(linux)
 				imod->linux_so);
 #endif
@@ -202,17 +201,14 @@ const game_modinfo_t* DLLINTERNAL lookup_game(const char* name) {
 // Installs gamedll from Steam cache
 mBOOL DLLINTERNAL install_gamedll(char* from, const char* to) {
 	int length_in;
-	int length_out;
 
 	if (!from)
 		return mFALSE;
 	if (!to)
 		to = from;
 
-	byte* cachefile = LOAD_FILE_FOR_ME(from, &length_in);
-
 	// If the file seems to exist in the cache.
-	if (cachefile) {
+	if (byte* cachefile = LOAD_FILE_FOR_ME(from, &length_in)) {
 		const int fd = open(to, O_WRONLY | O_CREAT | O_EXCL | O_BINARY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
 
 		if (fd < 0) {
@@ -221,7 +217,7 @@ mBOOL DLLINTERNAL install_gamedll(char* from, const char* to) {
 			return(mFALSE);
 		}
 
-		length_out = write(fd, cachefile, length_in);
+		const int length_out = write(fd, cachefile, length_in);
 		FREE_FILE(cachefile);
 		close(fd);
 
@@ -257,7 +253,6 @@ mBOOL DLLINTERNAL setup_gamedll(gamedll_t* gamedll) {
 #endif
 	static char override_desc_buf[NAME_MAX]; // pointer is given outside function
 	static char autodetect_desc_buf[NAME_MAX]; // pointer is given outside function
-	char install_path[NAME_MAX];
 	const game_modinfo_t* known;
 
 #ifdef _WIN32
@@ -397,8 +392,9 @@ mBOOL DLLINTERNAL setup_gamedll(gamedll_t* gamedll) {
 		// If the path is relative, the gamedll file will be missing and
 		// it might be found in the cache file.
 		if (!is_absolute_path(gamedll->pathname)) {
+			char install_path[NAME_MAX];
 			safevoid_snprintf(install_path, sizeof(install_path),
-				"%s/%s", gamedll->gamedir, gamedll->pathname);
+			                  "%s/%s", gamedll->gamedir, gamedll->pathname);
 			// If we could successfully install the gamedll from the cache we
 			// rectify the pathname to be a full pathname.
 			if (install_gamedll(gamedll->pathname, install_path))

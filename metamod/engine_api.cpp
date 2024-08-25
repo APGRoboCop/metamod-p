@@ -362,7 +362,7 @@ static void mm_CVarRegister(cvar_t* pCvar) {
 	RETURN_API_void()
 }
 static float mm_CVarGetFloat(const char* szVarName) {
-	META_ENGINE_HANDLE(float, 0.0, FN_CVARGETFLOAT, pfnCVarGetFloat, p, (szVarName))
+	META_ENGINE_HANDLE(float, 0.0f, FN_CVARGETFLOAT, pfnCVarGetFloat, p, (szVarName))
 	RETURN_API(float)
 }
 static const char* mm_CVarGetString(const char* szVarName) {

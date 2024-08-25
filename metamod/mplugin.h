@@ -170,7 +170,7 @@ public:
 	void DLLINTERNAL free_api_pointers() const;
 	mBOOL DLLINTERNAL clear();
 	mBOOL DLLINTERNAL plugin_unload(plid_t plid, PLUG_LOADTIME now, PL_UNLOAD_REASON reason); // other plugin unloading
-	void DLLINTERNAL show();				// print info about plugin to console
+	void DLLINTERNAL show() const;				// print info about plugin to console
 
 	mBOOL DLLINTERNAL newer_file() const;			// check for newer file on disk
 
@@ -209,7 +209,7 @@ public:
 private:
 	mBOOL DLLINTERNAL query();
 	mBOOL DLLINTERNAL attach(PLUG_LOADTIME now);
-	mBOOL DLLINTERNAL detach(PLUG_LOADTIME now, PL_UNLOAD_REASON reason);
+	mBOOL DLLINTERNAL detach(PLUG_LOADTIME now, PL_UNLOAD_REASON reason) const;
 
 	gamedll_funcs_t gamedll_funcs = {};
 	mutil_funcs_t mutil_funcs = {};

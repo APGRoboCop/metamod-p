@@ -1087,7 +1087,7 @@ mBOOL DLLINTERNAL MPlugin::unload(PLUG_LOADTIME now, PL_UNLOAD_REASON reason, PL
 //  -
 //  - ME_DLMISSING	couldn't find meta_detach() in plugin
 //  - ME_DLERROR	plugin detach() returned error
-mBOOL DLLINTERNAL MPlugin::detach(PLUG_LOADTIME now, PL_UNLOAD_REASON reason) {
+mBOOL DLLINTERNAL MPlugin::detach(PLUG_LOADTIME now, PL_UNLOAD_REASON reason) const {
 	META_DETACH_FN pfn_detach;
 
 	// If we have no handle, i.e. no dll loaded, we return true because the
@@ -1275,7 +1275,7 @@ mBOOL DLLINTERNAL MPlugin::clear() {
 }
 
 // List information about plugin to console.
-void DLLINTERNAL MPlugin::show() {
+void DLLINTERNAL MPlugin::show() const {
 	char* cp;
 	int n;
 	constexpr int width = 13;
