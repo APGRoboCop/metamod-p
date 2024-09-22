@@ -2,8 +2,6 @@
 *~
 metamod/.vs/*
 metamod/UpgradeLog.htm
-metamod/UpgradeLog2.htm
-metamod/UpgradeLog3.htm
 *.obj
 *.tlog
 *.ipch
@@ -14,6 +12,8 @@ metamod/Release/*
 *.i
 *.cfg
 *.cmd
+build/*
+build_linux/*
 doc/package_template/liblist.gam
 doc/package_template/addons/metamod/config.ini
 doc/package_template/addons/metamod/plugins.ini

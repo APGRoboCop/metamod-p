@@ -38,6 +38,7 @@
 #define TYPES_META_H
 
 #include "comp_dep.h"
+#include <stdint.h>
 
 // Our own boolean type, for stricter type matching.
 typedef enum mBOOL {
@@ -47,7 +48,7 @@ typedef enum mBOOL {
 
 // Like C's errno, for our various functions; describes causes of failure
 // or mFALSE returns.
-typedef enum {
+typedef enum : uint8_t {
 	ME_NOERROR = 0,
 	ME_FORMAT,			// invalid format
 	ME_COMMENT,			// ignored comment
