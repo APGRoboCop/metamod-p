@@ -122,11 +122,11 @@ public:
 	api_tables_t tables;
 	api_tables_t post_tables;
 
-	DLLINTERNAL void* get_api_table(enum_api_t api) {
+	DLLINTERNAL void* get_api_table(const enum_api_t api) {
 		return(((void**)&tables)[api]);
 	}
 
-	DLLINTERNAL void* get_api_post_table(enum_api_t api) {
+	DLLINTERNAL void* get_api_post_table(const enum_api_t api) {
 		return(((void**)&post_tables)[api]);
 	}
 
@@ -196,12 +196,12 @@ public:
 		return(info ? str_loadtime(info->unloadable, SL_SIMPLE) : " -");
 	}
 
-	const char* DLLINTERNAL str_loadable(STR_LOADTIME fmt) const
+	const char* DLLINTERNAL str_loadable(const STR_LOADTIME fmt) const
 	{
 		return(info ? str_loadtime(info->loadable, fmt) : " -");
 	}
 
-	const char* DLLINTERNAL str_unloadable(STR_LOADTIME fmt) const
+	const char* DLLINTERNAL str_unloadable(const STR_LOADTIME fmt) const
 	{
 		return(info ? str_loadtime(info->unloadable, fmt) : " -");
 	}

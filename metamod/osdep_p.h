@@ -69,7 +69,7 @@ void DLLINTERNAL my_closedir(DIR*);
 
 DLHANDLE DLLINTERNAL get_module_handle_of_memptr(void* memptr);
 
-#ifdef linux
+#ifdef __linux__
 void* DLLINTERNAL get_dlsym_pointer(void);
 #endif
 

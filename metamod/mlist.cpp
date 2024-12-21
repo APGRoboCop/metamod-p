@@ -195,7 +195,7 @@ MPlugin* DLLINTERNAL MPluginList::find(const char* findpath) {
 //  - ME_NOTFOUND	couldn't find a matching plugin
 //  - errno's from DLFNAME()
 MPlugin* DLLINTERNAL MPluginList::find_memloc(void* memptr) {
-#ifdef linux
+#ifdef __linux__
 	const char* dlfile;
 
 	if (!memptr)

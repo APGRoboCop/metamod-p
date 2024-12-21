@@ -1,0 +1,166 @@
+# AMBuildScript for metamod-p
+# vim: set sts=4 ts=8 sw=4 tw=99 et ft=python:
+import os, sys
+
+builder.cxx = builder.DetectCxx(target_arch = 'x86')
+
+# Include search paths
+include_paths = [
+  os.path.join(builder.currentSourcePath, 'hlsdk', 'common'),
+  os.path.join(builder.currentSourcePath, 'hlsdk', 'dlls'),
+  os.path.join(builder.currentSourcePath, 'hlsdk', 'engine'),
+  os.path.join(builder.currentSourcePath, 'hlsdk', 'pm_shared'),
+  os.path.join(builder.currentSourcePath, 'metamod'),
+]
+
+builder.cxx.defines += ['AMBUILD', '__METAMOD_BUILD__']
+
+# Compiler setup
+if builder.cxx.target.platform == 'linux':
+  # Linux defines
+  builder.cxx.defines += ['_LINUX', 'POSIX', 'LINUX', 'linux']
+  # Linux compiler C flags
+  builder.cxx.cflags += [
+    '-pipe',
+    '-fno-strict-aliasing',
+    '-Wall',
+    '-Werror',
+    '-Wno-uninitialized',
+    '-Wno-unused',
+    '-Wno-switch',
+    '-Wno-format',
+    '-Wno-format-security',
+    '-Wno-unknown-attributes',
+    '-Wno-logical-op-parentheses',
+    '-Wno-return-stack-address',
+    '-Wno-string-plus-int',
+    '-m32',
+  ]
+  # Linux compiler C++ flags
+  builder.cxx.cxxflags += [
+    '-Wno-invalid-offsetof',
+    '-Wno-write-strings',
+    '-std=c++17',
+  ]
+  # Linux linker flags
+  builder.cxx.linkflags += ['-m32', '-ldl', '-lm']
+elif builder.cxx.target.platform == 'windows':
+  # Windows defines
+  builder.cxx.defines += [
+    '_CRT_SECURE_NO_DEPRECATE',
+    '_CRT_SECURE_NO_WARNINGS',
+    '_CRT_NONSTDC_NO_DEPRECATE',
+    'NOMINMAX',
+    'WIN32',
+    '_WINDOWS'
+  ]
+  # Windows compiler C flags
+  builder.cxx.cflags += [
+    '/W4',
+  ]
+  # Windows compiler C++ flags
+  builder.cxx.cxxflags += [
+    '/std:c++17',
+    '/arch:SSE2',
+    '/fp:fast',
+    '/Qspectre',
+    '/EHsc'
+  ]
+  # Windows linker flags
+  builder.cxx.linkflags += [
+    '/EXPORT:GiveFnptrsToDll=_GiveFnptrsToDll@8,@1',
+    '/SECTION:.data,RW',
+    '/MACHINE:X86'
+  ]
+
+# Compiler options for optimization ( --enable-optimize )
+if builder.options.optimize == '1':
+  # Shared optimization definitions
+  builder.cxx.defines += ['NDEBUG']
+  if builder.cxx.target.platform == 'linux':
+    # Linux optimization flags
+    builder.cxx.cflags += ['-O2']
+  elif builder.cxx.target.platform == 'windows':
+    # Windows optimization flags - /Ob3 needs to be after /Ox, enables aggressive function inling -caxanga334
+    builder.cxx.cflags += ['/Ox', '/Zo', '/Ob3', '/GF']
+    # Windows optimization link flags
+    builder.cxx.linkflags += ['/OPT:ICF', '/OPT:REF']
+	# This needs to be after our optimization flags which could otherwise disable it.
+    builder.cxx.cflags += ['/Oy-']
+
+# Compiler options for debugging ( --enable-debug )
+if builder.options.debug == '1':
+  # Shared debug definitions
+  builder.cxx.defines += ['DEBUG', '_DEBUG']
+  if builder.cxx.target.platform == 'linux':
+    # Linux debug flags
+    builder.cxx.cflags += ['-g3', '-O0']
+  elif builder.cxx.target.platform == 'windows':
+    # Windows debug flags
+    builder.cxx.cflags += ['/Od', '/RTC1', '/MTd']
+    # Windows debug link flags
+    builder.cxx.linkflags += ['/NODEFAULTLIB:libcmt']
+
+# Handle --enable-static-lib and --enable-shared-lib
+if builder.cxx.target.platform == 'linux':
+  if builder.options.staticlib == '1':
+    builder.cxx.linkflags += [
+      '-static-libgcc',
+      '-static-libstdc++'
+    ]
+  elif builder.options.sharedlib == '1':
+    builder.cxx.linkflags += [
+      '-shared-libgcc',
+    ]
+
+
+library = builder.cxx.Library('metamod')
+
+library.compiler.includes += include_paths
+
+library.sources += [
+	'metamod/api_hook.cpp',
+	'metamod/api_info.cpp',
+	'metamod/commands_meta.cpp',
+	'metamod/conf_meta.cpp',
+	'metamod/dllapi.cpp',
+	'metamod/engine_api.cpp',
+	'metamod/engineinfo.cpp',
+	'metamod/game_autodetect.cpp',
+	'metamod/game_support.cpp',
+	'metamod/h_export.cpp',
+	'metamod/linkgame.cpp',
+	'metamod/linkplug.cpp',
+	'metamod/log_meta.cpp',
+	'metamod/meta_eiface.cpp',
+	'metamod/metamod.cpp',
+	'metamod/mhook.cpp',
+	'metamod/mlist.cpp',
+	'metamod/mplayer.cpp',
+	'metamod/mplugin.cpp',
+	'metamod/mqueue.cpp',
+	'metamod/mreg.cpp',
+	'metamod/mutil.cpp',
+	'metamod/osdep.cpp',
+	'metamod/osdep_p.cpp',
+	'metamod/reg_support.cpp',
+	'metamod/sdk_util.cpp',
+	'metamod/studioapi.cpp',
+	'metamod/support_meta.cpp',
+	'metamod/thread_logparse.cpp',
+	'metamod/vdate.cpp',
+]
+
+if builder.cxx.target.platform == 'linux':
+  library.sources += [
+    'metamod/osdep_detect_gamedll_linux.cpp',
+	'metamod/osdep_linkent_linux.cpp',
+  ]
+  
+if builder.cxx.target.platform == 'windows':
+  library.sources += [
+    'metamod/osdep_detect_gamedll_win32.cpp',
+	'metamod/osdep_linkent_win32.cpp',
+  ]
+
+builder.Add(library)

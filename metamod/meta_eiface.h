@@ -76,7 +76,7 @@ struct meta_new_dll_functions_t : NEW_DLL_FUNCTIONS {
 	meta_new_dll_functions_t& operator=(const meta_new_dll_functions_t&) DLLINTERNAL;
 
 	// Fill this object with pointers copied from a NEW_DLL_FUNCTIONS struct.
-	void DLLINTERNAL set_from(NEW_DLL_FUNCTIONS* pFuncs);
+	void DLLINTERNAL set_from(const NEW_DLL_FUNCTIONS* pFuncs);
 
 	// Copy the pointers from this object to a NEW_DLL_FUNCTIONS struct.
 	void DLLINTERNAL copy_to(NEW_DLL_FUNCTIONS* pFuncs) const;
@@ -149,7 +149,7 @@ inline meta_new_dll_functions_t& meta_new_dll_functions_t::operator=(const meta_
 	return *this;
 }
 
-inline void meta_new_dll_functions_t::set_from(NEW_DLL_FUNCTIONS* _pFuncs)
+inline void meta_new_dll_functions_t::set_from(const NEW_DLL_FUNCTIONS* _pFuncs)
 {
 	memcpy(this, _pFuncs, sizeof(NEW_DLL_FUNCTIONS));
 }
@@ -340,7 +340,7 @@ struct meta_enginefuncs_t : public enginefuncs_t {
 	meta_enginefuncs_t& operator=(const meta_enginefuncs_t&) DLLINTERNAL;
 
 	// Fill this object with pointers copied from an enginefuncs_t struct.
-	void DLLINTERNAL set_from(enginefuncs_t* pFuncs);
+	void DLLINTERNAL set_from(const enginefuncs_t* pFuncs);
 
 	// Copy the pointers from this object to an enginefuncs_t struct.
 	void DLLINTERNAL copy_to(enginefuncs_t* pFuncs) const;
@@ -394,7 +394,7 @@ inline meta_enginefuncs_t& meta_enginefuncs_t::operator=(const meta_enginefuncs_
 	return *this;
 }
 
-inline void meta_enginefuncs_t::set_from(enginefuncs_t* _pFuncs)
+inline void meta_enginefuncs_t::set_from(const enginefuncs_t* _pFuncs)
 {
 	memcpy(this, _pFuncs, sizeof(enginefuncs_t));
 }

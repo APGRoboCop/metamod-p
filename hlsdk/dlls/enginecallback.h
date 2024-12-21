@@ -23,6 +23,11 @@
 #include "event_flags.h"
 
 // Must be provided by user of this code
+/**
+ * Fix me! -caxanga334
+ * metamod-p\metamod\metamod.h(85): error C2371: 'g_engfuncs': redefinition; different basic types
+ * metamod-p\hlsdk\dlls\enginecallback.h(31): note: see declaration of 'g_engfuncs'
+*/
 extern enginefuncs_t g_engfuncs;
 
 // The actual engine callbacks

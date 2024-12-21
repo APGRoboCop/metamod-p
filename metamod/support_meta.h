@@ -97,19 +97,24 @@ inline int DLLINTERNAL mm_strncmp(const char* s1, const char* s2, size_t n) {
 // Technique 1: use "do..while":
 #if 0
 #define STRNCPY(dst, src, size) \
-	do { strcpy(dst, "\0"); strncat(dst, src, size-1); } while(0)
+	do { strcpy(dst, "\0"); strncat(dst, src, (size)-1); } while(0)
 #endif
 
 // Technique 2: use parens and commas:
 #if 0
 #define STRNCPY(dst, src, size) \
-	(strcpy(dst, "\0"), strncat(dst, src, size-1))
+	(strcpy(dst, "\0"), strncat(dst, src, (size)-1))
 #endif
 
 // Technique 3: use inline
 inline char* DLLINTERNAL STRNCPY(char* dst, const char* src, int size) {
-	return(strncat(&(*dst = 0), src, size - 1));
+	if (size > 0) {
+		dst[0] = '\0'; // Initialize the destination buffer
+		strncat(dst, src, size - 1); // Concatenate the source to the destination buffer
+	}
+	return dst;
 }
+
 
 // Renamed string functions to be clearer.
 inline int DLLINTERNAL strmatch(const char* s1, const char* s2) {

@@ -347,7 +347,7 @@ void DLLINTERNAL cmd_meta_load() {
 		META_CONS("   where <name> is an identifier used to locate the plugin file.");
 		META_CONS("   The system will look for a number of files based on this name, including:");
 		META_CONS("      name");
-#ifdef linux
+#ifdef __linux__
 		META_CONS("      name.so");
 		META_CONS("      name_mm.so");
 		META_CONS("      name_MM.so");

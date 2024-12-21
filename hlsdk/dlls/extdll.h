@@ -45,15 +45,22 @@ typedef int BOOL;
 #include <limits.h>
 #include <stdarg.h>
 #include <algorithm>
+
+#if defined (__clang_major__) && __clang_major__ < 9
+
 #ifndef min
 #define min(a,b)  (((a) < (b)) ? (a) : (b))
 #endif
+
 #ifndef max
 #define max(a,b)  (((a) > (b)) ? (a) : (b))
 #define _vsnprintf(a,b,c,d) vsnprintf(a,b,c,d)
 #undef min
 #undef max
 #endif
+
+#endif // defined (__clang_major__) && __clang_major__ < 9
+
 #endif //_WIN32
 
 // Misc C-runtime library headers
