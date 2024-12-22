@@ -258,7 +258,7 @@ static void mm_PlayerPostThink(edict_t* pEntity) {
 	RETURN_API_void()
 }
 static void mm_StartFrame() {
-	meta_debug_value = int(meta_debug.value);
+	meta_debug_value = static_cast<int>(meta_debug.value);
 
 	META_DLLAPI_HANDLE_void(FN_STARTFRAME, pfnStartFrame, void, (VOID_ARG))
 	RETURN_API_void()

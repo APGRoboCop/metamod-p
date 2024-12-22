@@ -104,27 +104,35 @@ void DLLINTERNAL meta_new_dll_functions_t::copy_to(NEW_DLL_FUNCTIONS* _pFuncs) c
 	memcpy(_pFuncs, this, size);
 }
 
-int DLLINTERNAL meta_new_dll_functions_t::determine_interface_version()
-{
-	// If the meta_enginefuncs_t::version is 0, i.e. has not yet been
-	// determined, that is a problem and an error. We should probably throw
-	// a fit here or something.
-	// For now we just return 0 and leave it to the caller to complain.
-	if (meta_enginefuncs_t::version() == 0) return 0;
+int DLLINTERNAL meta_new_dll_functions_t::determine_interface_version() {
+    // If the meta_enginefuncs_t::version is 0, i.e. has not yet been
+    // determined, that is a problem and an error. We should probably throw
+    // a fit here or something.
+    // For now we just return 0 and leave it to the caller to complain.
+    if (meta_enginefuncs_t::version() == 0) {
+        META_WARNING("Engine interface version not determined yet.");
+        return 0;
+    }
 
-	// The default version is 1.
-	sm_version = 1;
+    // The default version is 1.
+    sm_version = 1;
 
-	// With the enginefuncs interface version 156 the function
-	// pfnCvarValue() was added, which we call version 2.
-	if (meta_enginefuncs_t::version() >= 156) sm_version = 2;
+    // With the enginefuncs interface version 156 the function
+    // pfnCvarValue() was added, which we call version 2.
+    if (meta_enginefuncs_t::version() >= 156) {
+        sm_version = 2;
+    }
 
-	// With the enginefuncs interface version 157 the function
-	// pfnCvarValue2() was added, which we call version 3.
-	if (meta_enginefuncs_t::version() >= 157) sm_version = 3;
+    // With the enginefuncs interface version 157 the function
+    // pfnCvarValue2() was added, which we call version 3.
+    if (meta_enginefuncs_t::version() >= 157) {
+        sm_version = 3;
+    }
 
-	return sm_version;
+    META_DEBUG(3, ("Determined engine interface version: %d", sm_version));
+    return sm_version;
 }
+
 
 size_t DLLINTERNAL meta_new_dll_functions_t::get_size(int _version)
 {

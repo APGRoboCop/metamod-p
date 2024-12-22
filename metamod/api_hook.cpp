@@ -62,21 +62,21 @@ static const void** api_info_tables[3] = {
 static unsigned int call_count = 0;
 
 // get function pointer from api table by function pointer offset
-inline void* DLLINTERNAL get_api_function(const void* api_table, unsigned int func_offset) {
+inline void* DLLINTERNAL get_api_function(const void* api_table, const unsigned int func_offset) {
 	return(*(void**)((unsigned long)api_table + func_offset));
 }
 
 // get data pointer from api_info table by function offset
-inline const api_info_t* DLLINTERNAL get_api_info(enum_api_t api, unsigned int api_info_offset) {
+inline const api_info_t* DLLINTERNAL get_api_info(const enum_api_t api, const unsigned int api_info_offset) {
 	return((const api_info_t*)((unsigned long)api_info_tables[api] + api_info_offset));
 }
 
 // simplified 'void' version of main hook function
-void DLLINTERNAL main_hook_function_void(unsigned int api_info_offset, enum_api_t api, unsigned int func_offset, const void* packed_args) {
+void DLLINTERNAL main_hook_function_void(const unsigned int api_info_offset, const enum_api_t api, const unsigned int func_offset, const void* packed_args) {
 	int i;
 	MPlugin* iplug;
 	const void* api_table;
-	meta_globals_t backup_meta_globals[1]{};
+	meta_globals_t backup_meta_globals[1];
 
 	//passing offset from api wrapper function makes code faster/smaller
 	const api_info_t* api_info = get_api_info(api, api_info_offset);

@@ -132,7 +132,7 @@ int DLLINTERNAL metamod_startup() {
 	// place here at the start.
 	if (!meta_init_gamedll()) {
 		META_ERROR("Failure to init game DLL; exiting...");
-		return(0);
+		return 0;
 	}
 
 	// Register various console commands and cvars.
@@ -154,8 +154,8 @@ int DLLINTERNAL metamod_startup() {
 
 	// Set a slight debug level for developer mode, if debug level not
 	// already set.
-	if (int(CVAR_GET_FLOAT("developer")) != 0 && int(meta_debug.value) == 0) {
-		CVAR_SET_FLOAT("meta_debug", float(meta_debug_value = 3));
+	if (static_cast<int>(CVAR_GET_FLOAT("developer")) != 0 && static_cast<int>(meta_debug.value) == 0) {
+		CVAR_SET_FLOAT("meta_debug", static_cast<float>(meta_debug_value = 3));
 	}
 
 	// Init default values
@@ -276,7 +276,7 @@ int DLLINTERNAL metamod_startup() {
 
 	if (!meta_load_gamedll()) {
 		META_ERROR("Failure to load game DLL; exiting...");
-		return(0);
+		return 0;
 	}
 	if (!Plugins->load()) {
 		META_WARNING("Failure to load plugins...");
@@ -307,7 +307,7 @@ int DLLINTERNAL metamod_startup() {
 		}
 	}
 
-	return(1);
+	return 1;
 }
 
 // Set initial GameDLL fields (name, gamedir).
@@ -315,8 +315,6 @@ int DLLINTERNAL metamod_startup() {
 //  - ME_NULLRESULT	getcwd failed
 mBOOL DLLINTERNAL meta_init_gamedll() {
 	char gamedir[PATH_MAX];
-
-	memset(&GameDLL, 0, sizeof(GameDLL));
 
 	GET_GAME_DIR(gamedir);
 	normalize_pathname(gamedir);
@@ -347,14 +345,12 @@ mBOOL DLLINTERNAL meta_init_gamedll() {
 			META_WARNING("dll: Couldn't get cwd; %s", strerror(errno));
 			RETURN_ERRNO(mFALSE, ME_NULLRESULT);
 		}
-		safevoid_snprintf(GameDLL.gamedir, sizeof(GameDLL.gamedir),
-			"%s/%s", buf, gamedir);
+		safevoid_snprintf(GameDLL.gamedir, sizeof(GameDLL.gamedir), "%s/%s", buf, gamedir);
 		STRNCPY(GameDLL.name, gamedir, sizeof(GameDLL.name));
 	}
 
 	META_DEBUG(3, ("Game: %s", GameDLL.name));
-
-	return(mTRUE);
+	return mTRUE;
 }
 
 // Load game DLL.
@@ -373,7 +369,7 @@ mBOOL DLLINTERNAL meta_load_gamedll() {
 	if (!setup_gamedll(&GameDLL)) {
 		META_WARNING("dll: Unrecognized game: %s", GameDLL.name);
 		// meta_errno should be already set in lookup_game()
-		return(mFALSE);
+		return mFALSE;
 	}
 
 	// open the game DLL
@@ -515,8 +511,7 @@ mBOOL DLLINTERNAL meta_load_gamedll() {
 		}
 
 		pfn_give_engfuncs(&meta_engfuncs, gpGlobals);
-		META_DEBUG(3, ("dll: Game '%s': Called GiveFnptrsToDll",
-			GameDLL.name));
+		META_DEBUG(3, ("dll: Game '%s': Called GiveFnptrsToDll", GameDLL.name));
 
 		//activate linkent-replacement after give_engfuncs so that if game dll is
 		//plugin too and uses same method we get combined export table of plugin
@@ -527,45 +522,41 @@ mBOOL DLLINTERNAL meta_load_gamedll() {
 		}
 	}
 	else {
-		META_WARNING("dll: Couldn't find GiveFnptrsToDll() in game DLL '%s': %s",
-			GameDLL.name, DLERROR());
+		META_WARNING("dll: Couldn't find GiveFnptrsToDll() in game DLL '%s': %s", GameDLL.name, DLERROR());
 		RETURN_ERRNO(mFALSE, ME_DLMISSING);
 	}
 
 	// Yes...another macro.
 #define GET_FUNC_TABLE_FROM_GAME(gamedll, pfnGetFuncs, STR_GetFuncs, struct_field, API_TYPE, TABLE_TYPE, vers_pass, vers_int, vers_want, gotit) \
-		if(((pfnGetFuncs) = (API_TYPE) DLSYM((gamedll).handle, STR_GetFuncs))) { \
-			(gamedll).funcs.struct_field = (TABLE_TYPE*) calloc(1, sizeof(TABLE_TYPE)); \
-			if(!(gamedll).funcs.struct_field) {\
-				META_WARNING("malloc failed for gamedll struct_field: %s", STR_GetFuncs); \
-			} \
-			else if(pfnGetFuncs((gamedll).funcs.struct_field, vers_pass)) { \
-				META_DEBUG(3, ("dll: Game '%s': Found %s", (gamedll).name, STR_GetFuncs)); \
-				(gotit)=1; \
-			} \
-			else { \
-				META_WARNING("dll: Failure calling %s in game '%s'", STR_GetFuncs, (gamedll).name); \
-				free((gamedll).funcs.struct_field); \
-				(gamedll).funcs.struct_field=NULL; \
-				if((vers_int) != (vers_want)) { \
-					META_WARNING("dll: Interface version didn't match; we wanted %d, they had %d", vers_want, vers_int); \
-					/* reproduce error from engine */ \
-					META_CONS("=================="); \
-					META_CONS("Game DLL version mismatch"); \
-					META_CONS("DLL version is %d, engine version is %d", vers_int, vers_want); \
-					if((vers_int) > (vers_want)) \
-						META_CONS("Engine appears to be outdated, check for updates"); \
-					else \
-						META_CONS("The game DLL for %s appears to be outdated, check for updates", GameDLL.name); \
-					META_CONS("=================="); \
-					ALERT(at_error, "Exiting...\n"); \
-				} \
-			} \
-		} \
-		else { \
-			META_DEBUG(5, ("dll: Game '%s': No %s", (gamedll).name, STR_GetFuncs)); \
-			(gamedll).funcs.struct_field=NULL; \
-		}
+    if (((pfnGetFuncs) = (API_TYPE)DLSYM((gamedll).handle, STR_GetFuncs))) { \
+        (gamedll).funcs.struct_field = (TABLE_TYPE*)calloc(1, sizeof(TABLE_TYPE)); \
+        if (!(gamedll).funcs.struct_field) { \
+            META_WARNING("malloc failed for gamedll struct_field: %s", STR_GetFuncs); \
+        } else if (pfnGetFuncs((gamedll).funcs.struct_field, vers_pass)) { \
+            META_DEBUG(3, ("dll: Game '%s': Found %s", (gamedll).name, STR_GetFuncs)); \
+            (gotit) = 1; \
+        } else { \
+            META_WARNING("dll: Failure calling %s in game '%s'", STR_GetFuncs, (gamedll).name); \
+            free((gamedll).funcs.struct_field); \
+            (gamedll).funcs.struct_field = NULL; \
+            if ((vers_int) != (vers_want)) { \
+                META_WARNING("dll: Interface version didn't match; we wanted %d, they had %d", vers_want, vers_int); \
+                /* reproduce error from engine */ \
+                META_CONS("=================="); \
+                META_CONS("Game DLL version mismatch"); \
+                META_CONS("DLL version is %d, engine version is %d", vers_int, vers_want); \
+                if ((vers_int) > (vers_want)) \
+                    META_CONS("Engine appears to be outdated, check for updates"); \
+                else \
+                    META_CONS("The game DLL for %s appears to be outdated, check for updates", GameDLL.name); \
+                META_CONS("=================="); \
+                ALERT(at_error, "Exiting...\n"); \
+            } \
+        } \
+    } else { \
+        META_DEBUG(5, ("dll: Game '%s': No %s", (gamedll).name, STR_GetFuncs)); \
+        (gamedll).funcs.struct_field = NULL; \
+    }
 
 	// Look for API-NEW interface in Game dll.  We do this before API2/API, because
 	// that's what the engine appears to do..
@@ -574,21 +565,21 @@ mBOOL DLLINTERNAL meta_load_gamedll() {
 		GETNEWDLLFUNCTIONS_FN, meta_new_dll_functions_t,
 		&iface_vers, iface_vers, NEW_DLL_FUNCTIONS_VERSION, found)
 
-	// Look for API2 interface in plugin; preferred over API-1.
-	found = 0;
+		// Look for API2 interface in plugin; preferred over API-1.
+		found = 0;
 	iface_vers = INTERFACE_VERSION;
 	GET_FUNC_TABLE_FROM_GAME(GameDLL, pfn_getapi2, "GetEntityAPI2", dllapi_table,
 		GETENTITYAPI2_FN, DLL_FUNCTIONS,
 		&iface_vers, iface_vers, INTERFACE_VERSION, found)
 
-	// Look for API-1 in plugin, if API2 interface wasn't found.
-	if (!found) {
-		GETENTITYAPI_FN pfn_getapi;
-		found = 0;
-		GET_FUNC_TABLE_FROM_GAME(GameDLL, pfn_getapi, "GetEntityAPI", dllapi_table,
-			GETENTITYAPI_FN, DLL_FUNCTIONS,
-			INTERFACE_VERSION, INTERFACE_VERSION, INTERFACE_VERSION, found)
-	}
+		// Look for API-1 in plugin, if API2 interface wasn't found.
+		if (!found) {
+			GETENTITYAPI_FN pfn_getapi;
+			found = 0;
+			GET_FUNC_TABLE_FROM_GAME(GameDLL, pfn_getapi, "GetEntityAPI", dllapi_table,
+				GETENTITYAPI_FN, DLL_FUNCTIONS,
+				INTERFACE_VERSION, INTERFACE_VERSION, INTERFACE_VERSION, found)
+		}
 
 	// If didn't find either, return failure.
 	if (!found) {
@@ -597,5 +588,5 @@ mBOOL DLLINTERNAL meta_load_gamedll() {
 	}
 
 	META_LOG("Game DLL for '%s' loaded successfully", GameDLL.desc);
-	return(mTRUE);
+	return mTRUE;
 }
