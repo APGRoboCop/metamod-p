@@ -159,7 +159,7 @@ CCOPT = $(CCO) $(CCOPT_ARCH) -fno-exceptions -fno-rtti
 
 # optimization level; overridden for certain problematic files
 CCO = -O2 -fomit-frame-pointer -funsafe-math-optimizations -flto -fvisibility=hidden
-CCO += -mmmx -msse -msse2 -msse3 -mssse3 -msse4 -msse4a -msse4.1 -msse4.2 -mfpmath=sse
+CCO += -msse4.2 -mfpmath=sse
 
 # architecture tuning by target type
 ifeq "$(TARGETTYPE)" "amd64"
