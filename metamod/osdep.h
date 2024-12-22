@@ -162,8 +162,8 @@ inline const char* DLLINTERNAL DLERROR() {
 	return(str_GetLastError());
 }
 #endif /* _WIN32 */
-const char* DLLINTERNAL DLFNAME(void* memptr);
-mBOOL DLLINTERNAL IS_VALID_PTR(void* memptr);
+const char* DLLINTERNAL DLFNAME(const void* memptr);
+mBOOL DLLINTERNAL IS_VALID_PTR(const void* memptr);
 
 // Attempt to call the given function pointer, without segfaulting.
 mBOOL DLLINTERNAL os_safe_call(REG_CMD_FN pfn);

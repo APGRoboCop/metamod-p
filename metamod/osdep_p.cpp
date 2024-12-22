@@ -95,7 +95,7 @@ void DLLINTERNAL my_closedir(DIR* dir)
 
 //get module handle of memptr
 #ifdef __linux__
-DLHANDLE DLLINTERNAL get_module_handle_of_memptr(void* memptr)
+DLHANDLE DLLINTERNAL get_module_handle_of_memptr(const void* memptr)
 {
 	Dl_info dli;
 	memset(&dli, 0, sizeof(dli));
@@ -106,7 +106,7 @@ DLHANDLE DLLINTERNAL get_module_handle_of_memptr(void* memptr)
 		return((void*)0);
 }
 #else
-DLHANDLE DLLINTERNAL get_module_handle_of_memptr(void* memptr)
+DLHANDLE DLLINTERNAL get_module_handle_of_memptr(const void* memptr)
 {
 	MEMORY_BASIC_INFORMATION MBI;
 

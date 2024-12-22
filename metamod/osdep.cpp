@@ -98,7 +98,7 @@ char* DLLINTERNAL my_strlwr(char* s) {
 // Microsoft's msvcrt.dll:vsnprintf is buggy and so is vsnprintf on some glibc versions.
 // We use wrapper function to fix bugs.
 //  from: http://sourceforge.net/tracker/index.php?func=detail&aid=1083721&group_id=2435&atid=102435
-int DLLINTERNAL safe_vsnprintf(char* s, size_t n, const char* format, va_list src_ap) {
+int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, const va_list src_ap) {
 	va_list ap;
 	int res;
 	size_t bufsize = n;
@@ -180,7 +180,7 @@ int DLLINTERNAL safe_vsnprintf(char* s, size_t n, const char* format, va_list sr
 	return(res);
 }
 
-int DLLINTERNAL safe_snprintf(char* s, size_t n, const char* format, ...) {
+int DLLINTERNAL safe_snprintf(char* s, const size_t n, const char* format, ...) {
 	va_list ap;
 
 	va_start(ap, format);
@@ -191,7 +191,7 @@ int DLLINTERNAL safe_snprintf(char* s, size_t n, const char* format, ...) {
 }
 #endif
 
-void DLLINTERNAL safevoid_vsnprintf(char* s, size_t n, const char* format, va_list ap) {
+void DLLINTERNAL safevoid_vsnprintf(char* s, const size_t n, const char* format, const va_list ap) {
 	if (!s || n <= 0)
 		return;
 
@@ -238,7 +238,7 @@ char* DLLINTERNAL str_GetLastError() {
 #ifdef __linux__
 // Errno values:
 //  - ME_NOTFOUND	couldn't find a sharedlib that contains memory location
-const char* DLLINTERNAL DLFNAME(void* memptr) {
+const char* DLLINTERNAL DLFNAME(const void* memptr) {
 	Dl_info dli;
 	memset(&dli, 0, sizeof(dli));
 	if (dladdr(memptr, &dli))
@@ -268,7 +268,7 @@ const char* DLLINTERNAL DLFNAME(void* memptr) {
 //
 // Errno values:
 //  - ME_NOTFOUND	couldn't find a DLL that contains memory location
-const char* DLLINTERNAL DLFNAME(void* memptr) {
+const char* DLLINTERNAL DLFNAME(const void* memptr) {
 	MEMORY_BASIC_INFORMATION MBI;
 	static char fname[PATH_MAX] = {};
 
@@ -344,7 +344,7 @@ char* DLLINTERNAL realpath(const char* file_name, char* resolved_name) {
 // we need it for in this particular situation.
 // meta_errno values:
 //  - ME_NOTFOUND	couldn't find a matching sharedlib for this ptr
-mBOOL DLLINTERNAL IS_VALID_PTR(void* memptr) {
+mBOOL DLLINTERNAL IS_VALID_PTR(const void* memptr) {
 	Dl_info dli;
 	memset(&dli, 0, sizeof(dli));
 	if (dladdr(memptr, &dli))
@@ -356,10 +356,13 @@ mBOOL DLLINTERNAL IS_VALID_PTR(void* memptr) {
 // Use the native windows routine IsBadCodePtr.
 // meta_errno values:
 //  - ME_BADMEMPTR	not a valid memory pointer
-mBOOL DLLINTERNAL IS_VALID_PTR(void* memptr) {
-	if (IsBadCodePtr(FARPROC(memptr)))
+mBOOL DLLINTERNAL IS_VALID_PTR(const void* memptr) {
+	if (memptr == nullptr) {
 		RETURN_ERRNO(mFALSE, ME_BADMEMPTR);
-	return(mTRUE);
+	}
+	// Additional checks can be added here if necessary.
+	// For example, you could use platform-specific APIs to verify memory regions.
+	return mTRUE;
 }
 #endif /* _WIN32 */
 

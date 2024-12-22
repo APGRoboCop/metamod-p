@@ -42,7 +42,7 @@
 
 META_ERRNO meta_errno;
 
-void DLLINTERNAL do_exit(int exitval) {
+void DLLINTERNAL do_exit(const int exitval) {
 	sleep(3);
 	exit(exitval);
 }

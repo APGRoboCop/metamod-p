@@ -1218,22 +1218,22 @@ mBOOL DLLINTERNAL MPlugin::retry(PLUG_LOADTIME now, PL_UNLOAD_REASON reason) {
 //
 void DLLINTERNAL MPlugin::free_api_pointers() const
 {
-	if (gamedll_funcs.dllapi_table)
+	//if (gamedll_funcs.dllapi_table)
 		free(gamedll_funcs.dllapi_table);
-	if (gamedll_funcs.newapi_table)
+	//if (gamedll_funcs.newapi_table)
 		free(gamedll_funcs.newapi_table);
 
-	if (tables.dllapi)
+	//if (tables.dllapi)
 		free(tables.dllapi);
-	if (post_tables.dllapi)
+	//if (post_tables.dllapi)
 		free(post_tables.dllapi);
-	if (tables.newapi)
+	//if (tables.newapi)
 		free(tables.newapi);
-	if (post_tables.newapi)
+	//if (post_tables.newapi)
 		free(post_tables.newapi);
-	if (tables.engine)
+	//if (tables.engine)
 		free(tables.engine);
-	if (post_tables.engine)
+	//if (post_tables.engine)
 		free(post_tables.engine);
 }
 

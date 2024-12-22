@@ -67,7 +67,7 @@ void DLLINTERNAL my_closedir(DIR*);
 #include <dirent.h>
 #endif /* _WIN32 */
 
-DLHANDLE DLLINTERNAL get_module_handle_of_memptr(void* memptr);
+DLHANDLE DLLINTERNAL get_module_handle_of_memptr(const void* memptr);
 
 #ifdef __linux__
 void* DLLINTERNAL get_dlsym_pointer(void);
