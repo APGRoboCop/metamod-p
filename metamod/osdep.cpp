@@ -90,7 +90,7 @@ char* DLLINTERNAL my_strlwr(char* s) {
 }
 #endif
 
-#if (! defined(va_copy)) && defined(__GNUC__) && defined(__MINGW32__)
+#if (! defined(va_copy)) && defined(__GNUC__) || defined(__clang__) && defined(__MINGW32__)
 	#define va_copy(d,s)	__builtin_va_copy(d,s)
 #endif
 
@@ -98,7 +98,7 @@ char* DLLINTERNAL my_strlwr(char* s) {
 // Microsoft's msvcrt.dll:vsnprintf is buggy and so is vsnprintf on some glibc versions.
 // We use wrapper function to fix bugs.
 //  from: http://sourceforge.net/tracker/index.php?func=detail&aid=1083721&group_id=2435&atid=102435
-int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, const va_list src_ap) {
+int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, va_list src_ap) {
 	va_list ap;
 	int res;
 	size_t bufsize = n;

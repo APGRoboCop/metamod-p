@@ -219,9 +219,8 @@ void DLLINTERNAL main_hook_function_void(const unsigned int api_info_offset, con
 }
 
 // full return typed version of main hook function
-void* DLLINTERNAL main_hook_function(const class_ret_t& ret_init,
-	unsigned int api_info_offset, enum_api_t api, unsigned int func_offset, const void* packed_args)
-{
+void* DLLINTERNAL main_hook_function(const class_ret_t ret_init,
+	unsigned int api_info_offset, enum_api_t api, unsigned int func_offset, const void* packed_args) {
 	const api_info_t* api_info;
 	int i;
 	META_RES mres, status, prev_mres;
