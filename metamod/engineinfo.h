@@ -23,9 +23,9 @@ typedef void* MemAddr;
 
 // What we return in is_valid_code_pointer() when the EngineInfo object is
 // in an INVALID state, i.e. no code address range could be determined.
-static const bool c_DefaultReturnOnInvalidState = true;
+static constexpr bool c_DefaultReturnOnInvalidState = true;
 
-static const int  c_EngineInfo__typeLen = 10;
+static constexpr int c_EngineInfo_typeLen = 10;
 
 class EngineInfo : public class_metamod_new
 {
@@ -46,7 +46,7 @@ private:
 	// 'amd', 'amd64' etc.
 	// For Windows this is either 'sw' or 'hw' or 'swds' depending on
 	// the server type.
-	char m_type[c_EngineInfo__typeLen];
+	char m_type[c_EngineInfo_typeLen];
 
 	// functions :
 
@@ -89,15 +89,15 @@ public:
 
 	enum {
 		STATE_NULL = 0,
-		STATE_VALID,
-		STATE_INVALID,
+		STATE_VALID = 1,
+		STATE_INVALID = 2,
 
 		MODULE_NAME_NOTFOUND = 5,
-		INVALID_DOS_SIGN,
-		INVALID_NT_SIGN,
-		INVALID_ARG,
-		HEADER_NOTFOUND,
-		NOTFOUND
+		INVALID_DOS_SIGN = 6,
+		INVALID_NT_SIGN = 7,
+		INVALID_ARG = 8,
+		HEADER_NOTFOUND = 9,
+		NOTFOUND = 10
 	};
 
 	// functions :
@@ -113,7 +113,7 @@ public:
 	int DLLINTERNAL initialise(enginefuncs_t* pFuncs = nullptr);
 
 	// Test if pMem is within bounds of the code segment.
-	bool DLLINTERNAL is_valid_code_pointer(void* pMem) const;
+	bool DLLINTERNAL is_valid_code_pointer(const void* pMem) const;
 
 	// Overloaded versions of above test to keep the ugly pointer
 	// conversion stuff in here.
@@ -148,7 +148,7 @@ inline EngineInfo::EngineInfo(const EngineInfo& _rhs) :
 	m_codeEnd(_rhs.m_codeEnd),
 	m_state(STATE_NULL)
 {
-	memcpy(m_type, _rhs.m_type, c_EngineInfo__typeLen);
+	memcpy(m_type, _rhs.m_type, c_EngineInfo_typeLen);
 }
 
 inline EngineInfo& EngineInfo::operator=(const EngineInfo& _rhs)
@@ -156,7 +156,7 @@ inline EngineInfo& EngineInfo::operator=(const EngineInfo& _rhs)
 	m_state = _rhs.m_state;
 	m_codeStart = _rhs.m_codeStart;
 	m_codeEnd = _rhs.m_codeEnd;
-	memcpy(m_type, _rhs.m_type, c_EngineInfo__typeLen);
+	memcpy(m_type, _rhs.m_type, c_EngineInfo_typeLen);
 	return *this;
 }
 
@@ -165,7 +165,7 @@ inline const char* EngineInfo::type() const
 	return m_type;
 }
 
-inline bool EngineInfo::is_valid_code_pointer(void* _pMem) const
+inline bool EngineInfo::is_valid_code_pointer(const void* _pMem) const
 {
 	if (STATE_INVALID == m_state) {
 		return c_DefaultReturnOnInvalidState;

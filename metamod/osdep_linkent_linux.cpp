@@ -179,7 +179,7 @@ static void * __replacement_dlsym(void * module, const char * funcname)
 	//unlock
 	pthread_mutex_unlock(&mutex_replacement_dlsym);
 	
-	return(func);
+	return func;
 }
 
 //
@@ -223,7 +223,7 @@ int DLLINTERNAL init_linkent_replacement(DLHANDLE MetamodHandle, DLHANDLE GameDl
 	if(mprotect((void*)start_of_page, size_of_pages, PROT_READ|PROT_WRITE|PROT_EXEC))
 	{
 		META_ERROR("Couldn't initialize dynamic linkents, mprotect failed: %i.  Exiting...", errno);
-		return(0);
+		return 0;
 	}
 	
 	//Write our own jmp-forwarder on "dlsym"

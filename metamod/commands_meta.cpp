@@ -73,7 +73,7 @@ void DLLINTERNAL meta_register_cmdcvar() {
 	CVAR_REGISTER(&meta_debug);
 	CVAR_REGISTER(&meta_version);
 
-	meta_debug_value = int(meta_debug.value);
+	meta_debug_value = static_cast<int>(meta_debug.value);
 
 	char meta[] = "meta";
 	REG_SVR_COMMAND(meta, svr_meta);
@@ -378,7 +378,7 @@ void DLLINTERNAL cmd_meta_load() {
 }
 
 // Handle various console commands that refer to a known/loaded plugin.
-void DLLINTERNAL cmd_doplug(PLUG_CMD pcmd) {
+void DLLINTERNAL cmd_doplug(const PLUG_CMD pcmd) {
 	MPlugin* findp;
 
 	const int argc = CMD_ARGC();

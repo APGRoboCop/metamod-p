@@ -50,7 +50,7 @@
  // dll overwriting our memory when using an old Metamod with a new game
  // dll.
 
-const int c_NumDummies = 5;
+constexpr int c_NumDummies = 5;
 typedef void (*pdummyfunc)();
 
 // --------------------------------------------------------------------
@@ -438,7 +438,7 @@ private:
 	// functions :
 
 	// Moving copy_to() and set_from() to the private space.
-	void DLLINTERNAL set_from(enginefuncs_t* pFuncs) { meta_enginefuncs_t::set_from(pFuncs); }
+	void DLLINTERNAL set_from(const enginefuncs_t* pFuncs) { meta_enginefuncs_t::set_from(pFuncs); }
 	void DLLINTERNAL copy_to(enginefuncs_t* pFuncs) const { meta_enginefuncs_t::copy_to(pFuncs); }
 
 	// Determine the version of the engine interface from the

@@ -191,11 +191,11 @@ const game_modinfo_t* DLLINTERNAL lookup_game(const char* name) {
 				continue;
 			}
 
-			return(imod);
+			return imod;
 		}
 	}
 	// no match found
-	return(nullptr);
+	return nullptr;
 }
 
 // Installs gamedll from Steam cache
@@ -214,7 +214,7 @@ mBOOL DLLINTERNAL install_gamedll(char* from, const char* to) {
 		if (fd < 0) {
 			META_DEBUG(3, ("Installing gamedll from cache: Failed to create file %s: %s", to, strerror(errno)));
 			FREE_FILE(cachefile);
-			return(mFALSE);
+			return mFALSE;
 		}
 
 		const int length_out = write(fd, cachefile, length_in);
@@ -228,17 +228,17 @@ mBOOL DLLINTERNAL install_gamedll(char* from, const char* to) {
 			if (length_out >= 0)
 				unlink(to);
 
-			return(mFALSE);
+			return mFALSE;
 		}
 
 		META_LOG("Installed gamedll %s from cache.", to);
 	}
 	else {
 		META_DEBUG(3, ("Failed to install gamedll from cache: file %s not found in cache.", from));
-		return(mFALSE);
+		return mFALSE;
 	}
 
-	return(mTRUE);
+	return mTRUE;
 }
 
 // Set all the fields in the gamedll struct, - based either on an entry in
@@ -454,5 +454,5 @@ mBOOL DLLINTERNAL setup_gamedll(gamedll_t* gamedll) {
 		gamedll->desc = known->desc;
 		META_LOG("Recognized game '%s'; using dllfile '%s'", gamedll->name, gamedll->file);
 	}
-	return(mTRUE);
+	return mTRUE;
 }

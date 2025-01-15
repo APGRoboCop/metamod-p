@@ -43,16 +43,16 @@ public:
 	class_metamod_new() = default;
 
 	// Operators
-	void* operator new(size_t size) {
+	void* operator new(const size_t size) {
 		if (size == 0)
-			return(calloc(1, 1));
-		return(calloc(1, size));
+			return calloc(1, 1);
+		return calloc(1, size);
 	}
 
-	void* operator new[](size_t size) {
+	void* operator new[](const size_t size) {
 		if (size == 0)
-			return(calloc(1, 1));
-		return(calloc(1, size));
+			return calloc(1, 1);
+		return calloc(1, size);
 	}
 
 	void operator delete(void* ptr) {

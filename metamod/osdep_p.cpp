@@ -53,26 +53,26 @@ DIR* DLLINTERNAL my_opendir(const char* path)
 	safevoid_snprintf(search_path, sizeof(search_path), "%s\\*.*", path);
 
 	// Get memory for new DIR object
-	DIR* dir = (DIR*)calloc(1, sizeof(DIR));
+	DIR* dir = static_cast<my_DIR*>(calloc(1, sizeof(DIR)));
 
 	// Start searching
 	dir->handle = FindFirstFileA(search_path, &dir->find_data);
 	if (dir->handle == INVALID_HANDLE_VALUE) {
 		free(dir);
-		return(nullptr);
+		return nullptr;
 	}
 
 	// Found file
 	dir->not_found = 0;
 
-	return(dir);
+	return dir;
 }
 
 dirent* DLLINTERNAL my_readdir(DIR* dir)
 {
 	// If not found stop
 	if (!dir || dir->not_found)
-		return(nullptr);
+		return nullptr;
 
 	// Set filename
 	STRNCPY(dir->ent.d_name, dir->find_data.cFileName, sizeof(dir->ent.d_name));
@@ -80,7 +80,7 @@ dirent* DLLINTERNAL my_readdir(DIR* dir)
 	// Search next
 	dir->not_found = !FindNextFileA(dir->handle, &dir->find_data);
 
-	return(&dir->ent);
+	return&dir->ent;
 }
 
 void DLLINTERNAL my_closedir(DIR* dir)
@@ -111,12 +111,12 @@ DLHANDLE DLLINTERNAL get_module_handle_of_memptr(const void* memptr)
 	MEMORY_BASIC_INFORMATION MBI;
 
 	if (!VirtualQuery(memptr, &MBI, sizeof(MBI)))
-		return(nullptr);
+		return nullptr;
 	if (MBI.State != MEM_COMMIT)
-		return(nullptr);
+		return nullptr;
 	if (!MBI.AllocationBase)
-		return(nullptr);
+		return nullptr;
 
-	return DLHANDLE(MBI.AllocationBase);
+	return static_cast<DLHANDLE>(MBI.AllocationBase);
 }
 #endif /* __linux__ */

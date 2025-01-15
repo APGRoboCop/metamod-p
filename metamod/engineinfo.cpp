@@ -60,7 +60,7 @@ bool DLLINTERNAL EngineInfo::check_for_engine_module(const char* _pName)
 	// name of the engine's shared object. We copy the string for future
 	// reference and return successfully.
 	size = 0;
-	while (*pC != '.' && size < c_EngineInfo__typeLen - 1) {
+	while (*pC != '.' && size < c_EngineInfo_typeLen - 1) {
 		m_type[size++] = *pC++;
 	}
 	m_type[size] = '\0';
@@ -105,7 +105,7 @@ bool DLLINTERNAL EngineInfo::check_for_engine_module(const char* _pName)
 	// name of the engine's shared object. We copy the architecture string
 	// for future reference and return successfully.
 	size = 0;
-	while (*pType != '.' && size < c_EngineInfo__typeLen - 1) {
+	while (*pType != '.' && size < c_EngineInfo_typeLen - 1) {
 		m_type[size++] = *pType++;
 	}
 	m_type[size] = '\0';
@@ -175,7 +175,7 @@ int DLLINTERNAL EngineInfo::vac_pe_approx(enginefuncs_t* _pFuncs)
 	unsigned long* pengfuncs = (unsigned long*)_pFuncs;
 	unsigned int i, invals = 0;
 	for (i = 0, pengfuncs += i; i < 140; i++, pengfuncs++) {
-		if (((*pengfuncs) & c_VacDllEngineFuncsRangeMask) != c_VacDllEngineFuncsRangeMark) {
+		if ((*pengfuncs & c_VacDllEngineFuncsRangeMask) != c_VacDllEngineFuncsRangeMark) {
 			invals++;
 			break;
 		}
@@ -186,7 +186,7 @@ int DLLINTERNAL EngineInfo::vac_pe_approx(enginefuncs_t* _pFuncs)
 			"Unable to determine valid engine code address range.",
 			invals, c_VacDllEngineFuncsRangeMark);
 
-		strncpy(m_type, "vacdll+?", c_EngineInfo__typeLen);
+		strncpy(m_type, "vacdll+?", c_EngineInfo_typeLen);
 		m_state = STATE_INVALID;
 		return STATE_INVALID;
 	}
@@ -194,14 +194,14 @@ int DLLINTERNAL EngineInfo::vac_pe_approx(enginefuncs_t* _pFuncs)
 	m_codeStart = c_VacDllEngineFuncsRangeStart;
 	m_codeEnd = c_VacDllEngineFuncsRangeEnd;
 
-	strncpy(m_type, "vacdll", c_EngineInfo__typeLen);
+	strncpy(m_type, "vacdll", c_EngineInfo_typeLen);
 
 	m_state = STATE_VALID;
 
 	return 0;
 }
 
-void DLLINTERNAL EngineInfo::set_code_range(unsigned char* _pBase, PIMAGE_NT_HEADERS _pNThdr)
+void DLLINTERNAL EngineInfo::set_code_range(unsigned char* _pBase, const PIMAGE_NT_HEADERS _pNThdr)
 {
 	m_codeStart = _pBase + _pNThdr->OptionalHeader.BaseOfCode;
 	m_codeEnd = _pBase + _pNThdr->OptionalHeader.BaseOfCode + _pNThdr->OptionalHeader.SizeOfCode;
@@ -325,7 +325,7 @@ int DLLINTERNAL EngineInfo::initialise(enginefuncs_t* _pFuncs)
 #ifdef _WIN32
 
 	ret = nthdr_module_name();
-	if (MODULE_NAME_NOTFOUND == ret && (!_pFuncs->pfnIsDedicatedServer())) {
+	if (MODULE_NAME_NOTFOUND == ret && !_pFuncs->pfnIsDedicatedServer()) {
 		// We could not find the engine dll by name and we are running on
 		// a listen server. This usually means that that we are dealing with
 		// a VAC protected engine dll. No other way than approximating the

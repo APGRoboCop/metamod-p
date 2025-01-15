@@ -52,14 +52,14 @@
  // Flags to indicate current "load" state of plugin.
  // NOTE: order is important, as greater/less comparisons are made.
 typedef enum {
-	PL_EMPTY = 0,			// empty slot
+	PL_EMPTY = 0,		// empty slot
 	PL_VALID,			// has valid info in it
 	PL_BADFILE,			// nonexistent file (open failed),
-					//    or not a valid plugin file (query failed)
-					PL_OPENED,			// dlopened and queried
-					PL_FAILED,			// opened, but failed to attach or unattach
-					PL_RUNNING,			// attached and running
-					PL_PAUSED,			// attached but paused
+	//    or not a valid plugin file (query failed)
+	PL_OPENED,			// dlopened and queried
+	PL_FAILED,			// opened, but failed to attach or unattach
+	PL_RUNNING,			// attached and running
+	PL_PAUSED,			// attached but paused
 } PLUG_STATUS;
 
 // Action to take for plugin at next opportunity.
@@ -123,11 +123,11 @@ public:
 	api_tables_t post_tables;
 
 	DLLINTERNAL void* get_api_table(const enum_api_t api) {
-		return(((void**)&tables)[api]);
+		return((void**)&tables)[api];
 	}
 
 	DLLINTERNAL void* get_api_post_table(const enum_api_t api) {
-		return(((void**)&post_tables)[api]);
+		return((void**)&post_tables)[api];
 	}
 
 	int index;					// 1-based
@@ -159,7 +159,7 @@ public:
 	char* DLLINTERNAL resolve_suffix(const char* path) const;
 	static mBOOL DLLINTERNAL is_platform_postfix(const char* pf);
 
-	mBOOL DLLINTERNAL platform_match(MPlugin* plugin) const;
+	mBOOL DLLINTERNAL platform_match(const MPlugin* plugin) const;
 
 	mBOOL DLLINTERNAL load(PLUG_LOADTIME now);
 	mBOOL DLLINTERNAL unload(PLUG_LOADTIME now, PL_UNLOAD_REASON reason, PL_UNLOAD_REASON real_reason);
@@ -182,28 +182,28 @@ public:
 	const char* DLLINTERNAL str_reason(PL_UNLOAD_REASON preason, PL_UNLOAD_REASON preal_reason) const;
 	static const char* DLLINTERNAL str_loadtime(PLUG_LOADTIME pallow, STR_LOADTIME fmt);
 
-	const char* DLLINTERNAL str_status() const { return(str_status(ST_SIMPLE)); }
-	const char* DLLINTERNAL str_action() const { return(str_action(SA_SIMPLE)); }
-	const char* DLLINTERNAL str_source() const { return(str_source(SO_SIMPLE)); }
+	const char* DLLINTERNAL str_status() const { return str_status(ST_SIMPLE); }
+	const char* DLLINTERNAL str_action() const { return str_action(SA_SIMPLE); }
+	const char* DLLINTERNAL str_source() const { return str_source(SO_SIMPLE); }
 
 	const char* DLLINTERNAL str_loadable() const
 	{
-		return(info ? str_loadtime(info->loadable, SL_SIMPLE) : " -");
+		return info ? str_loadtime(info->loadable, SL_SIMPLE) : " -";
 	}
 
 	const char* DLLINTERNAL str_unloadable() const
 	{
-		return(info ? str_loadtime(info->unloadable, SL_SIMPLE) : " -");
+		return info ? str_loadtime(info->unloadable, SL_SIMPLE) : " -";
 	}
 
 	const char* DLLINTERNAL str_loadable(const STR_LOADTIME fmt) const
 	{
-		return(info ? str_loadtime(info->loadable, fmt) : " -");
+		return info ? str_loadtime(info->loadable, fmt) : " -";
 	}
 
 	const char* DLLINTERNAL str_unloadable(const STR_LOADTIME fmt) const
 	{
-		return(info ? str_loadtime(info->unloadable, fmt) : " -");
+		return info ? str_loadtime(info->unloadable, fmt) : " -";
 	}
 
 private:

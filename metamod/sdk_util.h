@@ -68,14 +68,14 @@
 // as parameter anyway, so there is no reason why ENTINDEX()
 // shouldn't.
 inline int ENTINDEX(const edict_t* pEdict) {
-	return((*g_engfuncs.pfnIndexOfEdict)(pEdict));
+	return(*g_engfuncs.pfnIndexOfEdict)(pEdict);
 }
 
 // Also, create some nice inlines for engine callback combos.
 
 // Get a setinfo value from a player entity.
 inline char* DLLINTERNAL ENTITY_KEYVALUE(edict_t* entity, char* key) {
-	return(INFOKEY_VALUE(GET_INFOKEYBUFFER(entity), key));
+	return INFOKEY_VALUE(GET_INFOKEYBUFFER(entity), key);
 }
 
 // Set a setinfo value for a player entity.
@@ -85,7 +85,7 @@ inline void DLLINTERNAL ENTITY_SET_KEYVALUE(edict_t* entity, char* key, char* va
 
 // Get a "serverinfo" value.
 inline char* DLLINTERNAL SERVERINFO(char* key) {
-	return(ENTITY_KEYVALUE(INDEXENT(0), key));
+	return ENTITY_KEYVALUE(INDEXENT(0), key);
 }
 
 // Set a "serverinfo" value.
@@ -95,7 +95,7 @@ inline void DLLINTERNAL SET_SERVERINFO(char* key, char* value) {
 
 // Get a "localinfo" value.
 inline char* DLLINTERNAL LOCALINFO(char* key) {
-	return(ENTITY_KEYVALUE(nullptr, key));
+	return ENTITY_KEYVALUE(nullptr, key);
 }
 
 // Set a "localinfo" value.
@@ -104,7 +104,7 @@ inline void DLLINTERNAL SET_LOCALINFO(char* key, char* value) {
 }
 
 inline int DLLINTERNAL fast_FNullEnt(const edict_t* pent) {
-	return(!pent || !(*g_engfuncs.pfnEntOffsetOfPEntity)(pent));
+	return!pent || !(*g_engfuncs.pfnEntOffsetOfPEntity)(pent);
 }
 
 // Our slightly modified version, using an edict_t pointer instead of a

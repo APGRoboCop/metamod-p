@@ -65,7 +65,7 @@ option_t* DLLINTERNAL MConfig::find(const char* lookup) const
 
 	for (optp = list; optp->name && !strmatch(optp->name, lookup); optp++);
 	if (optp->name)
-		return(optp);
+		return optp;
 	RETURN_ERRNO(NULL, ME_NOTFOUND);
 }
 
@@ -73,19 +73,19 @@ mBOOL DLLINTERNAL MConfig::set(const char* key, const char* value) const
 {
 	option_t* optp = find(key);
 	if (optp)
-		return(set(optp, value));
+		return set(optp, value);
 	RETURN_ERRNO(mFALSE, ME_NOTFOUND);
 }
 
 mBOOL DLLINTERNAL MConfig::set(option_t* setp, const char* setstr) {
 	char pathbuf[PATH_MAX];
-	int* optval = (int*)setp->dest;
-	char** optstr = (char**)setp->dest;
+	int* optval = static_cast<int*>(setp->dest);
+	char** optstr = static_cast<char**>(setp->dest);
 	// cvar_t *optcvar = (cvar_t *) setp->dest;
 	// SETOPT_FN optcmd = (SETOPT_FN) setp->dest;
 
 	if (!setstr)
-		return(mTRUE);
+		return mTRUE;
 
 	switch (setp->type) {
 	case CF_INT:
@@ -144,7 +144,7 @@ mBOOL DLLINTERNAL MConfig::set(option_t* setp, const char* setstr) {
 	//case CF_NONE:
 	//	break;
 	}
-	return(mTRUE);
+	return mTRUE;
 }
 
 mBOOL DLLINTERNAL MConfig::load(const char* fn) {
@@ -197,7 +197,7 @@ mBOOL DLLINTERNAL MConfig::load(const char* fn) {
 	}
 	filename = strdup(loadfile);
 	fclose(fp);
-	return(mTRUE);
+	return mTRUE;
 }
 
 void DLLINTERNAL MConfig::show() const
@@ -207,8 +207,8 @@ void DLLINTERNAL MConfig::show() const
 	else
 		META_CONS("%s:", "Config options from localinfo");
 	for (option_t* optp = list; optp->name; optp++) {
-		const int* optval = (int*)optp->dest;
-		char** optstr = (char**)optp->dest;
+		const int* optval = static_cast<int*>(optp->dest);
+		char** optstr = static_cast<char**>(optp->dest);
 		// cvar_t *optcvar = (cvar_t *) optp->dest;
 		// SETOPT_FN optcmd = (SETOPT_FN) optp->dest;
 		switch (optp->type) {

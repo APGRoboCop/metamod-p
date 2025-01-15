@@ -69,14 +69,14 @@ static IMAGE_NT_HEADERS* DLLINTERNAL_NOVIS get_ntheaders(HMODULE module)
 	//Check if valid dos header
 	mem.mem = (unsigned long)module;
 	if (IsBadReadPtr(mem.dos, sizeof(*mem.dos)) || mem.dos->e_magic != IMAGE_DOS_SIGNATURE)
-		return(nullptr);
+		return nullptr;
 
 	//Get and check pe header
 	mem.mem = rva_to_va(module, mem.dos->e_lfanew);
 	if (IsBadReadPtr(mem.pe, sizeof(*mem.pe)) || mem.pe->Signature != IMAGE_NT_SIGNATURE)
-		return(nullptr);
+		return nullptr;
 
-	return(mem.pe);
+	return mem.pe;
 }
 
 //
@@ -95,17 +95,17 @@ static IMAGE_EXPORT_DIRECTORY* DLLINTERNAL_NOVIS get_export_table(HMODULE module
 	//Check module
 	mem.pe = get_ntheaders(module);
 	if (!mem.pe)
-		return(nullptr);
+		return nullptr;
 
 	//Check for exports
 	if (!mem.pe->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress)
-		return(nullptr);
+		return nullptr;
 
 	mem.mem = rva_to_va(module, mem.pe->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
 	if (IsBadReadPtr(mem.export_dir, sizeof(*mem.export_dir)))
-		return(nullptr);
+		return nullptr;
 
-	return(mem.export_dir);
+	return mem.export_dir;
 }
 
 //
@@ -116,7 +116,7 @@ static int sort_names_list(const sort_names_t* A, const sort_names_t* B)
 	const char* str_A = (const char*)A->name;
 	const char* str_B = (const char*)B->name;
 
-	return(mm_strcmp(str_A, str_B));
+	return mm_strcmp(str_A, str_B);
 }
 
 //
@@ -141,7 +141,7 @@ static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMOD
 	if (!exportMM || !exportGame)
 	{
 		META_ERROR("Couldn't initialize dynamic linkents, exportMM: %i, exportGame: %i.  Exiting...", exportMM, exportGame);
-		return(0);
+		return 0;
 	}
 
 	//setup new export table
@@ -216,7 +216,7 @@ static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMOD
 	if (!VirtualProtect(exportMM, sizeof(*exportMM), PAGE_READWRITE, &OldProtect))
 	{
 		META_ERROR("Couldn't initialize dynamic linkents, VirtualProtect failed: %i.  Exiting...", GetLastError());
-		return(0);
+		return 0;
 	}
 
 	exportMM->Base = 1;
@@ -227,7 +227,7 @@ static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMOD
 	exportMM->AddressOfNameOrdinals = va_to_rva(moduleMM, newNameOrdinals);
 
 	VirtualProtect(exportMM, sizeof(*exportMM), OldProtect, &OldProtect);
-	return(1);
+	return 1;
 }
 
 //
@@ -235,5 +235,5 @@ static int DLLINTERNAL_NOVIS combine_module_export_tables(HMODULE moduleMM, HMOD
 //
 int DLLINTERNAL init_linkent_replacement(DLHANDLE moduleMetamod, DLHANDLE moduleGame)
 {
-	return(combine_module_export_tables(moduleMetamod, moduleGame));
+	return combine_module_export_tables(moduleMetamod, moduleGame);
 }

@@ -54,7 +54,7 @@ const char* DLLINTERNAL autodetect_gamedll(const gamedll_t* gamedll, const char*
 	if (!full_gamedir_path(buf, dllpath)) {
 		//whine & return
 		META_WARNING("GameDLL-Autodetection: Directory '%s' doesn't exist.", buf);
-		return(nullptr);
+		return nullptr;
 	}
 
 	// Generate knownfn path
@@ -63,14 +63,14 @@ const char* DLLINTERNAL autodetect_gamedll(const gamedll_t* gamedll, const char*
 	// Check if knownfn exists and is valid gamedll
 	if (is_gamedll(fnpath)) {
 		// knownfn exists and is loadable gamedll, return 0.
-		return(nullptr);
+		return nullptr;
 	}
 
 	// Open directory
 	if (!((dir = opendir(dllpath)))) {
 		//whine & return
 		META_WARNING("GameDLL-Autodetection: Couldn't open directory '%s'.", dllpath);
-		return(nullptr);
+		return nullptr;
 	}
 
 	const size_t dlext_len = strlen(PLATFORM_DLEXT);
@@ -116,7 +116,7 @@ const char* DLLINTERNAL autodetect_gamedll(const gamedll_t* gamedll, const char*
 			//gamedll detected
 			STRNCPY(buf, ent->d_name, sizeof(buf));
 			closedir(dir);
-			return(buf);
+			return buf;
 		}
 		META_DEBUG(8, ("is_gamedll(%s): failed.", fnpath));
 	}
@@ -125,5 +125,5 @@ const char* DLLINTERNAL autodetect_gamedll(const gamedll_t* gamedll, const char*
 	META_WARNING("GameDLL-Autodetection: Couldn't find gamedll in '%s'.", dllpath);
 	closedir(dir);
 
-	return(nullptr);
+	return nullptr;
 }

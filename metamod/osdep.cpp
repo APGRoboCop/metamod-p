@@ -66,7 +66,7 @@ char* DLLINTERNAL my_strtok_r(char* s, const char* delim, char** ptrptr) {
 	else
 		begin = *ptrptr;
 	if (!begin)
-		return(nullptr);
+		return nullptr;
 	char* end = strpbrk(begin, delim);
 	if (end) {
 		*end = '\0';
@@ -75,7 +75,7 @@ char* DLLINTERNAL my_strtok_r(char* s, const char* delim, char** ptrptr) {
 	}
 	else
 		*ptrptr = nullptr;
-	return(begin);
+	return begin;
 }
 #endif /* _WIN32 */
 
@@ -98,7 +98,7 @@ char* DLLINTERNAL my_strlwr(char* s) {
 // Microsoft's msvcrt.dll:vsnprintf is buggy and so is vsnprintf on some glibc versions.
 // We use wrapper function to fix bugs.
 //  from: http://sourceforge.net/tracker/index.php?func=detail&aid=1083721&group_id=2435&atid=102435
-int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, va_list src_ap) {
+int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, const va_list src_ap) {
 	va_list ap;
 	int res;
 	size_t bufsize = n;
@@ -108,7 +108,7 @@ int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, va_l
 
 	// If the format string is empty, nothing to do.
 	if (!format || !*format)
-		return(0);
+		return 0;
 
 	// The supplied count may be big enough. Try to use the library
 		// vsnprintf, fixing up the case where the library function
@@ -118,22 +118,22 @@ int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, va_l
 		// A NULL destination will cause a segfault with vsnprintf.
 		// if n > 0.  Nor do we want to copy our tmpbuf to NULL later.
 		if (!s)
-			return(-1);
+			return-1;
 
 		va_copy(ap, src_ap);
 		res = vsnprintf(s, n, format, ap);
 		va_end(ap);
 
 		if (res > 0) {
-			if (unsigned(res) == n)
+			if (static_cast<unsigned>(res) == n)
 				s[res - 1] = 0;
-			return(res);
+			return res;
 		}
 
 		// If n is already larger than INT_MAX, increasing it won't
 		// help.
 		if (n > INT_MAX)
-			return(-1);
+			return-1;
 
 		// Try a larger buffer.
 		bufsize *= 2;
@@ -144,7 +144,7 @@ int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, va_l
 
 	char* tmpbuf = static_cast<char*>(malloc(bufsize * sizeof(char)));
 	if (!tmpbuf)
-		return(-1);
+		return-1;
 
 	va_copy(ap, src_ap);
 	res = vsnprintf(tmpbuf, bufsize, format, ap);
@@ -168,7 +168,7 @@ int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, va_l
 	}
 
 	if (res > 0 && n > 0) {
-		if (n > unsigned(res))
+		if (n > static_cast<unsigned>(res))
 			memcpy(s, tmpbuf, (res + 1) * sizeof(char));
 		else {
 			memcpy(s, tmpbuf, (n - 1) * sizeof(char));
@@ -177,7 +177,7 @@ int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, va_l
 	}
 
 	free(tmpbuf);
-	return(res);
+	return res;
 }
 
 int DLLINTERNAL safe_snprintf(char* s, const size_t n, const char* format, ...) {
@@ -187,7 +187,7 @@ int DLLINTERNAL safe_snprintf(char* s, const size_t n, const char* format, ...) 
 	const int res = safe_vsnprintf(s, n, format, ap);
 	va_end(ap);
 
-	return(res);
+	return res;
 }
 #endif
 
@@ -205,11 +205,11 @@ void DLLINTERNAL safevoid_vsnprintf(char* s, const size_t n, const char* format,
 
 	// w32api returns -1 on too long write, glibc returns number of bytes it could have written if there were enough space
 	// w32api doesn't write null at all, some buggy glibc don't either
-	if (res < 0 || size_t(res) >= n)
+	if (res < 0 || static_cast<size_t>(res) >= n)
 		s[n - 1] = 0;
 }
 
-void DLLINTERNAL safevoid_snprintf(char* s, size_t n, const char* format, ...) {
+void DLLINTERNAL safevoid_snprintf(char* s, const size_t n, const char* format, ...) {
 	va_list ap;
 
 	va_start(ap, format);
@@ -229,7 +229,7 @@ char* DLLINTERNAL str_GetLastError() {
 		nullptr, GetLastError(),
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), //! Default language
 		LPTSTR(&buf), MAX_STRBUF_LEN - 1, nullptr);
-	return(buf);
+	return buf;
 }
 #endif /* _WIN32 */
 
@@ -281,13 +281,13 @@ const char* DLLINTERNAL DLFNAME(const void* memptr) {
 
 	// MSDN indicates that GetModuleFileName will leave string
 	// null-terminated, even if it's truncated because buffer is too small.
-	if (!GetModuleFileNameA(HMODULE(MBI.AllocationBase), fname, sizeof(fname) - 1))
+	if (!GetModuleFileNameA(static_cast<HMODULE>(MBI.AllocationBase), fname, sizeof(fname) - 1))
 		RETURN_ERRNO(NULL, ME_NOTFOUND);
 	if (!fname[0])
 		RETURN_ERRNO(NULL, ME_NOTFOUND);
 
 	normalize_pathname(fname);
-	return(fname);
+	return fname;
 }
 #endif /* _WIN32 */
 
@@ -304,7 +304,7 @@ void DLLINTERNAL normalize_pathname(char* path) {
 	META_DEBUG(8, ("normalize: %s", path));
 	for (char* cp = path; *cp; cp++) {
 		/*if(isupper(*cp))*/
-		*cp = char(tolower(*cp));
+		*cp = static_cast<char>(tolower(*cp));
 
 		if (*cp == '\\')
 			*cp = '/';
@@ -318,20 +318,20 @@ char* DLLINTERNAL realpath(const char* file_name, char* resolved_name) {
 	const int ret = GetFullPathNameA(file_name, PATH_MAX, resolved_name, nullptr);
 	if (ret > PATH_MAX) {
 		errno = ENAMETOOLONG;
-		return(nullptr);
+		return nullptr;
 	}
 	if (ret > 0) {
 		WIN32_FIND_DATAA find_data;
 		void* const handle = FindFirstFileA(resolved_name, &find_data);
 		if (INVALID_HANDLE_VALUE == handle) {
 			errno = ENOENT;
-			return(nullptr);
+			return nullptr;
 		}
 		FindClose(handle);
 		normalize_pathname(resolved_name);
-		return(resolved_name);
+		return resolved_name;
 	}
-	return(nullptr);
+	return nullptr;
 }
 #endif /*_WIN32*/
 
@@ -371,12 +371,12 @@ mBOOL DLLINTERNAL IS_VALID_PTR(const void* memptr) {
 // in plugin commands and produced confusing output ("plugin has been
 // unloaded", when really it segfaultd), and (b) wasn't necessary since
 // IS_VALID_PTR() should cover the situation.
-mBOOL DLLINTERNAL os_safe_call(REG_CMD_FN pfn) {
+mBOOL DLLINTERNAL os_safe_call(const REG_CMD_FN pfn) {
 	// try and see if this is a valid memory location
 	if (!IS_VALID_PTR((void*)pfn))
 		// meta_errno should be already set in is_valid_ptr()
-		return(mFALSE);
+		return mFALSE;
 
 	pfn();
-	return(mTRUE);
+	return mTRUE;
 }

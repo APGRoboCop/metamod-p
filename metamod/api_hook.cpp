@@ -41,13 +41,14 @@
 #include "osdep.h"			//unlikely
 
  // getting pointer with table index is faster than with if-else
-static const void** api_tables[3] = {
+constexpr size_t API_TABLE_COUNT = 3;
+
+static const void** api_tables[API_TABLE_COUNT] = {
 	(const void**)&Engine.funcs,
 	(const void**)&GameDLL.funcs.dllapi_table,
 	(const void**)&GameDLL.funcs.newapi_table
 };
-
-static const void** api_info_tables[3] = {
+static const void** api_info_tables[API_TABLE_COUNT] = {
 	(const void**)&engine_info,
 	(const void**)&dllapi_info,
 	(const void**)&newapi_info
@@ -63,12 +64,12 @@ static unsigned int call_count = 0;
 
 // get function pointer from api table by function pointer offset
 inline void* DLLINTERNAL get_api_function(const void* api_table, const unsigned int func_offset) {
-	return(*(void**)((unsigned long)api_table + func_offset));
+	return*(void**)((unsigned long)api_table + func_offset);
 }
 
 // get data pointer from api_info table by function offset
 inline const api_info_t* DLLINTERNAL get_api_info(const enum_api_t api, const unsigned int api_info_offset) {
-	return((const api_info_t*)((unsigned long)api_info_tables[api] + api_info_offset));
+	return(const api_info_t*)((unsigned long)api_info_tables[api] + api_info_offset);
 }
 
 // simplified 'void' version of main hook function
@@ -76,7 +77,7 @@ void DLLINTERNAL main_hook_function_void(const unsigned int api_info_offset, con
 	int i;
 	MPlugin* iplug;
 	const void* api_table;
-	meta_globals_t backup_meta_globals[1];
+	meta_globals_t backup_meta_globals[1]{};
 
 	//passing offset from api wrapper function makes code faster/smaller
 	const api_info_t* api_info = get_api_info(api, api_info_offset);
@@ -88,7 +89,9 @@ void DLLINTERNAL main_hook_function_void(const unsigned int api_info_offset, con
 	}
 
 	//Setup
+#ifndef __BUILD_FAST_METAMOD__
 	const int loglevel = api_info->loglevel;
+#endif
 	META_RES mres;
 	META_RES status = MRES_UNSET;
 	void* pfn_routine;
@@ -152,7 +155,7 @@ void DLLINTERNAL main_hook_function_void(const unsigned int api_info_offset, con
 			else {
 				// don't complain for NULL routines in NEW_DLL_FUNCTIONS
 				if (unlikely(api != e_api_newapi))
-					META_WARNING("Couldn't find api call: %s:%s", (api == e_api_engine) ? "engine" : GameDLL.file, api_info->name);
+					META_WARNING("Couldn't find api call: %s:%s", api == e_api_engine ? "engine" : GameDLL.file, api_info->name);
 				status = MRES_UNSET;
 			}
 		}
@@ -226,7 +229,9 @@ void* DLLINTERNAL main_hook_function(const class_ret_t ret_init,
 	META_RES mres, status, prev_mres;
 	MPlugin* iplug;
 	void* pfn_routine;
+#ifndef __BUILD_FAST_METAMOD__
 	int loglevel;
+#endif
 	const void* api_table;
 	meta_globals_t backup_meta_globals[1]{};
 
@@ -247,7 +252,9 @@ void* DLLINTERNAL main_hook_function(const class_ret_t ret_init,
 	class_ret_t pub_orig_ret = ret_init;
 
 	//Setup
+#ifndef __BUILD_FAST_METAMOD__
 	loglevel = api_info->loglevel;
+#endif
 	mres = MRES_UNSET;
 	status = MRES_UNSET;
 	prev_mres = MRES_UNSET;
@@ -324,7 +331,7 @@ void* DLLINTERNAL main_hook_function(const class_ret_t ret_init,
 			else {
 				// don't complain for NULL routines in NEW_DLL_FUNCTIONS
 				if (unlikely(api != e_api_newapi))
-					META_WARNING("Couldn't find api call: %s:%s", (api == e_api_engine) ? "engine" : GameDLL.file, api_info->name);
+					META_WARNING("Couldn't find api call: %s:%s", api == e_api_engine ? "engine" : GameDLL.file, api_info->name);
 				status = MRES_UNSET;
 			}
 		}
@@ -407,10 +414,10 @@ void* DLLINTERNAL main_hook_function(const class_ret_t ret_init,
 
 	//return value is passed through ret_init!
 	if (likely(status != MRES_OVERRIDE)) {
-		return(*static_cast<void**>(orig_ret.getptr()));
+		return*static_cast<void**>(orig_ret.getptr());
 	}
 	META_DEBUG(loglevel, ("Returning (override) %s()", api_info->name));
-	return(*static_cast<void**>(override_ret.getptr()));
+	return*static_cast<void**>(override_ret.getptr());
 }
 
 //

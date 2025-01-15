@@ -77,7 +77,7 @@ static void mutil_LogConsole(plid_t /* plid */, const char* fmt, ...) {
 }
 
 // Log regular message to logs; newline added.
-static void mutil_LogMessage(plid_t plid, const char* fmt, ...) {
+static void mutil_LogMessage(const plid_t plid, const char* fmt, ...) {
 	va_list ap;
 	char buf[MAX_LOGMSG_LEN];
 
@@ -89,7 +89,7 @@ static void mutil_LogMessage(plid_t plid, const char* fmt, ...) {
 }
 
 // Log an error message to logs; newline added.
-static void mutil_LogError(plid_t plid, const char* fmt, ...) {
+static void mutil_LogError(const plid_t plid, const char* fmt, ...) {
 	va_list ap;
 	char buf[MAX_LOGMSG_LEN];
 
@@ -101,11 +101,11 @@ static void mutil_LogError(plid_t plid, const char* fmt, ...) {
 }
 
 // Log a message only if cvar "developer" set; newline added.
-static void mutil_LogDeveloper(plid_t plid, const char* fmt, ...) {
+static void mutil_LogDeveloper(const plid_t plid, const char* fmt, ...) {
 	va_list ap;
 	char buf[MAX_LOGMSG_LEN];
 
-	if (int(CVAR_GET_FLOAT("developer")) == 0)
+	if (static_cast<int>(CVAR_GET_FLOAT("developer")) == 0)
 		return;
 
 	const plugin_info_t* plinfo = plid;
@@ -117,8 +117,8 @@ static void mutil_LogDeveloper(plid_t plid, const char* fmt, ...) {
 
 // Print a center-message, with text parameters and varargs.  Provides
 // functionality to the above center_say interfaces.
-static void mutil_CenterSayVarargs(plid_t plid, hudtextparms_t const& tparms,
-	const char* fmt, va_list ap)
+static void mutil_CenterSayVarargs(const plid_t plid, hudtextparms_t const& tparms,
+	const char* fmt, const va_list ap)
 {
 	char buf[MAX_LOGMSG_LEN];
 
@@ -133,7 +133,7 @@ static void mutil_CenterSayVarargs(plid_t plid, hudtextparms_t const& tparms,
 
 // Print message on center of all player's screens.  Uses default text
 // parameters (color green, 10 second fade-in).
-static void mutil_CenterSay(plid_t plid, const char* fmt, ...) {
+static void mutil_CenterSay(const plid_t plid, const char* fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
 	mutil_CenterSayVarargs(plid, default_csay_tparms, fmt, ap);
@@ -141,7 +141,7 @@ static void mutil_CenterSay(plid_t plid, const char* fmt, ...) {
 }
 
 // Print a center-message, with given text parameters.
-static void mutil_CenterSayParms(plid_t plid, hudtextparms_t const& tparms, const char* fmt, ...) {
+static void mutil_CenterSayParms(const plid_t plid, hudtextparms_t const& tparms, const char* fmt, ...) {
 	va_list ap;
 	va_start(ap, fmt);
 	mutil_CenterSayVarargs(plid, tparms, fmt, ap);
@@ -151,40 +151,44 @@ static void mutil_CenterSayParms(plid_t plid, hudtextparms_t const& tparms, cons
 // Allow plugins to call the entity functions in the GameDLL.  In
 // particular, calling "player()" as needed by most Bots.  Suggested by
 // Jussi Kivilinna.
-static qboolean mutil_CallGameEntity(plid_t plid, const char* entStr, entvars_t* pev) {
+static qboolean mutil_CallGameEntity(const plid_t plid, const char* entStr, entvars_t* pev) {
 	const plugin_info_t* plinfo = plid;
 	META_DEBUG(8, ("Looking up game entity '%s' for plugin '%s'", entStr,
 		plinfo->name));
 	const ENTITY_FN pfnEntity = ENTITY_FN(DLSYM(GameDLL.handle, entStr));
 	if (!pfnEntity) {
 		META_WARNING("Couldn't find game entity '%s' in game DLL '%s' for plugin '%s'", entStr, GameDLL.name, plinfo->name);
-		return(false);
+		return false;
 	}
 	META_DEBUG(7, ("Calling game entity '%s' for plugin '%s'", entStr,
 		plinfo->name));
 	(*pfnEntity)(pev);
-	return(true);
+	return true;
 }
 
 // Find a usermsg, registered by the gamedll, with the corresponding
 // msgname, and return remaining info about it (msgid, size).
 static int mutil_GetUserMsgID(plid_t plid, const char* msgname, int* size) {
+#ifndef __BUILD_FAST_METAMOD__
 	const plugin_info_t* plinfo = plid;
+#endif
 	META_DEBUG(8, ("Looking up usermsg name '%s' for plugin '%s'", msgname,
 		plinfo->name));
 	const MRegMsg* umsg = RegMsgs->find(msgname);
 	if (umsg) {
 		if (size)
 			*size = umsg->size;
-		return(umsg->msgid);
+		return umsg->msgid;
 	}
-	return(0);
+	return 0;
 }
 
 // Find a usermsg, registered by the gamedll, with the corresponding
 // msgid, and return remaining info about it (msgname, size).
-static const char* mutil_GetUserMsgName(plid_t plid, int msgid, int* size) {
+static const char* mutil_GetUserMsgName(plid_t plid, const int msgid, int* size) {
+#ifndef __BUILD_FAST_METAMOD__
 	const plugin_info_t* plinfo = plid;
+#endif
 	META_DEBUG(8, ("Looking up usermsg id '%d' for plugin '%s'", msgid,
 		plinfo->name));
 	// Guess names for any built-in Engine messages mentioned in the SDK;
@@ -193,22 +197,22 @@ static const char* mutil_GetUserMsgName(plid_t plid, int msgid, int* size) {
 		switch (msgid) {
 		case SVC_TEMPENTITY:
 			if (size) *size = -1;
-			return("tempentity?");
+			return"tempentity?";
 		case SVC_INTERMISSION:
 			if (size) *size = -1;
-			return("intermission?");
+			return"intermission?";
 		case SVC_CDTRACK:
 			if (size) *size = -1;
-			return("cdtrack?");
+			return"cdtrack?";
 		case SVC_WEAPONANIM:
 			if (size) *size = -1;
-			return("weaponanim?");
+			return"weaponanim?";
 		case SVC_ROOMTYPE:
 			if (size) *size = -1;
-			return("roomtype?");
+			return"roomtype?";
 		case SVC_DIRECTOR:
 			if (size) *size = -1;
-			return("director?");
+			return"director?";
 		}
 	}
 	const MRegMsg* umsg = RegMsgs->find(msgid);
@@ -217,27 +221,27 @@ static const char* mutil_GetUserMsgName(plid_t plid, int msgid, int* size) {
 			*size = umsg->size;
 		// 'name' is assumed to be a constant string, allocated in the
 		// gamedll.
-		return(umsg->name);
+		return umsg->name;
 	}
-	return(nullptr);
+	return nullptr;
 }
 
 // Return the full path of the plugin's loaded dll/so file.
-static const char* mutil_GetPluginPath(plid_t plid) {
+static const char* mutil_GetPluginPath(const plid_t plid) {
 	static char buf[PATH_MAX];
 
 	const MPlugin* plug = Plugins->find(plid);
 	if (!plug) {
 		META_WARNING("GetPluginPath: couldn't find plugin '%s'",
 			plid->name);
-		return(nullptr);
+		return nullptr;
 	}
 	STRNCPY(buf, plug->pathname, sizeof(buf));
-	return(buf);
+	return buf;
 }
 
 // Return various string-based info about the game/MOD/gamedll.
-static const char* mutil_GetGameInfo(plid_t plid, ginfo_t type) {
+static const char* mutil_GetGameInfo(const plid_t plid, const ginfo_t type) {
 	static char buf[MAX_STRBUF_LEN];
 	const char* cp;
 	switch (type) {
@@ -262,38 +266,38 @@ static const char* mutil_GetGameInfo(plid_t plid, ginfo_t type) {
 	default:
 		META_WARNING("GetGameInfo: invalid request '%d' from plugin '%s'",
 			type, plid->name);
-		return(nullptr);
+		return nullptr;
 	}
 	STRNCPY(buf, cp, sizeof(buf));
-	return(buf);
+	return buf;
 }
 
-static int mutil_LoadMetaPlugin(plid_t plid, const char* fname, PLUG_LOADTIME now, void** plugin_handle)
+static int mutil_LoadMetaPlugin(const plid_t plid, const char* fname, const PLUG_LOADTIME now, void** plugin_handle)
 {
 	MPlugin* pl_loaded;
 
 	if (nullptr == fname) {
-		return(ME_ARGUMENT);
+		return ME_ARGUMENT;
 	}
 
 	meta_errno = ME_NOERROR;
 	if (!((pl_loaded = Plugins->plugin_addload(plid, fname, now)))) {
 		if (plugin_handle)
 			*plugin_handle = nullptr;
-		return(meta_errno);
+		return meta_errno;
 	}
 	if (plugin_handle)
-		*plugin_handle = (void*)pl_loaded->handle;
-	return(0);
+		*plugin_handle = static_cast<void*>(pl_loaded->handle);
+	return 0;
 }
 
-static int mutil_UnloadMetaPlugin(plid_t plid, const char* fname, PLUG_LOADTIME now, PL_UNLOAD_REASON reason)
+static int mutil_UnloadMetaPlugin(const plid_t plid, const char* fname, const PLUG_LOADTIME now, const PL_UNLOAD_REASON reason)
 {
 	MPlugin* findp;
 	char* endptr;
 
 	if (nullptr == fname) {
-		return(ME_ARGUMENT);
+		return ME_ARGUMENT;
 	}
 
 	const int pindex = strtol(fname, &endptr, 10);
@@ -303,43 +307,43 @@ static int mutil_UnloadMetaPlugin(plid_t plid, const char* fname, PLUG_LOADTIME 
 		findp = Plugins->find_match(fname);
 
 	if (!findp)
-		return(meta_errno);
+		return meta_errno;
 
 	meta_errno = ME_NOERROR;
 
 	if (findp->plugin_unload(plid, now, reason))
-		return(0);
+		return 0;
 
-	return(meta_errno);
+	return meta_errno;
 }
 
-static int mutil_UnloadMetaPluginByHandle(plid_t plid, void* plugin_handle, PLUG_LOADTIME now, PL_UNLOAD_REASON reason)
+static int mutil_UnloadMetaPluginByHandle(const plid_t plid, void* plugin_handle, const PLUG_LOADTIME now, const PL_UNLOAD_REASON reason)
 {
 	MPlugin* findp;
 
 	if (nullptr == plugin_handle) {
-		return(ME_ARGUMENT);
+		return ME_ARGUMENT;
 	}
 
-	if (!((findp = Plugins->find(DLHANDLE(plugin_handle)))))
-		return(ME_NOTFOUND);
+	if (!((findp = Plugins->find(static_cast<DLHANDLE>(plugin_handle)))))
+		return ME_NOTFOUND;
 
 	meta_errno = ME_NOERROR;
 
 	if (findp->plugin_unload(plid, now, reason))
-		return(0);
+		return 0;
 
-	return(meta_errno);
+	return meta_errno;
 }
 
 // Check if player is being queried for cvar
 static const char* mutil_IsQueryingClientCvar(plid_t /*plid*/, const edict_t* player) {
-	return(g_Players.is_querying_cvar(player));
+	return g_Players.is_querying_cvar(player);
 }
 
 //
 static int mutil_MakeRequestID(plid_t /*plid*/) {
-	return(abs(0xbeef << 16) + (++requestid_counter));
+	return abs(0xbeef << 16) + ++requestid_counter;
 }
 
 //

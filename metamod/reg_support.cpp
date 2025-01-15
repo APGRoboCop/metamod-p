@@ -206,8 +206,8 @@ void DLLHIDDEN meta_CVarRegister(cvar_t* pCvar) {
 }
 
 // Replacement for engine routine RegUserMsg; called by plugins.
-int DLLHIDDEN meta_RegUserMsg(const char* pszName, int iSize) {
-	return(REG_USER_MSG(strdup(pszName), iSize));
+int DLLHIDDEN meta_RegUserMsg(const char* pszName, const int iSize) {
+	return REG_USER_MSG(strdup(pszName), iSize);
 }
 
 // Intercept and record queries

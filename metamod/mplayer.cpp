@@ -126,10 +126,10 @@ void DLLINTERNAL MPlayer::clear_cvar_query(const char* /*cvar*/)
 const char* DLLINTERNAL MPlayer::is_querying_cvar() const
 {
 	if (isQueried) {
-		return(cvarName);
+		return cvarName;
 	}
 
-	return(nullptr);
+	return nullptr;
 }
 
 // Mark a player as querying a client cvar and stores the cvar name
@@ -176,5 +176,5 @@ const char* DLLINTERNAL MPlayerList::is_querying_cvar(const edict_t* pEntity) co
 		RETURN_ERRNO(NULL, ME_NOTFOUND);
 	}
 
-	return(players[indx].is_querying_cvar());
+	return players[indx].is_querying_cvar();
 }

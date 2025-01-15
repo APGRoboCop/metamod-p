@@ -81,33 +81,33 @@ void DLLINTERNAL MPluginList::reset_plugin(MPlugin* pl_find) const
 // meta_errno values:
 //  - ME_ARGUMENT	invalid pindex
 //  - ME_NOTFOUND	couldn't find a matching plugin
-MPlugin* DLLINTERNAL MPluginList::find(int pindex) {
+MPlugin* DLLINTERNAL MPluginList::find(const int pindex) {
 	if (pindex <= 0)
 		RETURN_ERRNO(NULL, ME_ARGUMENT);
 	MPlugin* pfound = &plist[pindex - 1];
 	if (pfound->status < PL_VALID)
 		RETURN_ERRNO(NULL, ME_NOTFOUND);
-	return(pfound);
+	return pfound;
 }
 
 // Find a plugin based on the plugin handle.
 // meta_errno values:
 //  - ME_ARGUMENT	invalid pindex
 //  - ME_NOTFOUND	couldn't find a matching plugin
-MPlugin* DLLINTERNAL MPluginList::find(DLHANDLE handle) {
+MPlugin* DLLINTERNAL MPluginList::find(const DLHANDLE handle) {
 	if (!handle)
 		RETURN_ERRNO(NULL, ME_ARGUMENT);
 	for (int i = 0; i < endlist; i++) {
 		if (plist[i].status < PL_VALID)
 			continue;
 		if (plist[i].handle == handle)
-			return(&plist[i]);
+			return&plist[i];
 	}
 	RETURN_ERRNO(NULL, ME_NOTFOUND);
 }
 
 // Clear source_plugin_index on all matching plugins
-void DLLINTERNAL MPluginList::clear_source_plugin_index(int source_index) {
+void DLLINTERNAL MPluginList::clear_source_plugin_index(const int source_index) {
 	if (source_index <= 0)
 		return;
 
@@ -120,19 +120,19 @@ void DLLINTERNAL MPluginList::clear_source_plugin_index(int source_index) {
 }
 
 // Find if any plugin has been loaded by plugin 'source_index'
-mBOOL DLLINTERNAL MPluginList::found_child_plugins(int source_index) const
+mBOOL DLLINTERNAL MPluginList::found_child_plugins(const int source_index) const
 {
 	if (source_index <= 0)
-		return(mFALSE);
+		return mFALSE;
 
 	for (int i = 0; i < endlist; i++) {
 		if (plist[i].status < PL_VALID)
 			continue;
 		if (plist[i].source_plugin_index == source_index)
-			return(mTRUE);
+			return mTRUE;
 	}
 
-	return(mFALSE);
+	return mFALSE;
 }
 
 // Try make endlist lower (called after plugin unload)
@@ -156,14 +156,14 @@ void DLLINTERNAL MPluginList::trim_list() {
 // meta_errno values:
 //  - ME_ARGUMENT	null plid_t
 //  - ME_NOTFOUND	couldn't find a matching plugin
-MPlugin* DLLINTERNAL MPluginList::find(plid_t id) {
+MPlugin* DLLINTERNAL MPluginList::find(const plid_t id) {
 	if (!id)
 		RETURN_ERRNO(NULL, ME_ARGUMENT);
 	for (int i = 0; i < endlist; i++) {
 		if (plist[i].status < PL_VALID)
 			continue;
 		if (plist[i].info == id)
-			return(&plist[i]);
+			return&plist[i];
 	}
 	RETURN_ERRNO(NULL, ME_NOTFOUND);
 }
@@ -182,7 +182,7 @@ MPlugin* DLLINTERNAL MPluginList::find(const char* findpath) {
 			continue;
 		if (strmatch(plist[i].pathname, findpath)) {
 			META_DEBUG(8, ("Found loaded plugin %s", plist[i].file));
-			return(&plist[i]);
+			return&plist[i];
 		}
 	}
 	META_DEBUG(8, ("No loaded plugin found with path: %s", findpath));
@@ -217,7 +217,7 @@ MPlugin* DLLINTERNAL MPluginList::find_memloc(void* memptr) {
 		RETURN_ERRNO(NULL, ME_NOTFOUND);
 	}
 
-	return(find(dlhandle));
+	return find(dlhandle);
 #endif
 }
 
@@ -276,7 +276,7 @@ MPlugin* DLLINTERNAL MPluginList::find_match(const char* prefix) {
 	}
 
 	if (pfound)
-		return(pfound);
+		return pfound;
 
 	RETURN_ERRNO(NULL, ME_NOTFOUND);
 }
@@ -286,7 +286,7 @@ MPlugin* DLLINTERNAL MPluginList::find_match(const char* prefix) {
 // meta_errno values:
 //  - ME_ARGUMENT	null prefix
 //  - ME_NOTFOUND	couldn't find a matching plugin
-MPlugin* DLLINTERNAL MPluginList::find_match(MPlugin* pmatch) {
+MPlugin* DLLINTERNAL MPluginList::find_match(const MPlugin* pmatch) {
 	if (!pmatch)
 		RETURN_ERRNO(NULL, ME_ARGUMENT);
 	MPlugin* pfound = nullptr;
@@ -299,7 +299,7 @@ MPlugin* DLLINTERNAL MPluginList::find_match(MPlugin* pmatch) {
 	}
 
 	if (pfound)
-		return(pfound);
+		return pfound;
 
 	RETURN_ERRNO(NULL, ME_NOTFOUND);
 }
@@ -307,7 +307,7 @@ MPlugin* DLLINTERNAL MPluginList::find_match(MPlugin* pmatch) {
 // Add a plugin to the list.
 // meta_errno values:
 //  - ME_MAXREACHED		reached max plugins
-MPlugin* DLLINTERNAL MPluginList::add(MPlugin* padd) {
+MPlugin* DLLINTERNAL MPluginList::add(const MPlugin* padd) {
 	int i;
 
 	// Find either:
@@ -344,7 +344,7 @@ MPlugin* DLLINTERNAL MPluginList::add(MPlugin* padd) {
 	// copy status
 	iplug->status = padd->status;
 
-	return(iplug);
+	return iplug;
 }
 
 // Read plugins.ini at server startup.
@@ -415,7 +415,7 @@ mBOOL DLLINTERNAL MPluginList::ini_startup() {
 	if (!n) {
 		META_WARNING("ini: Warning; no plugins found to load?");
 	}
-	return(mTRUE);
+	return mTRUE;
 }
 
 // Re-read plugins.ini looking for added/deleted/changed plugins.
@@ -528,7 +528,7 @@ mBOOL DLLINTERNAL MPluginList::ini_refresh() {
 	if (!n) {
 		META_WARNING("ini: Warning; no plugins found to load?");
 	}
-	return(mTRUE);
+	return mTRUE;
 }
 
 // Load a plugin from plugin request.
@@ -537,7 +537,7 @@ mBOOL DLLINTERNAL MPluginList::ini_refresh() {
 //  - ME_ALREADY	this plugin already loaded
 //  - errno's from add()
 //  - errno's from load()
-MPlugin* DLLINTERNAL MPluginList::plugin_addload(plid_t plid, const char* fname, PLUG_LOADTIME now) {
+MPlugin* DLLINTERNAL MPluginList::plugin_addload(const plid_t plid, const char* fname, const PLUG_LOADTIME now) {
 	MPlugin pl_temp = MPlugin(); // value-initialization
 	MPlugin* pl_found, * pl_added, * pl_loader;
 
@@ -579,7 +579,7 @@ MPlugin* DLLINTERNAL MPluginList::plugin_addload(plid_t plid, const char* fname,
 	if (!((pl_added = add(&pl_temp)))) {
 		META_DEBUG(1, ("Couldn't add plugin '%s' to list; see log", pl_temp.desc));
 		// meta_errno should be already set in add()
-		return(nullptr);
+		return nullptr;
 	}
 
 	// try to load new plugin (setting 'must load now')
@@ -596,11 +596,11 @@ MPlugin* DLLINTERNAL MPluginList::plugin_addload(plid_t plid, const char* fname,
 		else
 			META_DEBUG(1, ("Couldn't load plugin '%s'; see log", pl_added->desc));
 		// meta_errno should be already set in load()
-		return(nullptr);
+		return nullptr;
 	}
 	META_DEBUG(1, ("Loaded plugin '%s' successfully", pl_added->desc));
 	meta_errno = ME_NOERROR;
-	return(pl_added);
+	return pl_added;
 }
 
 // Load a plugin from a console command.
@@ -623,7 +623,7 @@ mBOOL DLLINTERNAL MPluginList::cmd_addload(const char* args) {
 	if (pl_temp.cmd_parseline(args) != mTRUE) {
 		META_CONS("Couldn't parse 'meta load' arguments: %s", args);
 		// meta_errno should be already set in cmd_parseline()
-		return(mFALSE);
+		return mFALSE;
 	}
 
 	// resolve given path into a file; accepts various "shortcut"
@@ -633,7 +633,7 @@ mBOOL DLLINTERNAL MPluginList::cmd_addload(const char* args) {
 		META_CONS("Couldn't resolve given path into a file: %s",
 			pl_temp.file);
 		// meta_errno should be already set in resolve()
-		return(mFALSE);
+		return mFALSE;
 	}
 
 	// Try to find plugin with this pathname in the current list of
@@ -648,7 +648,7 @@ mBOOL DLLINTERNAL MPluginList::cmd_addload(const char* args) {
 	if (!((pl_added = add(&pl_temp)))) {
 		META_CONS("Couldn't add plugin '%s' to list; see log", pl_temp.desc);
 		// meta_errno should be already set in add()
-		return(mFALSE);
+		return mFALSE;
 	}
 
 	// try to load new plugin
@@ -669,11 +669,11 @@ mBOOL DLLINTERNAL MPluginList::cmd_addload(const char* args) {
 			META_CONS("Couldn't load plugin '%s'; see log", pl_added->desc);
 		show();
 		// meta_errno should be already set in load()
-		return(mFALSE);
+		return mFALSE;
 	}
 	META_CONS("Loaded plugin '%s' successfully", pl_added->desc);
 	show();
-	return(mTRUE);
+	return mTRUE;
 }
 
 // Load plugins at startup.
@@ -685,7 +685,7 @@ mBOOL DLLINTERNAL MPluginList::load() {
 	if (!ini_startup()) {
 		META_WARNING("Problem loading plugins.ini: %s", inifile);
 		// meta_errno should be already set in ini_startup()
-		return(mFALSE);
+		return mFALSE;
 	}
 
 	META_LOG("dll: Loading plugins...");
@@ -699,19 +699,19 @@ mBOOL DLLINTERNAL MPluginList::load() {
 			META_WARNING("dll: Failed to load plugin '%s'", plist[i].file);
 	}
 	META_LOG("dll: Finished loading %d plugins", n);
-	return(mTRUE);
+	return mTRUE;
 }
 
 // Update list of loaded plugins from ini file, and load any new/changed plugins.
 // meta_errno values:
 //  - errno's from ini_refresh()
-mBOOL DLLINTERNAL MPluginList::refresh(PLUG_LOADTIME now) {
+mBOOL DLLINTERNAL MPluginList::refresh(const PLUG_LOADTIME now) {
 	int ndone = 0, nkept = 0, nloaded = 0, nunloaded = 0, nreloaded = 0, ndelayed = 0;
 
 	if (!ini_refresh()) {
 		META_WARNING("dll: Problem reloading plugins.ini: %s", inifile);
 		// meta_errno should be already set in ini_refresh()
-		return(mFALSE);
+		return mFALSE;
 	}
 
 	META_DEBUG(3, ("dll: Updating plugins..."));
@@ -777,7 +777,7 @@ mBOOL DLLINTERNAL MPluginList::refresh(PLUG_LOADTIME now) {
 	}
 	META_DEBUG(3, ("dll: Finished updating %d plugins; kept %d, loaded %d, unloaded %d, reloaded %d, delayed %d",
 		ndone, nkept, nloaded, nunloaded, nreloaded, ndelayed));
-	return(mTRUE);
+	return mTRUE;
 }
 
 // Re-enable any plugins currently paused.
@@ -795,7 +795,7 @@ void DLLINTERNAL MPluginList::unpause_all() {
 // until changelevel.
 // meta_errno values:
 //  - none
-void DLLINTERNAL MPluginList::retry_all(PLUG_LOADTIME now) {
+void DLLINTERNAL MPluginList::retry_all(const PLUG_LOADTIME now) {
 	for (int i = 0; i < endlist; i++) {
 		MPlugin* iplug = &plist[i];
 		if (iplug->action != PA_NONE)
@@ -806,7 +806,7 @@ void DLLINTERNAL MPluginList::retry_all(PLUG_LOADTIME now) {
 // List plugins and information about them in a formatted table.
 // meta_errno values:
 //  - none
-void DLLINTERNAL MPluginList::show(int source_index) const
+void DLLINTERNAL MPluginList::show(const int source_index) const
 {
 	int n = 0, r = 0;
 	char desc[15 + 1], file[16 + 1], vers[7 + 1];		// plus 1 for term null

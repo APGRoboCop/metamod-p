@@ -59,10 +59,10 @@ int DLLINTERNAL valid_gamedir_file(const char* path) {
 	struct stat st;
 
 	if (!path)
-		return(FALSE);
+		return FALSE;
 
 	if (strmatch(path, "/dev/null"))
-		return(TRUE);
+		return TRUE;
 
 	if (is_absolute_path(path))
 		STRNCPY(buf, path, sizeof(buf));
@@ -72,24 +72,24 @@ int DLLINTERNAL valid_gamedir_file(const char* path) {
 	const int ret = stat(buf, &st);
 	if (ret != 0) {
 		META_DEBUG(5, ("Unable to stat '%s': %s", buf, strerror(errno)));
-		return(FALSE);
+		return FALSE;
 	}
 
 	const int reg = S_ISREG(st.st_mode);
 	if (!reg) {
 		META_DEBUG(5, ("Not a regular file: %s", buf));
-		return(FALSE);
+		return FALSE;
 	}
 
 	const int size = st.st_size;
 	if (!size) {
 		META_DEBUG(5, ("Empty file: %s", buf));
-		return(FALSE);
+		return FALSE;
 	}
 
 	if (ret == 0 && reg && size)
-		return(TRUE);
-	return(FALSE);
+		return TRUE;
+	return FALSE;
 }
 
 // Turns path into a full path:
@@ -115,5 +115,5 @@ char* DLLINTERNAL full_gamedir_path(const char* path, char* fullpath) {
 	}
 	// Replace backslashes, etc.
 	normalize_pathname(fullpath);
-	return(fullpath);
+	return fullpath;
 }

@@ -136,30 +136,30 @@ inline const char* DLLINTERNAL DLERROR(void) {
 typedef HINSTANCE DLHANDLE;
 typedef FARPROC DLFUNC;
 inline DLHANDLE DLLINTERNAL DLOPEN(const char* filename) {
-	return(LoadLibraryA(filename));
+	return LoadLibraryA(filename);
 }
-inline DLFUNC DLLINTERNAL DLSYM(DLHANDLE handle, const char* string) {
-	return(GetProcAddress(handle, string));
+inline DLFUNC DLLINTERNAL DLSYM(const DLHANDLE handle, const char* string) {
+	return GetProcAddress(handle, string);
 }
-inline int DLLINTERNAL DLCLOSE(DLHANDLE handle) {
+inline int DLLINTERNAL DLCLOSE(const DLHANDLE handle) {
 	if (!handle) {
 		dlclose_handle_invalid = mTRUE;
-		return(1);
+		return 1;
 	}
 
 	dlclose_handle_invalid = mFALSE;
 
 	// NOTE: Windows FreeLibrary returns success=nonzero, fail=zero,
 	// which is the opposite of the unix convention, thus the '!'.
-	return(!FreeLibrary(handle));
+	return!FreeLibrary(handle);
 }
 // Windows doesn't provide a function corresponding to dlerror(), so
 // we make our own.
 char* DLLINTERNAL str_GetLastError();
 inline const char* DLLINTERNAL DLERROR() {
 	if (dlclose_handle_invalid)
-		return("Invalid handle.");
-	return(str_GetLastError());
+		return"Invalid handle.";
+	return str_GetLastError();
 }
 #endif /* _WIN32 */
 const char* DLLINTERNAL DLFNAME(const void* memptr);
@@ -275,12 +275,12 @@ void DLLINTERNAL normalize_pathname(char* path);
 //  - a UNC network address (ie "\\srv1\blah").
 // Also, handle both native and normalized pathnames.
 inline mBOOL DLLINTERNAL is_absolute_path(const char* path) {
-	if (path[0] == '/') return(mTRUE);
+	if (path[0] == '/') return mTRUE;
 #ifdef _WIN32
-	if (path[1] == ':') return(mTRUE);
-	if (path[0] == '\\') return(mTRUE);
+	if (path[1] == ':') return mTRUE;
+	if (path[0] == '\\') return mTRUE;
 #endif /* _WIN32 */
-	return(mFALSE);
+	return mFALSE;
 }
 
 #ifdef _WIN32
@@ -295,7 +295,7 @@ inline const char* DLLINTERNAL str_os_error() {
 #ifdef __linux__
 	return(strerror(errno));
 #elif defined(_WIN32)
-	return(str_GetLastError());
+	return str_GetLastError();
 #endif /* _WIN32 */
 }
 

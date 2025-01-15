@@ -46,12 +46,12 @@ const char* DLLINTERNAL META_UTIL_VarArgs(const char* format, ...)
 	safevoid_vsnprintf(string, sizeof(string), format, argptr);
 	va_end(argptr);
 
-	return(string);
+	return string;
 }
 
-short DLLINTERNAL FixedSigned16(float value, float scale)
+short DLLINTERNAL FixedSigned16(const float value, const float scale)
 {
-	int output = int(value * scale);
+	int output = static_cast<int>(value * scale);
 
 	if (output > 32767)
 		output = 32767;
@@ -59,12 +59,12 @@ short DLLINTERNAL FixedSigned16(float value, float scale)
 	if (output < -32768)
 		output = -32768;
 
-	return short(output);
+	return static_cast<short>(output);
 }
 
-unsigned short DLLINTERNAL FixedUnsigned16(float value, float scale)
+unsigned short DLLINTERNAL FixedUnsigned16(const float value, const float scale)
 {
-	int output = int(value * scale);
+	int output = static_cast<int>(value * scale);
 	if (output < 0)
 		output = 0;
 	if (output > 0xFFFF)

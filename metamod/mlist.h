@@ -69,8 +69,8 @@ public:
 	MPlugin* DLLINTERNAL find(DLHANDLE handle);		// find by handle
 	MPlugin* DLLINTERNAL find_memloc(void* memptr);	// find by memory location
 	MPlugin* DLLINTERNAL find_match(const char* prefix);	// find by partial prefix match
-	MPlugin* DLLINTERNAL find_match(MPlugin* pmatch);	// find by platform_match()
-	MPlugin* DLLINTERNAL add(MPlugin* padd);
+	MPlugin* DLLINTERNAL find_match(const MPlugin* pmatch);	// find by platform_match()
+	MPlugin* DLLINTERNAL add(const MPlugin* padd);
 
 	mBOOL DLLINTERNAL found_child_plugins(int source_index) const;
 	void DLLINTERNAL clear_source_plugin_index(int source_index);

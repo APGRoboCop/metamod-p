@@ -173,14 +173,13 @@ static void mm_ClientUserInfoChanged(edict_t* pEntity, char* infobuffer) {
 	RETURN_API_void()
 }
 bool shouldExpensiveHooksBeEnabled(const char* gameMap) {
-	FILE* fp;
 	char loadfile[PATH_MAX];
 	char line[MAX_MAPNAME_LENGTH];
 
 	// Make full pathname (from gamedir if relative, collapse "..", backslashes, etc).
 	full_gamedir_path(Config->slowhooks_whitelist, loadfile);
 
-	fp = fopen(loadfile, "r");
+	FILE* fp = fopen(loadfile, "r");
 	if (!fp) {
 		META_WARNING("unable to open slowhook whitelist file '%s': %s", loadfile, strerror(errno));
 		return false;

@@ -52,7 +52,7 @@ inline int DLLINTERNAL mm_strcmp(const char* s1, const char* s2) {
 	int (*__strcmp)(const char*, const char*) = &strcmp;
 	return((*__strcmp)(s1, s2));
 #else
-	return(strcmp(s1, s2));
+	return strcmp(s1, s2);
 #endif
 }
 
@@ -62,7 +62,7 @@ inline int DLLINTERNAL mm_strncmp(const char* s1, const char* s2, size_t n) {
 	int (*__strncmp)(const char*, const char*, size_t) = &strncmp;
 	return((*__strncmp)(s1, s2, n));
 #else
-	return(strncmp(s1, s2, n));
+	return strncmp(s1, s2, n);
 #endif
 }
 
@@ -107,7 +107,7 @@ inline int DLLINTERNAL mm_strncmp(const char* s1, const char* s2, size_t n) {
 #endif
 
 // Technique 3: use inline
-inline char* DLLINTERNAL STRNCPY(char* dst, const char* src, int size) {
+inline char* DLLINTERNAL STRNCPY(char* dst, const char* src, const int size) {
 	if (size > 0) {
 		dst[0] = '\0'; // Initialize the destination buffer
 		strncat(dst, src, size - 1); // Concatenate the source to the destination buffer
@@ -119,23 +119,23 @@ inline char* DLLINTERNAL STRNCPY(char* dst, const char* src, int size) {
 // Renamed string functions to be clearer.
 inline int DLLINTERNAL strmatch(const char* s1, const char* s2) {
 	if (likely(s1) && likely(s2))
-		return(!mm_strcmp(s1, s2));
-	return(0);
+		return!mm_strcmp(s1, s2);
+	return 0;
 }
-inline int DLLINTERNAL strnmatch(const char* s1, const char* s2, size_t n) {
+inline int DLLINTERNAL strnmatch(const char* s1, const char* s2, const size_t n) {
 	if (likely(s1) && likely(s2))
-		return(!mm_strncmp(s1, s2, n));
-	return(0);
+		return!mm_strncmp(s1, s2, n);
+	return 0;
 }
 inline int DLLINTERNAL strcasematch(const char* s1, const char* s2) {
 	if (likely(s1) && likely(s2))
-		return(!strcasecmp(s1, s2));
-	return(0);
+		return!strcasecmp(s1, s2);
+	return 0;
 }
-inline int DLLINTERNAL strncasematch(const char* s1, const char* s2, size_t n) {
+inline int DLLINTERNAL strncasematch(const char* s1, const char* s2, const size_t n) {
 	if (likely(s1) && likely(s2))
-		return(!strncasecmp(s1, s2, n));
-	return(0);
+		return!strncasecmp(s1, s2, n);
+	return 0;
 }
 
 inline int DLLINTERNAL old_valid_file(char* path) {
@@ -146,7 +146,7 @@ inline int DLLINTERNAL old_valid_file(char* path) {
 	else
 		ret = 0;
 	FREE_FILE(cp);
-	return(ret);
+	return ret;
 }
 int DLLINTERNAL valid_gamedir_file(const char* path);
 char* DLLINTERNAL full_gamedir_path(const char* path, char* fullpath);

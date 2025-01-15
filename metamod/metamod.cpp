@@ -125,7 +125,7 @@ int DLLINTERNAL metamod_startup() {
 
 	// If running with "+developer", allow an opportunity to break in with
 	// a debugger.
-	if (int(CVAR_GET_FLOAT("developer")) != 0)
+	if (static_cast<int>(CVAR_GET_FLOAT("developer")) != 0)
 		sleep(1);
 
 	// Get gamedir, very early on, because it seems we need it all over the
@@ -213,7 +213,7 @@ int DLLINTERNAL metamod_startup() {
 	// Check for an initial debug level, since cfg files don't get exec'd
 	// until later.
 	if (Config->debuglevel != 0) {
-		CVAR_SET_FLOAT("meta_debug", float(meta_debug_value = Config->debuglevel));
+		CVAR_SET_FLOAT("meta_debug", static_cast<float>(meta_debug_value = Config->debuglevel));
 	}
 
 	// Prepare for registered commands from plugins.

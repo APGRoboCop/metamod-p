@@ -43,12 +43,12 @@
 #define va_to_rva(base, va) ((unsigned long)(va) - (unsigned long)(base))
 
 //
-static unsigned long DLLINTERNAL_NOVIS va_to_mapaddr(void* mapview, IMAGE_SECTION_HEADER* sections, int num_sects, unsigned long vaddr) {
+static unsigned long DLLINTERNAL_NOVIS va_to_mapaddr(void* mapview, const IMAGE_SECTION_HEADER* sections, const int num_sects, const unsigned long vaddr) {
 	for (int i = 0; i < num_sects; i++)
 		if (vaddr >= sections[i].VirtualAddress && vaddr < sections[i].VirtualAddress + sections[i].SizeOfRawData)
-			return(rva_to_va(mapview, (vaddr - sections[i].VirtualAddress + sections[i].PointerToRawData)));
+			return rva_to_va(mapview, vaddr - sections[i].VirtualAddress + sections[i].PointerToRawData);
 
-	return(0);
+	return 0;
 }
 
 // Checks module signatures and return ntheaders pointer for valid module
@@ -62,18 +62,18 @@ static IMAGE_NT_HEADERS* DLLINTERNAL_NOVIS get_ntheaders(void* mapview) {
 	//Check if valid dos header
 	mem.mem = (unsigned long)mapview;
 	if (IsBadReadPtr(mem.dos, sizeof(*mem.dos)) || mem.dos->e_magic != IMAGE_DOS_SIGNATURE)
-		return(nullptr);
+		return nullptr;
 
 	//Get and check pe header
 	mem.mem = rva_to_va(mapview, mem.dos->e_lfanew);
 	if (IsBadReadPtr(mem.pe, sizeof(*mem.pe)) || mem.pe->Signature != IMAGE_NT_SIGNATURE)
-		return(nullptr);
+		return nullptr;
 
-	return(mem.pe);
+	return mem.pe;
 }
 
 // Returns export table for valid module
-static IMAGE_EXPORT_DIRECTORY* DLLINTERNAL_NOVIS get_export_table(void* mapview, IMAGE_NT_HEADERS* ntheaders, IMAGE_SECTION_HEADER* sections, int num_sects) {
+static IMAGE_EXPORT_DIRECTORY* DLLINTERNAL_NOVIS get_export_table(void* mapview, IMAGE_NT_HEADERS* ntheaders, IMAGE_SECTION_HEADER* sections, const int num_sects) {
 	union {
 		unsigned long            mem;
 		void* pvoid;
@@ -86,13 +86,13 @@ static IMAGE_EXPORT_DIRECTORY* DLLINTERNAL_NOVIS get_export_table(void* mapview,
 
 	//Check for exports
 	if (!mem.pe->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress)
-		return(nullptr);
+		return nullptr;
 
 	mem.mem = va_to_mapaddr(mapview, sections, num_sects, mem.pe->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress);
 	if (IsBadReadPtr(mem.export_dir, sizeof(*mem.export_dir)))
-		return(nullptr);
+		return nullptr;
 
-	return(mem.export_dir);
+	return mem.export_dir;
 }
 
 mBOOL DLLINTERNAL is_gamedll(const char* filename) {
@@ -106,7 +106,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 	                                nullptr);
 	if (is_invalid_handle(hFile)) {
 		META_DEBUG(3, ("is_gamedll(%s): CreateFile() failed.", filename));
-		return(mFALSE);
+		return mFALSE;
 	}
 
 	//
@@ -114,7 +114,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 	if (is_invalid_handle(hMap)) {
 		META_DEBUG(3, ("is_gamedll(%s): CreateFileMapping() failed.", filename));
 		CloseHandle(hFile);
-		return(mFALSE);
+		return mFALSE;
 	}
 
 	//
@@ -123,7 +123,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 		META_DEBUG(3, ("is_gamedll(%s): MapViewOfFile() failed.", filename));
 		CloseHandle(hMap);
 		CloseHandle(hFile);
-		return(mFALSE);
+		return mFALSE;
 	}
 
 	IMAGE_NT_HEADERS* ntheaders = get_ntheaders(mapview);
@@ -132,7 +132,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 		UnmapViewOfFile(mapview);
 		CloseHandle(hMap);
 		CloseHandle(hFile);
-		return(mFALSE);
+		return mFALSE;
 	}
 
 	//Sections for va_to_mapaddr function
@@ -143,7 +143,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 		UnmapViewOfFile(mapview);
 		CloseHandle(hMap);
 		CloseHandle(hFile);
-		return(mFALSE);
+		return mFALSE;
 	}
 
 	//
@@ -153,7 +153,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 		UnmapViewOfFile(mapview);
 		CloseHandle(hMap);
 		CloseHandle(hFile);
-		return(mFALSE);
+		return mFALSE;
 	}
 
 	//
@@ -163,7 +163,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 		UnmapViewOfFile(mapview);
 		CloseHandle(hMap);
 		CloseHandle(hFile);
-		return(mFALSE);
+		return mFALSE;
 	}
 
 	for (unsigned int i = 0; i < exports->NumberOfNames; i++) {
@@ -196,7 +196,7 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 				CloseHandle(hMap);
 				CloseHandle(hFile);
 
-				return(mFALSE);
+				return mFALSE;
 			}
 		}
 	}
@@ -210,9 +210,9 @@ mBOOL DLLINTERNAL is_gamedll(const char* filename) {
 		// This is gamedll!
 		META_DEBUG(5, ("is_gamedll(%s): Detected GameDLL.", filename));
 
-		return(mTRUE);
+		return mTRUE;
 	}
 	META_DEBUG(5, ("is_gamedll(%s): Library isn't GameDLL.", filename));
 
-	return(mFALSE);
+	return mFALSE;
 }

@@ -122,7 +122,7 @@ public:
 	REG_STATUS status;			// whether corresponding plugin is loaded
 // functions:
 	void DLLINTERNAL init(int idx);		// init values, as not using constructors
-	mBOOL DLLINTERNAL set(cvar_t* src) const;
+	mBOOL DLLINTERNAL set(const cvar_t* src) const;
 };
 
 // A list of registered cvars.

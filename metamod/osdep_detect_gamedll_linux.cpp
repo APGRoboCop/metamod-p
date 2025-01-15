@@ -123,7 +123,7 @@ mBOOL DLLINTERNAL is_gamedll(const char *filename) {
 	} else {
 		META_DEBUG(3, ("is_gamedll(%s): Failed, cannot fopen() file.", filename));
 				
-		return(mFALSE);
+		return mFALSE;
 	}
 	
 	// Check that filesize is atleast size of ELF header!
@@ -135,7 +135,7 @@ mBOOL DLLINTERNAL is_gamedll(const char *filename) {
 #endif
 		fclose(pf);
 		
-		return(mFALSE);
+		return mFALSE;
 	}
 	
 	// mmap library for easy reading
@@ -149,7 +149,7 @@ mBOOL DLLINTERNAL is_gamedll(const char *filename) {
 	if(!ehdr || (void*)ehdr==(void*)-1) {
 		META_DEBUG(3, ("is_gamedll(%s): Failed, mmap() [0x%x]", filename, ehdr));
 		
-		return(mFALSE);
+		return mFALSE;
 	}
 	
 	//In case that ELF file is incomplete (because bad upload etc), we protect memory-mapping access with signal-handler
@@ -170,7 +170,7 @@ mBOOL DLLINTERNAL is_gamedll(const char *filename) {
 				
 		munmap(ehdr, filesize);
 		
-		return(mFALSE);
+		return mFALSE;
 	}
 	
 	if(mm_strncmp((char *)ehdr, ELFMAG, SELFMAG) != 0 || ehdr->e_ident[EI_VERSION] != EV_CURRENT) {
@@ -182,7 +182,7 @@ mBOOL DLLINTERNAL is_gamedll(const char *filename) {
 		
 		munmap(ehdr, filesize);
 		
-		return(mFALSE);
+		return mFALSE;
 	}
 
 #ifdef __x86_64__
@@ -196,7 +196,7 @@ mBOOL DLLINTERNAL is_gamedll(const char *filename) {
 		
 		munmap(ehdr, filesize);
 		
-		return(mFALSE);
+		return mFALSE;
 	}
 #else
 	// check if x86-shared-library
@@ -209,7 +209,7 @@ mBOOL DLLINTERNAL is_gamedll(const char *filename) {
 		
 		munmap(ehdr, filesize);
 		
-		return(mFALSE);
+		return mFALSE;
 	}
 #endif
 
@@ -266,7 +266,7 @@ mBOOL DLLINTERNAL is_gamedll(const char *filename) {
 		
 		munmap(ehdr, filesize);
 		
-		return(mFALSE);
+		return mFALSE;
 	}
 	
 	//Search symbols for exports
@@ -312,7 +312,7 @@ mBOOL DLLINTERNAL is_gamedll(const char *filename) {
 				
 				munmap(ehdr, filesize);
 				
-				return(mFALSE);
+				return mFALSE;
 			}
 		}
 	}
@@ -327,7 +327,7 @@ mBOOL DLLINTERNAL is_gamedll(const char *filename) {
 				
 		munmap(ehdr, filesize);
 		
-		return(mTRUE);
+		return mTRUE;
 	} else {
 		META_DEBUG(5, ("is_gamedll(%s): Library isn't GameDLL.", filename));
 	}
@@ -337,5 +337,5 @@ mBOOL DLLINTERNAL is_gamedll(const char *filename) {
 	
 	munmap(ehdr, filesize);
 	
-	return(mFALSE);
+	return mFALSE;
 }
