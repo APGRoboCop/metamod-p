@@ -98,7 +98,7 @@ char* DLLINTERNAL my_strlwr(char* s) {
 // Microsoft's msvcrt.dll:vsnprintf is buggy and so is vsnprintf on some glibc versions.
 // We use wrapper function to fix bugs.
 //  from: http://sourceforge.net/tracker/index.php?func=detail&aid=1083721&group_id=2435&atid=102435
-int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, const va_list src_ap) {
+int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, va_list src_ap) {
 	va_list ap;
 	int res;
 	size_t bufsize = n;
@@ -111,14 +111,14 @@ int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, cons
 		return 0;
 
 	// The supplied count may be big enough. Try to use the library
-		// vsnprintf, fixing up the case where the library function
+	// vsnprintf, fixing up the case where the library function
 	// neglects to terminate with '/0'.
 	if (n > 0)
 	{
 		// A NULL destination will cause a segfault with vsnprintf.
 		// if n > 0.  Nor do we want to copy our tmpbuf to NULL later.
 		if (!s)
-			return-1;
+			return -1;
 
 		va_copy(ap, src_ap);
 		res = vsnprintf(s, n, format, ap);
@@ -133,7 +133,7 @@ int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, cons
 		// If n is already larger than INT_MAX, increasing it won't
 		// help.
 		if (n > INT_MAX)
-			return-1;
+			return -1;
 
 		// Try a larger buffer.
 		bufsize *= 2;
@@ -144,13 +144,13 @@ int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, cons
 
 	char* tmpbuf = static_cast<char*>(malloc(bufsize * sizeof(char)));
 	if (!tmpbuf)
-		return-1;
+		return -1;
 
 	va_copy(ap, src_ap);
 	res = vsnprintf(tmpbuf, bufsize, format, ap);
 	va_end(ap);
 
-	// The test for bufsize limit is probably not necesary
+	// The test for bufsize limit is probably not necessary
 	// with 2GB address space limit, since, in practice, malloc will
 	// fail well before INT_MAX.
 	while (res < 0 && bufsize <= INT_MAX) {
@@ -191,7 +191,7 @@ int DLLINTERNAL safe_snprintf(char* s, const size_t n, const char* format, ...) 
 }
 #endif
 
-void DLLINTERNAL safevoid_vsnprintf(char* s, const size_t n, const char* format, const va_list ap) {
+void DLLINTERNAL safevoid_vsnprintf(char* s, const size_t n, const char* format, va_list ap) {
 	if (!s || n <= 0)
 		return;
 
@@ -242,7 +242,7 @@ const char* DLLINTERNAL DLFNAME(const void* memptr) {
 	Dl_info dli;
 	memset(&dli, 0, sizeof(dli));
 	if (dladdr(memptr, &dli))
-		return(dli.dli_fname);
+		return dli.dli_fname;
 	else
 		RETURN_ERRNO(NULL, ME_NOTFOUND);
 }
@@ -348,7 +348,7 @@ mBOOL DLLINTERNAL IS_VALID_PTR(const void* memptr) {
 	Dl_info dli;
 	memset(&dli, 0, sizeof(dli));
 	if (dladdr(memptr, &dli))
-		return(mTRUE);
+		return mTRUE;
 	else
 		RETURN_ERRNO(mFALSE, ME_NOTFOUND);
 }
