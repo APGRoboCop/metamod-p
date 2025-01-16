@@ -291,7 +291,7 @@ mBOOL DLLINTERNAL MPlugin::resolve() {
 	else
 		file = pathname;
 	// store pathname: the gamedir relative path, or an absolute path
-	const int len = strlen(GameDLL.gamedir);
+	const size_t len = strlen(GameDLL.gamedir);
 	if (strncasecmp(pathname, GameDLL.gamedir, len) == 0)
 		STRNCPY(filename, pathname + len + 1, sizeof(filename));
 	else
@@ -419,26 +419,26 @@ char* DLLINTERNAL MPlugin::resolve_suffix(const char* path) const
 #ifdef __x86_64__
 	safevoid_snprintf(buf, sizeof(buf), "%s_amd64.so", path);
 	if (stat(buf, &st) == 0 && S_ISREG(st.st_mode))
-		return(buf);
+		return buf;
 	safevoid_snprintf(buf, sizeof(buf), "%s_x86_64.so", path);
 	if (stat(buf, &st) == 0 && S_ISREG(st.st_mode))
-		return(buf);
+		return buf;
 	safevoid_snprintf(buf, sizeof(buf), "%s_x86-64.so", path);
 	if (stat(buf, &st) == 0 && S_ISREG(st.st_mode))
-		return(buf);
+		return buf;
 #else
 	safevoid_snprintf(buf, sizeof(buf), "%s_i386.so", path);
 	if (stat(buf, &st) == 0 && S_ISREG(st.st_mode))
-		return(buf);
+		return buf;
 	safevoid_snprintf(buf, sizeof(buf), "%s_i486.so", path);
 	if (stat(buf, &st) == 0 && S_ISREG(st.st_mode))
-		return(buf);
+		return buf;
 	safevoid_snprintf(buf, sizeof(buf), "%s_i586.so", path);
 	if (stat(buf, &st) == 0 && S_ISREG(st.st_mode))
-		return(buf);
+		return buf;
 	safevoid_snprintf(buf, sizeof(buf), "%s_i686.so", path);
 	if (stat(buf, &st) == 0 && S_ISREG(st.st_mode))
-		return(buf);
+		return buf;
 #endif /* !__x86_64__ */
 #endif /* linux */
 

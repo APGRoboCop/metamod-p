@@ -112,25 +112,25 @@ extern mBOOL dlclose_handle_invalid DLLHIDDEN;
 typedef void* DLHANDLE;
 typedef void* DLFUNC;
 inline DLHANDLE DLLINTERNAL DLOPEN(const char* filename) {
-	return(dlopen(filename, RTLD_NOW));
+	return dlopen(filename, RTLD_NOW);
 }
 inline DLFUNC DLLINTERNAL DLSYM(DLHANDLE handle, const char* string) {
-	return(dlsym(handle, string));
+	return dlsym(handle, string);
 }
 //dlclose crashes if handle is null.
 inline int DLLINTERNAL DLCLOSE(DLHANDLE handle) {
 	if (!handle) {
 		dlclose_handle_invalid = mTRUE;
-		return(1);
+		return 1;
 	}
 
 	dlclose_handle_invalid = mFALSE;
-	return(dlclose(handle));
+	return dlclose(handle);
 }
-inline const char* DLLINTERNAL DLERROR(void) {
+inline const char* DLLINTERNAL DLERROR() {
 	if (dlclose_handle_invalid)
 		return("Invalid handle.");
-	return(dlerror());
+	return dlerror();
 }
 #elif defined(_WIN32)
 typedef HINSTANCE DLHANDLE;
@@ -293,7 +293,7 @@ char* DLLINTERNAL realpath(const char* file_name, char* resolved_name);
 // on errno.  For win32, it's based on GetLastError.
 inline const char* DLLINTERNAL str_os_error() {
 #ifdef __linux__
-	return(strerror(errno));
+	return strerror(errno);
 #elif defined(_WIN32)
 	return str_GetLastError();
 #endif /* _WIN32 */

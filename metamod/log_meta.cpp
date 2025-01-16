@@ -184,7 +184,7 @@ public:
 static BufferedMessage* messageQueueStart = nullptr;
 static BufferedMessage* messageQueueEnd = nullptr;
 
-static void buffered_ALERT(const MLOG_SERVICE service, const ALERT_TYPE atype, const char* prefix, const char* fmt, const va_list ap) {
+static void buffered_ALERT(const MLOG_SERVICE service, const ALERT_TYPE atype, const char* prefix, const char* fmt, va_list ap) {
 	char buf[MAX_LOGMSG_LEN];
 
 	if (nullptr != g_engfuncs.pfnAlertMessage) {

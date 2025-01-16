@@ -1,5 +1,6 @@
 #!/bin/sh
 
-make OS=win32 OPT=opt
-make OPT=opt
-make TARGET=amd64 OPT=opt
+make OPT=opt-fast
+make TARGET=amd64 OPT=opt-fast
+make
+make TARGET=amd64

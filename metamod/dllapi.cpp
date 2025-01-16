@@ -480,14 +480,14 @@ C_DLLEXPORT int GetEntityAPI(DLL_FUNCTIONS* pFunctionTable, int interfaceVersion
 	META_DEBUG(3, ("called: GetEntityAPI; version=%d", interfaceVersion));
 	if (!pFunctionTable || metamod_not_loaded) {
 		META_WARNING("GetEntityAPI called with null pFunctionTable");
-		return(FALSE);
+		return FALSE;
 	}
 	if (interfaceVersion != INTERFACE_VERSION) {
 		META_WARNING("GetEntityAPI version mismatch; requested=%d ours=%d", interfaceVersion, INTERFACE_VERSION);
-		return(FALSE);
+		return FALSE;
 	}
 	memcpy(pFunctionTable, &gFunctionTable, sizeof(DLL_FUNCTIONS));
-	return(TRUE);
+	return TRUE;
 }
 
 C_DLLEXPORT int GetEntityAPI2(DLL_FUNCTIONS* pFunctionTable, int* interfaceVersion)
@@ -495,13 +495,13 @@ C_DLLEXPORT int GetEntityAPI2(DLL_FUNCTIONS* pFunctionTable, int* interfaceVersi
 	META_DEBUG(3, ("called: GetEntityAPI2; version=%d", *interfaceVersion));
 	if (!pFunctionTable || metamod_not_loaded) {
 		META_WARNING("GetEntityAPI2 called with null pFunctionTable");
-		return(FALSE);
+		return FALSE;
 	}
 	if (*interfaceVersion != INTERFACE_VERSION) {
 		META_WARNING("GetEntityAPI2 version mismatch; requested=%d ours=%d", *interfaceVersion, INTERFACE_VERSION);
 		//! Tell engine what version we had, so it can figure out who is out of date.
 		*interfaceVersion = INTERFACE_VERSION;
-		return(FALSE);
+		return FALSE;
 	}
 
 	if (!Config->slowhooks) {
@@ -541,7 +541,7 @@ C_DLLEXPORT int GetEntityAPI2(DLL_FUNCTIONS* pFunctionTable, int* interfaceVersi
 
 	g_engine_dll_funcs_table = pFunctionTable;
 	memcpy(g_engine_dll_funcs_table, &gFunctionTable, sizeof(DLL_FUNCTIONS));
-	return(TRUE);
+	return TRUE;
 }
 
 // I could find _no_ documentation or examples for the intended use of
@@ -575,18 +575,18 @@ C_DLLEXPORT int GetNewDLLFunctions(NEW_DLL_FUNCTIONS* pNewFunctionTable, int* in
 	// them.  Otherwise, we're in the position of having to provide answers
 	// we can't necessarily provide (for instance, ShouldCollide())...
 	if (!GameDLL.funcs.newapi_table)
-		return(FALSE);
+		return FALSE;
 #endif
 
 	if (!pNewFunctionTable) {
 		META_ERROR("GetNewDLLFunctions called with null pNewFunctionTable");
-		return(FALSE);
+		return FALSE;
 	}
 	if (*interfaceVersion != NEW_DLL_FUNCTIONS_VERSION) {
 		META_ERROR("GetNewDLLFunctions version mismatch; requested=%d ours=%d", *interfaceVersion, NEW_DLL_FUNCTIONS_VERSION);
 		//! Tell engine what version we had, so it can figure out who is out of date.
 		*interfaceVersion = NEW_DLL_FUNCTIONS_VERSION;
-		return(FALSE);
+		return FALSE;
 	}
 
 	// disabling hooks for improved linux performance
@@ -601,5 +601,5 @@ C_DLLEXPORT int GetNewDLLFunctions(NEW_DLL_FUNCTIONS* pNewFunctionTable, int* in
 		}
 		sNewFunctionTable.copy_to(pNewFunctionTable);
 	}
-	return(TRUE);
+	return TRUE;
 }

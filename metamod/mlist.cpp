@@ -203,7 +203,7 @@ MPlugin* DLLINTERNAL MPluginList::find_memloc(void* memptr) {
 	if (!(dlfile = DLFNAME(memptr))) {
 		META_DEBUG(8, ("DLFNAME failed to find memloc %d", memptr));
 		// meta_errno should be already set in DLFNAME
-		return(NULL);
+		return nullptr;
 	}
 
 	return(find(dlfile));

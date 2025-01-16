@@ -97,13 +97,13 @@ void DLLINTERNAL my_closedir(DIR* dir)
 #ifdef __linux__
 DLHANDLE DLLINTERNAL get_module_handle_of_memptr(const void* memptr)
 {
-	Dl_info dli;
-	memset(&dli, 0, sizeof(dli));
+    Dl_info dli;
+    memset(&dli, 0, sizeof(dli));
 
-	if (dladdr(memptr, &dli))
-		return(dlopen(dli.dli_fname, RTLD_NOW));
-	else
-		return((void*)0);
+    if (dladdr(memptr, &dli))
+        return static_cast<DLHANDLE>(dlopen(dli.dli_fname, RTLD_NOW));
+    else
+        return nullptr;
 }
 #else
 DLHANDLE DLLINTERNAL get_module_handle_of_memptr(const void* memptr)

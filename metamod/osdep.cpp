@@ -81,12 +81,11 @@ char* DLLINTERNAL my_strtok_r(char* s, const char* delim, char** ptrptr) {
 
 #ifdef __linux__
 char* DLLINTERNAL my_strlwr(char* s) {
-	char* c;
 	if (!s)
-		return(0);
-	for (c = s; *c; c++)
+		return nullptr;
+	for (char* c = s; *c; c++)
 		*c = tolower(*c);
-	return(s);
+	return s;
 }
 #endif
 
@@ -176,7 +175,6 @@ int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, va_l
 		}
 	}
 
-	free(tmpbuf);
 	return res;
 }
 

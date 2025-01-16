@@ -118,7 +118,7 @@ static void mutil_LogDeveloper(const plid_t plid, const char* fmt, ...) {
 // Print a center-message, with text parameters and varargs.  Provides
 // functionality to the above center_say interfaces.
 static void mutil_CenterSayVarargs(const plid_t plid, hudtextparms_t const& tparms,
-	const char* fmt, const va_list ap)
+	const char* fmt, va_list ap)
 {
 	char buf[MAX_LOGMSG_LEN];
 

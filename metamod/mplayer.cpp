@@ -72,10 +72,14 @@ MPlayer::MPlayer(const MPlayer& rhs)
 // Assignment operator
 MPlayer& DLLINTERNAL MPlayer::operator=(const MPlayer& rhs)
 {
+	// Self-assignment check
+	if (this == &rhs) {
+		return *this;
+	}
+
 	isQueried = rhs.isQueried;
 
-	//	if(cvarName)
-	{
+	if (cvarName) {
 		free(cvarName);
 	}
 
