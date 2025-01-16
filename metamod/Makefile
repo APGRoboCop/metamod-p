@@ -158,8 +158,9 @@ endif
 CCOPT = $(CCO) $(CCOPT_ARCH) -fno-exceptions -fno-rtti
 
 # optimization level; overridden for certain problematic files
-CCO = -O2 -fomit-frame-pointer -funsafe-math-optimizations -fvisibility=hidden -flto 
-CCO += -msse4.2 -mfpmath=sse -fno-aggressive-loop-optimizations -ffunction-sections -fdata-sections
+CCO = -O2 -msse4.2 -mfpmath=sse -pipe -flto -fvisibility=hidden
+CCO += -ffunction-sections -fdata-sections -funsafe-math-optimizations
+CCO += -fno-aggressive-loop-optimizations -fomit-frame-pointer
 
 # architecture tuning by target type
 ifeq "$(TARGETTYPE)" "amd64"
