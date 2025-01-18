@@ -45,9 +45,9 @@
  // Max number of plugins we can manage.  This is an arbitrary, fixed number,
  // for convenience.  It would probably be better to dynamically grow the
  // list as needed, but we do this for now.
-#define MAX_PLUGINS 50
+constexpr int MAX_PLUGINS = 50;
 // Width required to printf above MAX, for show() functions.
-#define WIDTH_MAX_PLUGINS	2
+constexpr int WIDTH_MAX_PLUGINS = 2;
 
 // A list of plugins.
 class MPluginList : public class_metamod_new {

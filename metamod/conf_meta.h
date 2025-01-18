@@ -44,10 +44,10 @@
 #include "comp_dep.h"
 
  // Max length of line in config file.
-#define MAX_CONF_LEN	1024
+constexpr int MAX_CONF_LEN = 1024;
 
 // Max length of a map name
-#define MAX_MAPNAME_LENGTH	256
+constexpr int MAX_MAPNAME_LENGTH = 256;
 
 // Supported config value-types.
 typedef enum {

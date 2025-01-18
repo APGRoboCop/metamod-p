@@ -49,21 +49,21 @@
 #include "engine_t.h"           // engine_t, Engine
 
  // file that lists plugins to load at startup
-#define PLUGINS_INI			"addons/metamod/plugins.ini"
-#define OLD_PLUGINS_INI		"metamod.ini"
+constexpr const char* PLUGINS_INI = "addons/metamod/plugins.ini";
+constexpr const char* OLD_PLUGINS_INI = "metamod.ini";
 
 // file that lists maps where expensive hooks should be enabled
-#define SLOWHOOKS_INI		"addons/metamod/slowhooks.ini"
+constexpr const char* SLOWHOOKS_INI = "addons/metamod/slowhooks.ini";
 
 // file that contains commands to metamod plugins at startup
-#define EXEC_CFG			"addons/metamod/exec.cfg"
-#define OLD_EXEC_CFG		"metaexec.cfg"
+constexpr const char* EXEC_CFG = "addons/metamod/exec.cfg";
+constexpr const char* OLD_EXEC_CFG = "metaexec.cfg";
 
 // previously, file that contained path for an override-gamedll
-#define OLD_GAMEDLL_TXT		"metagame.ini"
+constexpr const char* OLD_GAMEDLL_TXT = "metagame.ini";
 
 // generic config file
-#define CONFIG_INI			"addons/metamod/config.ini"
+constexpr const char* CONFIG_INI = "addons/metamod/config.ini";
 
 // metamod module handle
 extern DLHANDLE metamod_handle DLLHIDDEN;

@@ -38,6 +38,7 @@
 #define SUPPORT_META_H
 
 #include <cstring>		// strcpy(), strncat()
+#include <cstddef>
 #include <sys/types.h>	// stat
 #include <sys/stat.h>	// stat
 
@@ -64,6 +65,16 @@ inline int DLLINTERNAL mm_strncmp(const char* s1, const char* s2, size_t n) {
 #else
 	return strncmp(s1, s2, n);
 #endif
+}
+
+inline size_t strlcpy(char* dst, const char* src, const size_t size) {
+	const size_t src_len = strlen(src);
+	if (size > 0) {
+		const size_t copy_len = (src_len >= size) ? size - 1 : src_len;
+		memcpy(dst, src, copy_len);
+		dst[copy_len] = '\0';
+	}
+	return src_len;
 }
 
 // Unlike snprintf(), strncpy() doesn't necessarily null-terminate the
@@ -107,10 +118,9 @@ inline int DLLINTERNAL mm_strncmp(const char* s1, const char* s2, size_t n) {
 #endif
 
 // Technique 3: use inline
-inline char* DLLINTERNAL STRNCPY(char* dst, const char* src, const int size) {
+inline char* STRNCPY(char* dst, const char* src, const int size) {
 	if (size > 0) {
-		dst[0] = '\0'; // Initialize the destination buffer
-		strncat(dst, src, size - 1); // Concatenate the source to the destination buffer
+		strlcpy(dst, src, size);
 	}
 	return dst;
 }
@@ -158,10 +168,10 @@ char* DLLINTERNAL full_gamedir_path(const char* path, char* fullpath);
 #define STRINGIZE(name, len)		(#name)
 
 // Max description length for plugins.ini and other places.
-#define MAX_DESC_LEN 256
+constexpr int MAX_DESC_LEN = 256;
 
 // For various character string buffers.
-#define MAX_STRBUF_LEN 1024
+constexpr int MAX_STRBUF_LEN = 1024;
 
 // Smallest of two
 #define MIN(x, y) (((x)<(y))?(x):(y))
