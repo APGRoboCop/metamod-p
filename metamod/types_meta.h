@@ -41,9 +41,9 @@
 #include <stdint.h>
 
 // Our own boolean type, for stricter type matching.
-typedef enum mBOOL {
-	mFALSE = 0,
-	mTRUE,
+typedef enum mBOOL : bool {
+	mFALSE = false,
+	mTRUE = true,
 } mBOOL;
 
 // Like C's errno, for our various functions; describes causes of failure
