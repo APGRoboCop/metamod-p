@@ -575,7 +575,7 @@ mBOOL DLLINTERNAL meta_load_gamedll() {
 		// Look for API-1 in plugin, if API2 interface wasn't found.
 		if (!found) {
 			GETENTITYAPI_FN pfn_getapi;
-			found = 0;
+			//found = 0;
 			GET_FUNC_TABLE_FROM_GAME(GameDLL, pfn_getapi, "GetEntityAPI", dllapi_table,
 				GETENTITYAPI_FN, DLL_FUNCTIONS,
 				INTERFACE_VERSION, INTERFACE_VERSION, INTERFACE_VERSION, found)

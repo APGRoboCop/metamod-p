@@ -24,6 +24,10 @@ if builder.cxx.target.platform == 'linux':
     '-pipe',
     '-msse4.2',
     '-fno-strict-aliasing',
+	'-flto',
+	'-fno-aggressive-loop-optimizations',
+	'-ffunction-sections -fdata-sections',
+	'-funsafe-math-optimizations',
     '-Wall',
     '-Werror',
     '-Wno-uninitialized',
@@ -41,7 +45,7 @@ if builder.cxx.target.platform == 'linux':
   builder.cxx.cxxflags += [
     '-Wno-invalid-offsetof',
     '-Wno-write-strings',
-    '-std=c++17',
+    '-std=gnu++17',
   ]
   # Linux linker flags
   builder.cxx.linkflags += ['-m32', '-ldl', '-lm']
@@ -63,9 +67,10 @@ elif builder.cxx.target.platform == 'windows':
   builder.cxx.cxxflags += [
     '/std:c++17',
     '/arch:SSE2',
-    '/fp:precise',
+    '/fp:fast',
     '/Qspectre',
-    '/EHsc'
+    '/EHsc',
+	'/Gy'
   ]
   # Windows linker flags
   builder.cxx.linkflags += [
@@ -80,10 +85,10 @@ if builder.options.optimize == '1':
   builder.cxx.defines += ['NDEBUG']
   if builder.cxx.target.platform == 'linux':
     # Linux optimization flags
-    builder.cxx.cflags += ['-O2']
+    builder.cxx.cflags += ['-O3']
   elif builder.cxx.target.platform == 'windows':
     # Windows optimization flags - /Ob3 needs to be after /Ox, enables aggressive function inling -caxanga334
-    builder.cxx.cflags += ['/O2', '/Zo', '/Ob3', '/GF']
+    builder.cxx.cflags += ['/Ox', '/Ot', '/Zo', '/Ob3', '/GF']
     # Windows optimization link flags
     builder.cxx.linkflags += ['/OPT:ICF', '/OPT:REF']
     # This needs to be after our optimization flags which could otherwise disable it.
@@ -120,36 +125,33 @@ library = builder.cxx.Library('metamod')
 library.compiler.includes += include_paths
 
 library.sources += [
-	'metamod/api_hook.cpp',
-	'metamod/api_info.cpp',
-	'metamod/commands_meta.cpp',
-	'metamod/conf_meta.cpp',
-	'metamod/dllapi.cpp',
-	'metamod/engine_api.cpp',
-	'metamod/engineinfo.cpp',
-	'metamod/game_autodetect.cpp',
-	'metamod/game_support.cpp',
-	'metamod/h_export.cpp',
-	'metamod/linkgame.cpp',
-	'metamod/linkplug.cpp',
-	'metamod/log_meta.cpp',
-	'metamod/meta_eiface.cpp',
-	'metamod/metamod.cpp',
-	'metamod/mhook.cpp',
-	'metamod/mlist.cpp',
-	'metamod/mplayer.cpp',
-	'metamod/mplugin.cpp',
-	'metamod/mqueue.cpp',
-	'metamod/mreg.cpp',
-	'metamod/mutil.cpp',
-	'metamod/osdep.cpp',
-	'metamod/osdep_p.cpp',
-	'metamod/reg_support.cpp',
-	'metamod/sdk_util.cpp',
-	'metamod/studioapi.cpp',
-	'metamod/support_meta.cpp',
-	'metamod/thread_logparse.cpp',
-	'metamod/vdate.cpp',
+	'./metamod/api_hook.cpp',
+	'./metamod/api_info.cpp',
+	'./metamod/commands_meta.cpp',
+	'./metamod/conf_meta.cpp',
+	'./metamod/dllapi.cpp',
+	'./metamod/engine_api.cpp',
+	'./metamod/engineinfo.cpp',
+	'./metamod/game_autodetect.cpp',
+	'./metamod/game_support.cpp',
+	'./metamod/h_export.cpp',
+	'./metamod/linkgame.cpp',
+	'./metamod/linkplug.cpp',
+	'./metamod/log_meta.cpp',
+	'./metamod/meta_eiface.cpp',
+	'./metamod/metamod.cpp',
+	'./metamod/mlist.cpp',
+	'./metamod/mplayer.cpp',
+	'./metamod/mplugin.cpp',
+	'./metamod/mreg.cpp',
+	'./metamod/mutil.cpp',
+	'./metamod/osdep.cpp',
+	'./metamod/osdep_p.cpp',
+	'./metamod/reg_support.cpp',
+	'./metamod/sdk_util.cpp',
+	'./metamod/studioapi.cpp',
+	'./metamod/support_meta.cpp',
+	'./metamod/vdate.cpp',
 ]
 
 if builder.cxx.target.platform == 'linux':
