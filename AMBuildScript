@@ -26,7 +26,7 @@ if builder.cxx.target.platform == 'linux':
     '-fno-strict-aliasing',
 	'-flto',
     '-Wall',
-    '-Werror',
+    #'-Werror',
     '-Wno-uninitialized',
     '-Wno-unused',
     '-Wno-switch',
