@@ -77,15 +77,15 @@ jobs:
         python -m pip install wheel
         pip install git+https://github.com/alliedmodders/ambuild
 
-    - name: Fetch FoXBot
+    - name: Fetch Metamod-P
       uses: actions/checkout@v4
       with:
-        path: foxbot
+        path: metamod-p
         submodules: recursive
 
     - name: Build Files
       shell: bash
-      working-directory: foxbot
+      working-directory: metamod-p
       run: |
         mkdir post
         cd post
@@ -102,13 +102,13 @@ jobs:
     - name: Upload Binary
       uses: actions/upload-artifact@v4
       with:
-        name: foxbot-${{ matrix.os_short }}-${{ steps.short-sha.outputs.sha }}
+        name: metamod-p-${{ matrix.os_short }}-${{ steps.short-sha.outputs.sha }}
         path: |
-            foxbot/post/*
+            metamod-p/post/*
 
     - name: Upload Debug Symbols
       uses: actions/upload-artifact@v4
       with:
-        name: foxbot-dbgsym-${{ matrix.os_short }}-${{ steps.short-sha.outputs.sha }}
+        name: metamod-p-dbgsym-${{ matrix.os_short }}-${{ steps.short-sha.outputs.sha }}
         path: |
-            foxbot/post/**/*.${{ matrix.dbg_ext }}
+            metamod-p/post/**/*.${{ matrix.dbg_ext }}
