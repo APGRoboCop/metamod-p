@@ -83,9 +83,9 @@ if builder.options.optimize == '1':
     builder.cxx.cflags += ['-O2']
   elif builder.cxx.target.platform == 'windows':
     # Windows optimization flags - /Ob3 needs to be after /Ox, enables aggressive function inling -caxanga334
-    builder.cxx.cflags += ['/O2', '/Zo', '/Ob2', '/GF']
+    builder.cxx.cflags += ['/O2', '/Zo', '/Ob2', '/GL']
     # Windows optimization link flags
-    builder.cxx.linkflags += ['/OPT:ICF', '/OPT:REF']
+    builder.cxx.linkflags += ['/OPT:ICF', '/OPT:REF', '/LTCG']
     # This needs to be after our optimization flags which could otherwise disable it.
     builder.cxx.cflags += ['/Oy-']
 

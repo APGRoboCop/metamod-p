@@ -4,7 +4,7 @@ on: ["push", "workflow_dispatch"]
 
 jobs:
   build_main:
-    name: Build for ${{ matrix.os_short }}
+    name: Build ${{ matrix.build_type }} for ${{ matrix.os_short }}
     runs-on: ${{ matrix.os_version }}
 
     # skip build on '[ci skip]'
@@ -13,10 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-22.04
-          - windows-x32
         include:
+          # Linux Release Build
           - os: ubuntu-22.04
             os_short: linux
             os_version: ubuntu-22.04
@@ -26,7 +24,25 @@ jobs:
             cxx: clang++
             vs_arch: unused
             am_arch: x86
+            build_type: release
+            artifact_suffix: ""
+            configure_flags: "--symbol-files --enable-optimize"
 
+          # Linux Fast Build
+          - os: ubuntu-22.04
+            os_short: linux
+            os_version: ubuntu-22.04
+            package_ext: tar.gz
+            dbg_ext: dbg
+            cc: clang
+            cxx: clang++
+            vs_arch: unused
+            am_arch: x86
+            build_type: fast
+            artifact_suffix: "-fast"
+            configure_flags: "--symbol-files --enable-optimize --extra-cppflags=-D__BUILD_FAST_METAMOD__"
+
+          # Windows Release Build
           - os: windows-x32
             os_short: win32
             os_version: windows-latest
@@ -36,7 +52,23 @@ jobs:
             cxx: not-used
             vs_arch: x32
             am_arch: x86
+            build_type: release
+            artifact_suffix: ""
+            configure_flags: "--symbol-files --enable-optimize"
 
+          # Windows Fast Build
+          - os: windows-x32
+            os_short: win32
+            os_version: windows-latest
+            package_ext: zip
+            dbg_ext: pdb
+            cc: not-used
+            cxx: not-used
+            vs_arch: x32
+            am_arch: x86
+            build_type: fast
+            artifact_suffix: "-fast"
+            configure_flags: "--symbol-files --enable-optimize --extra-cppflags=-D__BUILD_FAST_METAMOD__"
 
     steps:
     - name: Install (Linux)
@@ -92,7 +124,7 @@ jobs:
         
         export AM_ARCH=${{ matrix.am_arch }}
 
-        python3 ../configure.py --symbol-files --enable-optimize
+        python3 ../configure.py ${{ matrix.configure_flags }}
         
         ambuild
 
@@ -102,13 +134,13 @@ jobs:
     - name: Upload Binary
       uses: actions/upload-artifact@v4
       with:
-        name: metamod-p-${{ matrix.os_short }}-${{ steps.short-sha.outputs.sha }}
+        name: metamod-p-${{ matrix.os_short }}${{ matrix.artifact_suffix }}-${{ steps.short-sha.outputs.sha }}
         path: |
             metamod-p/post/*
 
     - name: Upload Debug Symbols
       uses: actions/upload-artifact@v4
       with:
-        name: metamod-p-dbgsym-${{ matrix.os_short }}-${{ steps.short-sha.outputs.sha }}
+        name: metamod-p-dbgsym-${{ matrix.os_short }}${{ matrix.artifact_suffix }}-${{ steps.short-sha.outputs.sha }}
         path: |
             metamod-p/post/**/*.${{ matrix.dbg_ext }}
