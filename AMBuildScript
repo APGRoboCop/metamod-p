@@ -2,7 +2,7 @@
 # vim: set sts=4 ts=8 sw=4 tw=99 et ft=python:
 import os, sys
 
-builder.cxx = builder.DetectCxx(target_arch = builder.target_arch)
+builder.cxx = builder.DetectCxx(target_arch = 'x86')
 
 # Include search paths
 include_paths = [
@@ -38,6 +38,7 @@ if builder.cxx.target.platform == 'linux':
     '-Wno-logical-op-parentheses',
     '-Wno-return-stack-address',
     '-Wno-string-plus-int',
+    '-m32',
   ]
   # Linux compiler C++ flags
   builder.cxx.cxxflags += [
@@ -45,14 +46,8 @@ if builder.cxx.target.platform == 'linux':
     '-Wno-write-strings',
     '-std=gnu++17',
   ]
-  # Linux architecture-specific flags
-  if builder.target_arch == 'x86_64':
-	builder.cxx.cflags += ['-m64']
-	builder.cxx.linkflags += ['-m64', '-ldl', '-lm']
-  elif builder.target_arch == 'x86':
-	builder.cxx.cflags += ['-m32']
-	builder.cxx.linkflags += ['-m32', '-ldl', '-lm']
-	
+  # Linux linker flags
+  builder.cxx.linkflags += ['-m32', '-ldl', '-lm']
 elif builder.cxx.target.platform == 'windows':
   # Windows defines
   builder.cxx.defines += [
