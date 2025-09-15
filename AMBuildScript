@@ -32,7 +32,6 @@ if builder.cxx.target.platform == 'linux':
     '-fno-strict-aliasing',
 	'-fno-exceptions',
 	'-fno-rtti',
-	'-flto',
     '-Wall',
     '-Werror',
     '-Wno-uninitialized',
@@ -53,7 +52,7 @@ if builder.cxx.target.platform == 'linux':
     '-std=gnu++17',
   ]
   # Linux linker flags
-  builder.cxx.linkflags += ['-m32', '-ldl', '-lm']
+  builder.cxx.linkflags += ['-m32', '-ldl', '-lm', '-flto']
 elif builder.cxx.target.platform == 'windows':
   # Windows defines
   builder.cxx.defines += [
