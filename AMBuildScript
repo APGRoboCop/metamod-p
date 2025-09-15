@@ -2,7 +2,7 @@
 # vim: set sts=4 ts=8 sw=4 tw=99 et ft=python:
 import os, sys
 
-builder.cxx = builder.DetectCxx(target_arch = 'x86')
+builder.cxx = builder.DetectCxx(target_arch = builder.target_arch)
 
 # Include search paths
 include_paths = [
@@ -24,6 +24,8 @@ if builder.cxx.target.platform == 'linux':
     '-pipe',
     '-msse4.2',
     '-fno-strict-aliasing',
+	'-fno-exceptions',
+	'-fno-rtti',
 	#'-flto',
     '-Wall',
     #'-Werror',
@@ -36,7 +38,6 @@ if builder.cxx.target.platform == 'linux':
     '-Wno-logical-op-parentheses',
     '-Wno-return-stack-address',
     '-Wno-string-plus-int',
-    '-m32',
   ]
   # Linux compiler C++ flags
   builder.cxx.cxxflags += [
@@ -44,8 +45,14 @@ if builder.cxx.target.platform == 'linux':
     '-Wno-write-strings',
     '-std=gnu++17',
   ]
-  # Linux linker flags
-  builder.cxx.linkflags += ['-m32', '-ldl', '-lm']
+  # Linux architecture-specific flags
+  if builder.target_arch == 'x86_64':
+	builder.cxx.cflags += ['-m64']
+	builder.cxx.linkflags += ['-m64', '-ldl', '-lm']
+  elif builder.target_arch == 'x86':
+	builder.cxx.cflags += ['-m32']
+	builder.cxx.linkflags += ['-m32', '-ldl', '-lm']
+	
 elif builder.cxx.target.platform == 'windows':
   # Windows defines
   builder.cxx.defines += [
@@ -104,12 +111,12 @@ if builder.options.debug == '1':
 
 # Handle --enable-static-lib and --enable-shared-lib
 if builder.cxx.target.platform == 'linux':
-  if builder.options.staticlib == '1':
+  if builder.options.staticlib:
     builder.cxx.linkflags += [
       '-static-libgcc',
       '-static-libstdc++'
     ]
-  elif builder.options.sharedlib == '1':
+  elif builder.options.sharedlib:
     builder.cxx.linkflags += [
       '-shared-libgcc',
     ]

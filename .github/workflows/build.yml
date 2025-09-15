@@ -41,6 +41,20 @@ jobs:
             build_type: fast
             artifact_suffix: "-fast"
             configure_flags: "--symbol-files --enable-optimize --extra-cppflags=-D__BUILD_FAST_METAMOD__"
+            
+          # Linux ADM64 Build  
+          - os: ubuntu-22.04
+            os_short: linux-amd64
+            os_version: ubuntu-22.04
+            package_ext: tar.gz
+            dbg_ext: dbg
+            cc: clang
+            cxx: clang++
+            vs_arch: unused
+            am_arch: x86_64
+            build_type: release
+            artifact_suffix: ""
+            configure_flags: "--symbol-files --enable-optimize --target-arch=x86_64"
 
           # Windows Release Build
           - os: windows-x32
