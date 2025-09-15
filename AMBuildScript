@@ -15,6 +15,12 @@ include_paths = [
 
 builder.cxx.defines += ['AMBUILD', '__METAMOD_BUILD__']
 
+# Add any extra C++/C flags that were passed.
+if builder.options.extra_cppflags:
+  flags = builder.options.extra_cppflags.split()
+  builder.cxx.cflags += flags
+  builder.cxx.cxxflags += flags
+
 # Compiler setup
 if builder.cxx.target.platform == 'linux':
   # Linux defines
