@@ -24,7 +24,7 @@ if builder.cxx.target.platform == 'linux':
     '-pipe',
     '-msse4.2',
     '-fno-strict-aliasing',
-	'-flto',
+	#'-flto',
     '-Wall',
     #'-Werror',
     '-Wno-uninitialized',
@@ -80,10 +80,10 @@ if builder.options.optimize == '1':
   builder.cxx.defines += ['NDEBUG']
   if builder.cxx.target.platform == 'linux':
     # Linux optimization flags
-    builder.cxx.cflags += ['-O3']
+    builder.cxx.cflags += ['-O2']
   elif builder.cxx.target.platform == 'windows':
     # Windows optimization flags - /Ob3 needs to be after /Ox, enables aggressive function inling -caxanga334
-    builder.cxx.cflags += ['/Ox', '/Ot', '/Zo', '/Ob3', '/GF']
+    builder.cxx.cflags += ['/O2', '/Zo', '/Ob2', '/GF']
     # Windows optimization link flags
     builder.cxx.linkflags += ['/OPT:ICF', '/OPT:REF']
     # This needs to be after our optimization flags which could otherwise disable it.
