@@ -28,6 +28,6 @@ builder.options.add_argument('--enable-shared-lib', action='store_const', const=
                        help='Enable dynamically link the sanitizer runtime')
 builder.options.add_argument('--extra-cppflags', type=str, dest='extra_cppflags', default='',
                        help='Extra C++ compiler flags')
-#builder.options.add_argument('--target-arch', type=str, dest='target_arch', default=None,
-#                       help='Target architecture')
+builder.options.add_argument('--target-arch', type=str, dest='target_arch', default=None,
+                       help='Target architecture')
 builder.Configure()
