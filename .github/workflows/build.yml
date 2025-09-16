@@ -15,9 +15,9 @@ jobs:
       matrix:
         include:
           # Linux Release Build
-          - os: ubuntu-22.04
+          - os: ubuntu-20.04
             os_short: linux
-            os_version: ubuntu-22.04
+            os_version: ubuntu-20.04
             package_ext: tar.gz
             dbg_ext: dbg
             cc: clang
@@ -29,9 +29,9 @@ jobs:
             configure_flags: "--symbol-files --enable-optimize"
 
           # Linux Fast Build
-          - os: ubuntu-22.04
+          - os: ubuntu-20.04
             os_short: linux
-            os_version: ubuntu-22.04
+            os_version: ubuntu-20.04
             package_ext: tar.gz
             dbg_ext: dbg
             cc: clang
@@ -53,7 +53,7 @@ jobs:
             vs_arch: unused
             am_arch: x86
             build_type: latest_release
-            artifact_suffix: "latest"
+            artifact_suffix: "-latest"
             configure_flags: "--symbol-files --enable-optimize"
 
           # Linux Latest Fast Build
@@ -67,7 +67,7 @@ jobs:
             vs_arch: unused
             am_arch: x86
             build_type: latest_fast
-            artifact_suffix: "latest-fast"
+            artifact_suffix: "-latest-fast"
             configure_flags: "--symbol-files --enable-optimize --extra-cppflags=-D__BUILD_FAST_METAMOD__"
             
           # Linux AMD64 Build  
@@ -81,7 +81,7 @@ jobs:
             vs_arch: unused
             am_arch: x86_64
             build_type: amd64
-            artifact_suffix: "amd64"
+            artifact_suffix: "-amd64"
             configure_flags: "--symbol-files --enable-optimize --target-arch=x86_64"
             
           # Linux AMD64 Build  
@@ -95,7 +95,7 @@ jobs:
             vs_arch: unused
             am_arch: x86_64
             build_type: amd64_fast
-            artifact_suffix: "amd64-fast"
+            artifact_suffix: "-amd64-fast"
             configure_flags: "--symbol-files --enable-optimize --target-arch=x86_64 --extra-cppflags=-D__BUILD_FAST_METAMOD__"
 
           # Windows Release Build
