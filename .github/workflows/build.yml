@@ -53,7 +53,7 @@ jobs:
             vs_arch: unused
             am_arch: x86
             build_type: latest_release
-            artifact_suffix: ""
+            artifact_suffix: "latest"
             configure_flags: "--symbol-files --enable-optimize"
 
           # Linux Latest Fast Build
@@ -67,22 +67,36 @@ jobs:
             vs_arch: unused
             am_arch: x86
             build_type: latest_fast
-            artifact_suffix: "-fast"
+            artifact_suffix: "latest-fast"
             configure_flags: "--symbol-files --enable-optimize --extra-cppflags=-D__BUILD_FAST_METAMOD__"
             
           # Linux AMD64 Build  
-          #- os: ubuntu-22.04
-          #  os_short: linux-amd64
-          #  os_version: ubuntu-22.04
-          #  package_ext: tar.gz
-          #  dbg_ext: dbg
-          #  cc: clang
-          #  cxx: clang++
-          #  vs_arch: unused
-          #  am_arch: x86_64
-          #  build_type: release
-          #  artifact_suffix: ""
-          #  configure_flags: "--symbol-files --enable-optimize --target-arch=x86_64"
+          - os: ubuntu-latest
+            os_short: linux
+            os_version: ubuntu-latest
+            package_ext: tar.gz
+            dbg_ext: dbg
+            cc: clang
+            cxx: clang++
+            vs_arch: unused
+            am_arch: x86_64
+            build_type: amd64
+            artifact_suffix: "amd64"
+            configure_flags: "--symbol-files --enable-optimize --target-arch=x86_64"
+            
+          # Linux AMD64 Build  
+          - os: ubuntu-latest
+            os_short: linux
+            os_version: ubuntu-latest
+            package_ext: tar.gz
+            dbg_ext: dbg
+            cc: clang
+            cxx: clang++
+            vs_arch: unused
+            am_arch: x86_64
+            build_type: amd64_fast
+            artifact_suffix: "amd64-fast"
+            configure_flags: "--symbol-files --enable-optimize --target-arch=x86_64 --extra-cppflags=-D__BUILD_FAST_METAMOD__"
 
           # Windows Release Build
           - os: windows-x32
