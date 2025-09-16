@@ -52,7 +52,7 @@ jobs:
             cxx: clang++
             vs_arch: unused
             am_arch: x86
-            build_type: release
+            build_type: latest_release
             artifact_suffix: ""
             configure_flags: "--symbol-files --enable-optimize"
 
@@ -66,7 +66,7 @@ jobs:
             cxx: clang++
             vs_arch: unused
             am_arch: x86
-            build_type: fast
+            build_type: latest_fast
             artifact_suffix: "-fast"
             configure_flags: "--symbol-files --enable-optimize --extra-cppflags=-D__BUILD_FAST_METAMOD__"
             
