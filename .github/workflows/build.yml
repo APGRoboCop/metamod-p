@@ -15,9 +15,9 @@ jobs:
       matrix:
         include:
           # Linux Release Build
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             os_short: linux
-            os_version: ubuntu-20.04
+            os_version: ubuntu-22.04
             package_ext: tar.gz
             dbg_ext: dbg
             cc: clang
@@ -29,9 +29,9 @@ jobs:
             configure_flags: "--symbol-files --enable-optimize"
 
           # Linux Fast Build
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             os_short: linux
-            os_version: ubuntu-20.04
+            os_version: ubuntu-22.04
             package_ext: tar.gz
             dbg_ext: dbg
             cc: clang
