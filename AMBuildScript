@@ -51,6 +51,7 @@ if builder.cxx.target.platform == 'linux':
     '-Wno-write-strings',
     '-std=gnu++17',
   ]
+  # TODO: Not important but maybe add AMD64 -m64 compile flag
   # Linux linker flags
   builder.cxx.linkflags += ['-m32', '-ldl', '-lm', '-flto']
 elif builder.cxx.target.platform == 'windows':
