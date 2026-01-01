@@ -52,7 +52,7 @@ const dllapi_info_t dllapi_info = {
 	{ mFALSE,  10,	api_caller_void_args_2p,	"DispatchKeyValue" },		// pfnKeyValue
 	{ mFALSE,  9,	api_caller_void_args_2p,	"DispatchSave" },		// pfnSave
 	{ mFALSE,  9,	api_caller_int_args_2pi,	"DispatchRestore" },		// pfnRestore
-	{ mFALSE,  20,	api_caller_void_args_p,		"DispatchObjectCollsionBox" },	// pfnSetAbsBox
+	{ mFALSE,  20,	api_caller_void_args_p,		"DispatchObjectCollisionBox" },	// pfnSetAbsBox
 	{ mFALSE,  9,	api_caller_void_args_4pi,	"SaveWriteFields" },		// pfnSaveWriteFields
 	{ mFALSE,  9,	api_caller_void_args_4pi,	"SaveReadFields" },		// pfnSaveReadFields
 	{ mFALSE,  9,	api_caller_void_args_p,		"SaveGlobalState" },		// pfnSaveGlobalState
