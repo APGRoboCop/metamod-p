@@ -43,11 +43,11 @@
 #endif /* not OPT_TYPE */
 
 //#define VDATE 			"2024/03/18"
-#define VPATCH_COPYRIGHT_YEAR   "2024"
+#define VPATCH_COPYRIGHT_YEAR   "2026"
 #define VMETA_VERSION		"1.21"
 
 #define VPATCH_NAME		"Metamod-P-APG (MM-P-APG)"
-#define VPATCH_IVERSION		43
+#define VPATCH_IVERSION		44
 #define VPATCH_VERSION		"-APG"
 #define VPATCH_AUTHOR		"Jussi Kivilinna & RoboCop"
 #define VPATCH_WEBSITE		"https://apg-clan.org/"

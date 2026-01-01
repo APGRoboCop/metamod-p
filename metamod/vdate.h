@@ -39,7 +39,8 @@
 
 #include "comp_dep.h"
 
-extern char const* COMPILE_TIME DLLHIDDEN;
-extern char const* COMPILE_TZONE DLLHIDDEN;
+extern const char* const COMPILE_TIME DLLHIDDEN;
+extern const char* const COMPILE_TZONE DLLHIDDEN;
+extern const char* const vstring DLLHIDDEN;
 
 #endif /* VDATE_H */

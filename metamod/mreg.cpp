@@ -102,10 +102,14 @@ MRegCmdList::MRegCmdList()
 	: mlist(nullptr), size(REG_CMD_GROWSIZE), endlist(0)
 {
 	mlist = static_cast<MRegCmd*>(calloc(1, size * sizeof(MRegCmd)));
+	if (!mlist) {
+		META_ERROR("Failed to allocate MRegCmdList");
+		size = 0;
+		return;
+	}
 	// initialize array
 	for (int i = 0; i < size; i++)
 		mlist[i].init(i + 1);		// 1-based index
-	endlist = 0;
 }
 
 // Try to find a registered function with the given name.
@@ -113,11 +117,14 @@ MRegCmdList::MRegCmdList()
 //  - ME_NOTFOUND	couldn't find a matching function
 MRegCmd* DLLINTERNAL MRegCmdList::find(const char* findname) const
 {
+	if (!findname)
+		RETURN_ERRNO(nullptr, ME_ARGUMENT);
+	
 	for (int i = 0; i < endlist; i++) {
-		if (!strcasecmp(mlist[i].name, findname))
-			return&mlist[i];
+		if (mlist[i].name && !strcasecmp(mlist[i].name, findname))
+			return &mlist[i];  // Fixed spacing
 	}
-	RETURN_ERRNO(NULL, ME_NOTFOUND);
+	RETURN_ERRNO(nullptr, ME_NOTFOUND);
 }
 
 // Add the given name to the list and return the instance.  This only
@@ -312,13 +319,15 @@ MRegCvar* DLLINTERNAL MRegCvarList::add(const char* addname) {
 	if (!icvar->data) {
 		META_WARNING("Couldn't malloc cvar for adding reg cvar name '%s': %s",
 			addname, strerror(errno));
-		RETURN_ERRNO(NULL, ME_NOMEM);
+		RETURN_ERRNO(nullptr, ME_NOMEM);
 	}
 	icvar->data->name = strdup(addname);
 	if (!icvar->data->name) {
 		META_WARNING("Couldn't strdup for adding reg cvar name '%s': %s",
 			addname, strerror(errno));
-		RETURN_ERRNO(NULL, ME_NOMEM);
+		free(icvar->data);  // Fix: free previously allocated memory - [APG]RoboCop[CL]
+		icvar->data = nullptr;
+		RETURN_ERRNO(nullptr, ME_NOMEM);
 	}
 	endlist++;
 

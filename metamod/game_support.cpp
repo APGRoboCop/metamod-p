@@ -225,7 +225,7 @@ mBOOL DLLINTERNAL install_gamedll(char* from, const char* to) {
 
 		// Writing the file was not successfull
 		if (length_out != length_in) {
-			META_DEBUG(3, ("Installing gamedll from chache: Failed to write all %d bytes to file, only %d written: %s", length_in, length_out, strerror(errno)));
+			META_DEBUG(3, ("Installing gamedll from cache: Failed to write all %d bytes to file, only %d written: %s", length_in, length_out, strerror(errno)));
 			// Let's not leave a mess but clean up nicely.
 			if (length_out >= 0)
 				unlink(to);

@@ -88,6 +88,8 @@ public:
 
 // A list of registered commands.
 class MRegCmdList : public class_metamod_new {
+public:
+	~MRegCmdList() DLLINTERNAL;
 private:
 	// data:
 	MRegCmd* mlist;			// malloc'd array of registered commands
@@ -127,6 +129,8 @@ public:
 
 // A list of registered cvars.
 class MRegCvarList : public class_metamod_new {
+public:
+	~MRegCvarList() DLLINTERNAL;
 private:
 	// data:
 	MRegCvar* vlist;		// malloc'd array of registered cvars
