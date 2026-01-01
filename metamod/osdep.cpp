@@ -158,8 +158,10 @@ int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, va_l
 		bufsize *= 2;
 		char* newbuf = static_cast<char*>(realloc(tmpbuf, bufsize * sizeof(char)));
 
-		if (!newbuf)
+		if (!newbuf) {
+			free(tmpbuf);
 			break;
+		}
 
 		tmpbuf = newbuf;
 
@@ -177,6 +179,7 @@ int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, va_l
 		}
 	}
 
+	free(tmpbuf);
 	return res;
 }
 

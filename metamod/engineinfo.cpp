@@ -174,9 +174,9 @@ int DLLINTERNAL EngineInfo::vac_pe_approx(enginefuncs_t* _pFuncs)
 	// If we find functions outside this range we can't determine a valid
 	// range and have to just give up.
 
-	unsigned long* pengfuncs = (unsigned long*)_pFuncs;
-	unsigned int i, invals = 0;
-	for (i = 0, pengfuncs += i; i < 140; i++, pengfuncs++) {
+	unsigned long* pengfuncs = reinterpret_cast<unsigned long*>(_pFuncs);
+	unsigned int invals = 0;
+	for (unsigned int i = 0; i < 140; i++, pengfuncs++) {
 		if ((*pengfuncs & c_VacDllEngineFuncsRangeMask) != c_VacDllEngineFuncsRangeMark) {
 			invals++;
 			break;
@@ -271,7 +271,7 @@ int DLLINTERNAL EngineInfo::phdr_dladdr(void* _pMem)
 int DLLINTERNAL EngineInfo::phdr_r_debug(void)
 {
 	ElfW(Dyn)* pDyn;
-	struct r_debug* pr_debug;
+	struct r_debug* pr_debug = nullptr;
 	struct link_map* pMap;
 
 	// Search if we have a DT_DEBUG symbol in our DYNAMIC segment, which
@@ -344,8 +344,11 @@ int DLLINTERNAL EngineInfo::initialise(enginefuncs_t* _pFuncs)
 	}
 
 	// If we have a refererence pointer we try to use it first.
-	if (0 != phdr_dladdr(_pFuncs)) {
-		ret = phdr_r_debug();
+	else {
+		// FIX: Use 'else if' - was always calling phdr_r_debug regardless of phdr_dladdr result - [APG]RoboCop[CL]
+		if (0 != phdr_dladdr(_pFuncs)) {
+			ret = phdr_r_debug();
+		}
 	}
 
 #endif /* _WIN32 */
@@ -358,5 +361,5 @@ int DLLINTERNAL EngineInfo::initialise(enginefuncs_t* _pFuncs)
 			m_codeStart, m_codeEnd);
 	}
 
-	return 0;
+	return ret;
 }

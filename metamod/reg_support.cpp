@@ -120,12 +120,12 @@ void DLLHIDDEN meta_command_handler() {
 // string.  The function pointer handed to the engine is actually a pointer
 // to a generic command-handler function (see above).
 void DLLHIDDEN meta_AddServerCommand(char* cmd_name, void (*function) ()) {
-	const MPlugin* iplug;
+	const MPlugin* iplug = Plugins->find_memloc((void*)function);
 
 	META_DEBUG(4, ("called: meta_AddServerCommand; cmd_name=%s, function=%d", cmd_name, function));
 
 	// try to find which plugin is registering this command
-	if (!((iplug = Plugins->find_memloc((void*)function)))) {
+	if (!iplug) {
 		// if this isn't supported on this OS, don't log an error
 		if (meta_errno != ME_OSNOTSUP)
 			META_WARNING("Failed to find memloc for regcmd '%s'", cmd_name);
@@ -148,10 +148,7 @@ void DLLHIDDEN meta_AddServerCommand(char* cmd_name, void (*function) ()) {
 	icmd->status = RG_VALID;
 	// Store which plugin this is for, if we know.  We can use '0' for
 	// unknown plugin, since plugin index starts at 1.
-	if (iplug)
-		icmd->plugid = iplug->index;
-	else
-		icmd->plugid = 0;
+	icmd->plugid = iplug ? iplug->index : 0;
 }
 
 // Replacement for engine routine CVarRegister; called by plugins.  Rather
@@ -167,12 +164,12 @@ void DLLHIDDEN meta_AddServerCommand(char* cmd_name, void (*function) ()) {
 // code tries to _directly_ read/set the fields of its own cvar structures,
 // it will fail to work properly.
 void DLLHIDDEN meta_CVarRegister(cvar_t* pCvar) {
-	const MPlugin* iplug;
+	const MPlugin* iplug = Plugins->find_memloc(pCvar);
 
 	META_DEBUG(4, ("called: meta_CVarRegister; name=%s", pCvar->name));
 
 	// try to find which plugin is registering this cvar
-	if (!((iplug = Plugins->find_memloc(pCvar)))) {
+	if (!iplug) {
 		// if this isn't supported on this OS, don't log an error
 		if (meta_errno != ME_OSNOTSUP)
 			// Note: if cvar_t was malloc'd by the plugin, we can't
@@ -201,14 +198,13 @@ void DLLHIDDEN meta_CVarRegister(cvar_t* pCvar) {
 	icvar->status = RG_VALID;
 	// Store which plugin this is for, if we know.  Use '0' for unknown
 	// plugin, as plugin index starts at 1.
-	if (iplug)
-		icvar->plugid = iplug->index;
-	else
-		icvar->plugid = 0;
+	icvar->plugid = iplug ? iplug->index : 0;
 }
 
 // Replacement for engine routine RegUserMsg; called by plugins.
-int DLLHIDDEN meta_RegUserMsg(const char* pszName, const int iSize) {
+// TODO: The strdup'd name is intentionally not freed as the engine
+// retains a pointer to this string for the lifetime of the server. - [APG]RoboCop[CL]
+int DLLHIDDEN meta_RegUserMsg(const char* pszName, int iSize) {
 	return REG_USER_MSG(strdup(pszName), iSize);
 }
 
@@ -216,5 +212,6 @@ int DLLHIDDEN meta_RegUserMsg(const char* pszName, const int iSize) {
 void DLLHIDDEN meta_QueryClientCvarValue(const edict_t* player, const char* cvarName) {
 	g_Players.set_player_cvar_query(player, cvarName);
 
-	(*g_engfuncs.pfnQueryClientCvarValue)(player, cvarName);
+	if (g_engfuncs.pfnQueryClientCvarValue)
+		(*g_engfuncs.pfnQueryClientCvarValue)(player, cvarName);
 }
