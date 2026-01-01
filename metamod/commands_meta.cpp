@@ -323,7 +323,7 @@ void DLLINTERNAL cmd_meta_cvarlist() {
 // "meta config" console command.
 void DLLINTERNAL cmd_meta_config() {
 	if (CMD_ARGC() != 2) {
-		META_CONS("usage: meta cvars");
+		META_CONS("usage: meta config");
 		return;
 	}
 	Config->show();
