@@ -49,7 +49,7 @@ if builder.cxx.target.platform == 'linux':
   builder.cxx.cxxflags += [
     '-Wno-invalid-offsetof',
     '-Wno-write-strings',
-    '-std=gnu++17',
+    '-std=c++17',
   ]
   # TODO: Not important but maybe add AMD64 -m64 compile flag
   # Linux linker flags

@@ -197,6 +197,7 @@ mBOOL DLLINTERNAL MConfig::load(const char* fn) {
 			continue;
 		}
 	}
+	free(filename);  // Memory leak fix - [APG]RoboCop[CL]
 	filename = strdup(loadfile);
 	fclose(fp);
 	return mTRUE;

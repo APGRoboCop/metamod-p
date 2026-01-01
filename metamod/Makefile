@@ -120,9 +120,9 @@ ifeq "$(HOST)" "cygwin"
 	endif
 else
 	ifeq "$(TARGETTYPE)" "amd64"
-		CC=gcc -m64
+		CC=clang -m64
 	else
-		CC=gcc -m32
+		CC=clang -m32
 	endif
 endif
 
