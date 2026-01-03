@@ -45,12 +45,22 @@ if builder.cxx.target.platform == 'linux':
     '-Wno-switch',
     '-Wno-format',
     '-Wno-format-security',
-    #'-Wno-unknown-attributes', #Not for GCC
-    #'-Wno-logical-op-parentheses',
-    #'-Wno-return-stack-address',
-    #'-Wno-string-plus-int',
     '-m32',
   ]
+  # GCC-specific warning suppressions
+  if builder.cxx.like('gcc'):
+    builder.cxx.cflags += [
+      '-Wno-attributes',
+      '-Wno-dangling-pointer',
+    ]
+  # Clang-specific warning suppressions
+  if builder.cxx.like('clang'):
+    builder.cxx.cflags += [
+      '-Wno-unknown-attributes',
+      '-Wno-logical-op-parentheses',
+      '-Wno-return-stack-address',
+      '-Wno-string-plus-int',
+    ]
   # Linux compiler C++ flags
   builder.cxx.cxxflags += [
     '-Wno-invalid-offsetof',
