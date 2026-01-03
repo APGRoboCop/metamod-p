@@ -104,7 +104,7 @@ jobs:
       run: |
         sudo dpkg --add-architecture i386
         sudo apt-get update
-        sudo apt-get install -y gcc-13 g++-13 gcc-13-multilib g++-13-multilib
+        sudo apt-get install -y clang g++-multilib
         echo "CC=clang" >> $GITHUB_ENV
         echo "CXX=clang++" >> $GITHUB_ENV
 
@@ -152,7 +152,7 @@ jobs:
         
         export AM_ARCH=${{ matrix.am_arch }}
 
-        CC=gcc-13 CXX=g++-13 python3 ../configure.py ${{ matrix.configure_flags }}
+        python3 ../configure.py ${{ matrix.configure_flags }}
         
         ambuild
 

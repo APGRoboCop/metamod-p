@@ -51,7 +51,7 @@ if builder.cxx.target.platform == 'linux':
   if builder.cxx.like('gcc'):
     builder.cxx.cflags += [
       '-Wno-attributes',
-      '-Wno-dangling-pointer',
+      #'-Wno-dangling-pointer',
     ]
   # Clang-specific warning suppressions
   if builder.cxx.like('clang'):
