@@ -223,7 +223,7 @@ void DLLINTERNAL main_hook_function_void(const unsigned int api_info_offset, con
 	}
 }
 
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && (__GNUC__ >= 12)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdangling-pointer"
 #endif
@@ -427,7 +427,7 @@ void* DLLINTERNAL main_hook_function(const class_ret_t ret_init,
 	return*static_cast<void**>(override_ret.getptr());
 }
 
-#if defined(__GNUC__) && !defined(__clang__)
+#if defined(__GNUC__) && !defined(__clang__) && (__GNUC__ >= 12)
 #pragma GCC diagnostic pop
 #endif
 

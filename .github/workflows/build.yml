@@ -15,7 +15,7 @@ jobs:
       matrix:
         include:
           # Linux Release Build
-          - os: ubuntu-24.04
+          - os: ubuntu-22.04
             os_short: linux
             os_version: ubuntu-22.04
             package_ext: tar.gz
@@ -29,7 +29,7 @@ jobs:
             configure_flags: "--symbol-files --enable-optimize"
 
           # Linux Fast Build
-          - os: ubuntu-24.04
+          - os: ubuntu-22.04
             os_short: linux
             os_version: ubuntu-22.04
             package_ext: tar.gz
@@ -104,7 +104,7 @@ jobs:
       run: |
         sudo dpkg --add-architecture i386
         sudo apt-get update
-        sudo apt-get install -y clang g++-multilib
+        sudo apt-get install -y gcc-13 g++-13 gcc-13-multilib g++-13-multilib
         echo "CC=clang" >> $GITHUB_ENV
         echo "CXX=clang++" >> $GITHUB_ENV
 
@@ -152,7 +152,7 @@ jobs:
         
         export AM_ARCH=${{ matrix.am_arch }}
 
-        python3 ../configure.py ${{ matrix.configure_flags }}
+        CC=gcc-13 CXX=g++-13 python3 ../configure.py ${{ matrix.configure_flags }}
         
         ambuild
 
