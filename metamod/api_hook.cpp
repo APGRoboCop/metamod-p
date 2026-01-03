@@ -140,7 +140,7 @@ void DLLINTERNAL main_hook_function_void(const unsigned int api_info_offset, con
 			META_WARNING("Plugin didn't set meta_result: %s:%s()", iplug->file, api_info->name);
 	}
 
-	call_count--;
+	call_count--; //TODO: Possible cause of CS 1.6 and CZ crashes? [APG]RoboCop[CL]
 
 	//Api call
 	if (likely(status != MRES_SUPERCEDE)) {
@@ -157,7 +157,7 @@ void DLLINTERNAL main_hook_function_void(const unsigned int api_info_offset, con
 			else {
 				// don't complain for NULL routines in NEW_DLL_FUNCTIONS
 				if (unlikely(api != e_api_newapi))
-					META_WARNING("Couldn't find api call: %s:%s", api == e_api_engine ? "engine" : GameDLL.file, api_info->name);
+					META_WARNING("Couldn't find api call: %s:%s", (api == e_api_engine) ? "engine" : GameDLL.file, api_info->name);
 				status = MRES_UNSET;
 			}
 		}
@@ -171,7 +171,7 @@ void DLLINTERNAL main_hook_function_void(const unsigned int api_info_offset, con
 	else
 		META_DEBUG(loglevel, ("Skipped (supercede) %s:%s()", (api == e_api_engine) ? "engine" : GameDLL.file, api_info->name));
 
-	call_count++;
+	call_count++; //TODO: Possible cause of CS 1.6 and CZ crashes? [APG]RoboCop[CL]
 
 	//Post plugin functions
 	prev_mres = MRES_UNSET;
@@ -222,6 +222,11 @@ void DLLINTERNAL main_hook_function_void(const unsigned int api_info_offset, con
 		PublicMetaGlobals = backup_meta_globals[0];
 	}
 }
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdangling-pointer"
+#endif
 
 // full return typed version of main hook function
 void* DLLINTERNAL main_hook_function(const class_ret_t ret_init,
@@ -421,6 +426,10 @@ void* DLLINTERNAL main_hook_function(const class_ret_t ret_init,
 	META_DEBUG(loglevel, ("Returning (override) %s()", api_info->name));
 	return*static_cast<void**>(override_ret.getptr());
 }
+
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
 //
 // Macros for creating api caller functions

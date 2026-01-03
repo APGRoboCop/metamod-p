@@ -120,9 +120,9 @@ ifeq "$(HOST)" "cygwin"
 	endif
 else
 	ifeq "$(TARGETTYPE)" "amd64"
-		CC=clang -m64
+		CC=gcc -m64
 	else
-		CC=clang -m32
+		CC=gcc -m32
 	endif
 endif
 
@@ -158,9 +158,9 @@ endif
 CCOPT = $(CCO) $(CCOPT_ARCH) -fno-exceptions -fno-rtti
 
 # optimization level; overridden for certain problematic files
-CCO = -O2 -msse4.2 -mfpmath=sse -pipe -flto -fvisibility=hidden -fvisibility-inlines-hidden
+CCO = -O2 -msse -msse2 -mfpmath=sse -pipe -flto -fvisibility=hidden -fvisibility-inlines-hidden
 CCO += -ffunction-sections -fdata-sections -funsafe-math-optimizations -fno-strict-aliasing
-#CCO += -fno-aggressive-loop-optimizations
+CCO += -fno-aggressive-loop-optimizations
 
 # architecture tuning by target type
 ifeq "$(TARGETTYPE)" "amd64"
@@ -183,7 +183,7 @@ FILES_ALL = *.cpp *.h [A-Z]* *.rc
 
 CFLAGS=-Wall -Wno-unknown-pragmas -Wno-attributes -Wno-write-strings
 
-CFLAGS+=-std=gnu++17
+CFLAGS+=-std=c++17
 
 #CFLAGS += -DTEST
 
