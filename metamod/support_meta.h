@@ -67,6 +67,10 @@ inline int DLLINTERNAL mm_strncmp(const char* s1, const char* s2, size_t n) {
 #endif
 }
 
+// Only define strlcpy if the system doesn't provide it.
+// glibc 2.38+ with _FORTIFY_SOURCE provides strlcpy in <string.h> [APG]RoboCop[CL]
+#if !defined(__GLIBC__) || (__GLIBC__ < 2) || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 38)
+#ifndef HAVE_STRLCPY
 inline size_t strlcpy(char* dst, const char* src, const size_t size) {
 	const size_t src_len = strlen(src);
 	if (size > 0) {
@@ -76,6 +80,9 @@ inline size_t strlcpy(char* dst, const char* src, const size_t size) {
 	}
 	return src_len;
 }
+#define HAVE_STRLCPY 1
+#endif
+#endif
 
 // Unlike snprintf(), strncpy() doesn't necessarily null-terminate the
 // target.  It appears the former function reasonably considers the given
