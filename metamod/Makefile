@@ -112,6 +112,13 @@ endif
 
 GCCMAJ_GT_4 = $(shell if [ $(GCCMAJ) -gt 4 ]; then echo 1; else echo 0; fi)
 
+ifeq "$(OS)" "linux"
+    GCCMAJ_GE_12 = $(shell if [ $(GCCMAJ) -ge 12 ] 2>/dev/null; then echo 1; else echo 0; fi)
+    ifeq "$(GCCMAJ_GE_12)" "1"
+        CFLAGS_GCC12 = -Wno-dangling-pointer
+    endif
+endif
+
 ifeq "$(HOST)" "cygwin"
 	ifeq "$(TARGETTYPE)" "amd64"
 		CC=gcc-linux-x86_64
@@ -158,9 +165,9 @@ endif
 CCOPT = $(CCO) $(CCOPT_ARCH) -fno-exceptions -fno-rtti
 
 # optimization level; overridden for certain problematic files
-CCO = -O2 -msse -msse2 -mfpmath=sse -pipe -flto -fvisibility=hidden -fvisibility-inlines-hidden
-CCO += -ffunction-sections -fdata-sections -funsafe-math-optimizations -fno-strict-aliasing
-CCO += -fno-aggressive-loop-optimizations
+CCO = -O2 -msse -msse2 -mfpmath=sse -pipe -flto=auto -fvisibility=hidden -fvisibility-inlines-hidden
+CCO += -ffunction-sections -fdata-sections -fno-strict-aliasing
+CCO += -fno-aggressive-loop-optimizations -fstack-protector-strong -D_FORTIFY_SOURCE=2
 
 # architecture tuning by target type
 ifeq "$(TARGETTYPE)" "amd64"
@@ -181,20 +188,20 @@ SRCDIR=.
 INCLUDEDIRS+=-I$(SRCDIR) -I$(METADIR) -I$(SDKSRC)/engine -I$(SDKSRC)/common -I$(SDKSRC)/pm_shared -I$(SDKSRC)/dlls -I$(SDKSRC)
 FILES_ALL = *.cpp *.h [A-Z]* *.rc
 
-CFLAGS=-Wall -Wno-unknown-pragmas -Wno-attributes -Wno-write-strings
+CFLAGS=-Wall -Wno-unknown-pragmas -Wno-attributes -Wno-write-strings -Wformat -Wformat-security $(CFLAGS_GCC12)
 
 CFLAGS+=-std=c++17
 
 #CFLAGS += -DTEST
 
 ifeq "$(OPT)" "opt-fast"
-	ODEF = -DOPT_TYPE="\"optimized+meta_debug-disabled\""
+	ODEF = -DOPT_TYPE="\"optimized+meta_debug-disabled\"" -DNDEBUG
 	CFLAGS := $(CCOPT) $(CFLAGS) $(ODEF) -D__BUILD_FAST_METAMOD__
 	OBJDIR_LINUX = $(OBJDIR_LINUX_OPT)
 	OBJDIR_WIN = $(OBJDIR_WIN_OPT)
 else	#other
 ifeq "$(OPT)" "opt"
-	ODEF = -DOPT_TYPE="\"optimized\""
+	ODEF = -DOPT_TYPE="\"optimized\""  -DNDEBUG
 	CFLAGS := $(CCOPT) $(CFLAGS) $(ODEF)
 	OBJDIR_LINUX = $(OBJDIR_LINUX_OPT)
 	OBJDIR_WIN = $(OBJDIR_WIN_OPT)
@@ -241,8 +248,9 @@ $(STLOBJ): CFLAGS += -Wno-error
 
 # linux .so compile commands
 DO_CC_LINUX=$(CC) $(CFLAGS) -fPIC $(INCLUDEDIRS) -o $@ -c $< $(FILTER)
-LINK_LINUX=$(CC) $(CFLAGS) -shared -ldl -lm -static-libgcc $(EXTRA_LINK) $(OBJ_LINUX) -o $@
-
+LINK_LINUX=$(CC) $(CFLAGS) -shared -ldl -lm -static-libgcc -static-libstdc++ -flto=auto -s \
+	-Wl,--gc-sections -Wl,--as-needed -Wl,-z,relro,-z,now -Wl,-z,noexecstack \
+	$(EXTRA_LINK) $(OBJ_LINUX) -o $@
 # sort by date
 #SRCFILES := $(shell ls -t $(SRCFILES))
 
