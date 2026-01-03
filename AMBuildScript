@@ -29,7 +29,7 @@ if builder.options.extra_cppflags:
 # Compiler setup
 if builder.cxx.target.platform == 'linux':
   # Linux defines
-  builder.cxx.defines += ['_LINUX', 'POSIX', 'LINUX', 'linux']
+  builder.cxx.defines += ['_LINUX', 'POSIX', 'LINUX', 'linux', '_FORTIFY_SOURCE=2']
   # Linux compiler C flags
   builder.cxx.cflags += [
     '-pipe',
@@ -43,6 +43,7 @@ if builder.cxx.target.platform == 'linux':
     '-fvisibility-inlines-hidden',
     '-ffunction-sections',
     '-fdata-sections',
+    '-fstack-protector-strong'
     '-Wall',
     '-Werror',
     '-Wformat',
@@ -121,12 +122,14 @@ if builder.options.optimize == '1':
     # Linux optimization flags
     builder.cxx.cflags += [
       '-O2',
-      '-flto',
+      '-flto=auto',
     ]
     # LTO must be in link flags too - [APG]RoboCop[CL]
     builder.cxx.linkflags += [
-      '-flto',
+      '-flto=auto',
       '-s',
+      '-Wl,-z,relro,-z,now',
+      '-Wl,-z,noexecstack',
     ]
   elif builder.cxx.target.platform == 'windows':
     # Windows optimization flags - /Ob2 needs to be after /O2, enables aggressive function inling -caxanga334
