@@ -42,34 +42,6 @@ jobs:
             artifact_suffix: "-fast"
             configure_flags: "--symbol-files --enable-optimize --extra-cppflags=-D__BUILD_FAST_METAMOD__"
             
-          # Linux Latest Release Build
-          - os: ubuntu-latest
-            os_short: linux
-            os_version: ubuntu-latest
-            package_ext: tar.gz
-            dbg_ext: dbg
-            cc: clang
-            cxx: clang++
-            vs_arch: unused
-            am_arch: x86
-            build_type: latest_release
-            artifact_suffix: "-latest"
-            configure_flags: "--symbol-files --enable-optimize"
-
-          # Linux Latest Fast Build
-          - os: ubuntu-latest
-            os_short: linux
-            os_version: ubuntu-latest
-            package_ext: tar.gz
-            dbg_ext: dbg
-            cc: clang
-            cxx: clang++
-            vs_arch: unused
-            am_arch: x86
-            build_type: latest_fast
-            artifact_suffix: "-latest-fast"
-            configure_flags: "--symbol-files --enable-optimize --extra-cppflags=-D__BUILD_FAST_METAMOD__"
-            
           # Linux AMD64 Build  #TODO: add -m64 in AMBuildScript
           #- os: ubuntu-latest
           #  os_short: linux
@@ -101,7 +73,7 @@ jobs:
           # Windows Release Build
           - os: windows-x32
             os_short: win32
-            os_version: windows-latest
+            os_version: windows-2022
             package_ext: zip
             dbg_ext: pdb
             cc: not-used
@@ -115,7 +87,7 @@ jobs:
           # Windows Fast Build
           - os: windows-x32
             os_short: win32
-            os_version: windows-latest
+            os_version: windows-2022
             package_ext: zip
             dbg_ext: pdb
             cc: not-used
@@ -157,7 +129,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.12'
+        python-version: '3.11'
 
     - name: Setup ambuild
       run: |
