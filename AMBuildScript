@@ -38,6 +38,10 @@ if builder.cxx.target.platform == 'linux':
     '-fno-strict-aliasing',
     '-fno-exceptions',
     '-fno-rtti',
+    '-fvisibility=hidden',
+    '-fvisibility-inlines-hidden',
+    '-ffunction-sections',
+    '-fdata-sections',
     '-Wall',
     '-Werror',
     '-Wno-uninitialized',
@@ -69,7 +73,14 @@ if builder.cxx.target.platform == 'linux':
   ]
   # TODO: Not important but maybe add AMD64 -m64 compile flag
   # Linux linker flags
-  builder.cxx.linkflags += ['-m32', '-ldl', '-lm', '-flto']
+  builder.cxx.linkflags += [
+    '-m32',
+    '-ldl',
+    '-lm',
+    '-Wl,--gc-sections',
+    '-Wl,--as-needed',
+    '-Wl,--no-undefined',
+  ]
 elif builder.cxx.target.platform == 'windows':
   # Windows defines
   builder.cxx.defines += [
@@ -83,6 +94,8 @@ elif builder.cxx.target.platform == 'windows':
   # Windows compiler C flags
   builder.cxx.cflags += [
     '/W3',
+    '/GS-',
+    '/Gy',
   ]
   # Windows compiler C++ flags
   builder.cxx.cxxflags += [
@@ -90,12 +103,13 @@ elif builder.cxx.target.platform == 'windows':
     '/arch:SSE2',
     '/fp:fast',
     '/EHsc',
+    '/GR-',
   ]
   # Windows linker flags
   builder.cxx.linkflags += [
     '/EXPORT:GiveFnptrsToDll=_GiveFnptrsToDll@8,@1',
     '/SECTION:.data,RW',
-    '/MACHINE:X86'
+    '/MACHINE:X86',
   ]
 
 # Compiler options for optimization ( --enable-optimize )
@@ -104,14 +118,30 @@ if builder.options.optimize == '1':
   builder.cxx.defines += ['NDEBUG']
   if builder.cxx.target.platform == 'linux':
     # Linux optimization flags
-    builder.cxx.cflags += ['-O2']
+    builder.cxx.cflags += [
+      '-O2',
+      '-flto',
+    ]
+	# LTO must be in link flags too - [APG]RoboCop[CL]
+    builder.cxx.linkflags += [
+      '-flto',
+      '-s',
+    ]
   elif builder.cxx.target.platform == 'windows':
-    # Windows optimization flags - /Ob3 needs to be after /Ox, enables aggressive function inling -caxanga334
-    builder.cxx.cflags += ['/O2', '/Zo', '/Ob2', '/GL']
+    # Windows optimization flags - /Ob2 needs to be after /O2, enables aggressive function inling -caxanga334
+    builder.cxx.cflags += [
+      '/O2',
+      '/Ob2',
+      '/Oi',
+      '/Ot',
+      '/GL',
+    ]
     # Windows optimization link flags
-    builder.cxx.linkflags += ['/OPT:ICF', '/OPT:REF', '/LTCG']
-    # This needs to be after our optimization flags which could otherwise disable it.
-    builder.cxx.cflags += ['/Oy-']
+    builder.cxx.linkflags += [
+      '/OPT:ICF',
+      '/OPT:REF',
+      '/LTCG',
+    ]
 
 # Compiler options for debugging ( --enable-debug )
 if builder.options.debug == '1':
