@@ -10,12 +10,13 @@ if sys.platform.startswith('linux'):
 builder.cxx = builder.DetectCxx(target_arch = 'x86')
 
 # Include search paths
+hlsdk_path = os.path.join(builder.currentSourcePath, 'hlsdk')
 include_paths = [
-  os.path.join(builder.currentSourcePath, 'hlsdk', 'common'),
-  os.path.join(builder.currentSourcePath, 'hlsdk', 'dlls'),
-  os.path.join(builder.currentSourcePath, 'hlsdk', 'engine'),
-  os.path.join(builder.currentSourcePath, 'hlsdk', 'pm_shared'),
-  os.path.join(builder.currentSourcePath, 'metamod'),
+    os.path.join(hlsdk_path, 'common'),
+    os.path.join(hlsdk_path, 'dlls'),
+    os.path.join(hlsdk_path, 'engine'),
+    os.path.join(hlsdk_path, 'pm_shared'),
+    os.path.join(builder.currentSourcePath, 'metamod'),
 ]
 
 builder.cxx.defines += ['AMBUILD', '__METAMOD_BUILD__']
@@ -44,9 +45,23 @@ if builder.cxx.target.platform == 'linux':
     '-ffunction-sections',
     '-fdata-sections',
     '-fstack-protector-strong',
+    '-fstack-clash-protection',
+    '-fcf-protection',
     '-Wall',
-    '-Werror',
-    '-Wformat',
+    #'-Werror',
+    '-Wextra',
+    '-Wshadow',
+    '-Wnon-virtual-dtor',
+    '-Wold-style-cast',
+    '-Wcast-align',
+    '-Wunused',
+    '-Woverloaded-virtual',
+    '-Wpedantic',
+    '-Wconversion',
+    '-Wsign-conversion',
+    '-Wnull-dereference',
+    '-Wdouble-promotion',
+    '-Wformat=2',
     '-Wformat-security',
     '-Wno-uninitialized',
     '-Wno-unused',
@@ -105,6 +120,7 @@ elif builder.cxx.target.platform == 'windows':
     '/arch:SSE2',
     '/fp:fast',
     '/EHsc',
+    '/Qspectre',
     '/GR-',
   ]
   # Windows linker flags
@@ -154,7 +170,7 @@ if builder.options.debug == '1':
   builder.cxx.defines += ['DEBUG', '_DEBUG']
   if builder.cxx.target.platform == 'linux':
     # Linux debug flags
-    builder.cxx.cflags += ['-g3', '-O0']
+    builder.cxx.cflags += ['-g3', '-O0', '-fsanitize=address', '-fsanitize=undefined', '-fsanitize=leak']
   elif builder.cxx.target.platform == 'windows':
     # Windows debug flags
     builder.cxx.cflags += ['/Od', '/RTC1', '/MDd']

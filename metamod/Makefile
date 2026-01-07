@@ -168,6 +168,7 @@ CCOPT = $(CCO) $(CCOPT_ARCH) -fno-exceptions -fno-rtti
 CCO = -O2 -msse -msse2 -mfpmath=sse -pipe -flto=auto -fvisibility=hidden -fvisibility-inlines-hidden
 CCO += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CCO += -fno-aggressive-loop-optimizations -fstack-protector-strong -D_FORTIFY_SOURCE=2
+CCO += -fstack-clash-protection -fcf-protection
 
 # architecture tuning by target type
 ifeq "$(TARGETTYPE)" "amd64"
@@ -177,7 +178,8 @@ else
 endif
 
 # debugging; halt on warnings
-CCDEBUG+= -ggdb3 -g3
+CCDEBUG = -fsanitize=address -fsanitize=undefined -fsanitize=leak
+CCDEBUG += -ggdb3 -g3
 
 
 #############################################################################
@@ -188,9 +190,12 @@ SRCDIR=.
 INCLUDEDIRS+=-I$(SRCDIR) -I$(METADIR) -I$(SDKSRC)/engine -I$(SDKSRC)/common -I$(SDKSRC)/pm_shared -I$(SDKSRC)/dlls -I$(SDKSRC)
 FILES_ALL = *.cpp *.h [A-Z]* *.rc
 
-CFLAGS=-Wall -Wno-unknown-pragmas -Wno-attributes -Wno-write-strings -Wformat -Wformat-security $(CFLAGS_GCC12)
+CFLAGS = -Wall -Wno-unknown-pragmas -Wno-attributes -Wno-write-strings $(CFLAGS_GCC12)
+CFLAGS += -Wextra -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align
+CFLAGS += -Wunused -Woverloaded-virtual -Wpedantic -Wconversion -Wsign-conversion
+CFLAGS += -Wnull-dereference -Wdouble-promotion -Wformat=2 -Wformat-security
 
-CFLAGS+=-std=c++17
+CFLAGS += -std=c++17
 
 #CFLAGS += -DTEST
 
@@ -201,7 +206,7 @@ ifeq "$(OPT)" "opt-fast"
 	OBJDIR_WIN = $(OBJDIR_WIN_OPT)
 else	#other
 ifeq "$(OPT)" "opt"
-	ODEF = -DOPT_TYPE="\"optimized\""  -DNDEBUG
+	ODEF = -DOPT_TYPE="\"optimized\"" -DNDEBUG
 	CFLAGS := $(CCOPT) $(CFLAGS) $(ODEF)
 	OBJDIR_LINUX = $(OBJDIR_LINUX_OPT)
 	OBJDIR_WIN = $(OBJDIR_WIN_OPT)
