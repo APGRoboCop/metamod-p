@@ -2,11 +2,6 @@
 # vim: set sts=4 ts=8 sw=4 tw=99 et ft=python:
 import os, sys
 
-# Force GCC on Linux for legacy support - [APG]RoboCop[CL]
-if sys.platform.startswith('linux'):
-    os.environ['CC'] = 'gcc'
-    os.environ['CXX'] = 'g++'
-
 builder.cxx = builder.DetectCxx(target_arch = 'x86')
 
 # Include search paths
@@ -73,6 +68,7 @@ if builder.cxx.target.platform == 'linux':
     builder.cxx.cflags += [
       '-Wno-attributes',
       '-Wno-dangling-pointer',
+      '-Wno-stringop-overflow',
     ]
   # Clang-specific warning suppressions
   if builder.cxx.like('clang'):
@@ -110,7 +106,7 @@ elif builder.cxx.target.platform == 'windows':
   ]
   # Windows compiler C flags
   builder.cxx.cflags += [
-    '/W3',
+    '/W4',
     '/GS-',
     '/Gy',
   ]

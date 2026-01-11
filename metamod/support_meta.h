@@ -127,7 +127,7 @@ inline size_t strlcpy(char* dst, const char* src, const size_t size) {
 // Technique 3: use inline
 inline char* STRNCPY(char* dst, const char* src, const int size) {
 	if (size > 0) {
-		strlcpy(dst, src, size);
+		strlcpy(dst, src, static_cast<size_t>(size));
 	}
 	return dst;
 }

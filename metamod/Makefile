@@ -115,7 +115,7 @@ GCCMAJ_GT_4 = $(shell if [ $(GCCMAJ) -gt 4 ]; then echo 1; else echo 0; fi)
 ifeq "$(OS)" "linux"
     GCCMAJ_GE_12 = $(shell if [ $(GCCMAJ) -ge 12 ] 2>/dev/null; then echo 1; else echo 0; fi)
     ifeq "$(GCCMAJ_GE_12)" "1"
-        CFLAGS_GCC12 = -Wno-dangling-pointer
+        CFLAGS_GCC12 = -Wno-dangling-pointer -Wno-stringop-overflow
     endif
 endif
 

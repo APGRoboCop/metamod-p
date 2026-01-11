@@ -11,6 +11,12 @@ except:
     sys.stderr.write('AMBuild {0} must be installed to build this project.\n'.format(API_VERSION))
     sys.stderr.write('http://www.alliedmods.net/ambuild\n')
     sys.exit(1)
+    
+# Force GCC on Linux for legacy support - [APG]RoboCop[CL]
+import os
+if sys.platform.startswith('linux'):
+    os.environ['CC'] = 'gcc'
+    os.environ['CXX'] = 'g++'
 
 def make_objdir_name(p):
     return 'obj-' + util.Platform() + '-' + p.target_arch
@@ -27,7 +33,7 @@ builder.options.add_argument('--enable-static-lib', action='store_const', const=
 builder.options.add_argument('--enable-shared-lib', action='store_const', const='1', dest='sharedlib',
                        help='Enable dynamically link the sanitizer runtime')
 builder.options.add_argument('--extra-cppflags', type=str, dest='extra_cppflags', default='',
-                       help='Extra C++ compiler flags')
+                       help='Extra C++ compiler flags, e.g. "-D__BUILD_FAST_METAMOD__"')
 builder.options.add_argument('--target-arch', type=str, dest='target_arch', default=None,
                        help='Target architecture')
 builder.Configure()
