@@ -254,7 +254,7 @@ $(STLOBJ): CFLAGS += -Wno-error
 # linux .so compile commands
 DO_CC_LINUX=$(CC) $(CFLAGS) -fPIC $(INCLUDEDIRS) -o $@ -c $< $(FILTER)
 LINK_LINUX=$(CC) $(CFLAGS) -shared -ldl -lm -static-libgcc -static-libstdc++ -flto=auto -s \
-	-Wl,--gc-sections -Wl,--as-needed -Wl,-z,relro,-z,now -Wl,-z,noexecstack \
+	-Wl,--gc-sections -Wl,--as-needed -Wl,-z,relro,-z,now -Wl,-z,noexecstack -Wl,--strip-all \
 	$(EXTRA_LINK) $(OBJ_LINUX) -o $@
 # sort by date
 #SRCFILES := $(shell ls -t $(SRCFILES))

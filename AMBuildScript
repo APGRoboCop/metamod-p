@@ -69,6 +69,7 @@ if builder.cxx.target.platform == 'linux':
       '-Wno-attributes',
       '-Wno-dangling-pointer',
       '-Wno-stringop-overflow',
+      '-fno-aggressive-loop-optimizations',
     ]
   # Clang-specific warning suppressions
   if builder.cxx.like('clang'):
@@ -93,6 +94,7 @@ if builder.cxx.target.platform == 'linux':
     '-Wl,--gc-sections',
     '-Wl,--as-needed',
     '-Wl,--no-undefined',
+    '-Wl,--strip-all',
   ]
 elif builder.cxx.target.platform == 'windows':
   # Windows defines
