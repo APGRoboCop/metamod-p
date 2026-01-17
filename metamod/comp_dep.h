@@ -74,8 +74,8 @@
 #endif //defined WIN32
 #endif
 
-#if defined (_WIN32)
-	// This is already defined in newer versions of Visual Studio (note: it's defined in Visual Studio 2022 at least but possibly in prior versions too).
+#ifdef _WIN32
+// This is already defined in newer versions of Visual Studio (note: it's defined in Visual Studio 2022 at least but possibly in prior versions too).
 	#if defined (_MSC_VER) && (_MSC_VER < 1931)
 		// On x86 va_list is just a pointer.
 		#define va_copy(dst,src) ((dst)=(src))
