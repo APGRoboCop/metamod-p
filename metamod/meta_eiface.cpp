@@ -152,9 +152,11 @@ size_t DLLINTERNAL meta_new_dll_functions_t::get_size(int _version)
 	case 1:
 		// Version 1 is missing all functions from CvarValue() on.
 		size -= sizeof(FN_CVARVALUE);
+		break; // Prevent fallthrough
 	case 2:
 		// Version 2 is missing all functions from CvarValue2() on.
 		size -= sizeof(FN_CVARVALUE2);
+		break;
 	}
 
 	return size;
@@ -687,10 +689,12 @@ void HL_enginefuncs_t::fixup_engine_interface()
 	switch (version()) {
 	case 138:
 		pfnGetPlayerAuthId = nullptr;
+		[[fallthrough]]; // Explicitly indicate fall-through - [APG]RoboCop[CL]
 	case 144:
 		pfnSequenceGet = nullptr;
 		pfnSequencePickSentence = nullptr;
 		pfnGetFileSize = nullptr;
+		[[fallthrough]];
 	case 147:
 		pfnGetApproxWavePlayLen = nullptr;
 		pfnIsCareerMatch = nullptr;
@@ -700,11 +704,16 @@ void HL_enginefuncs_t::fixup_engine_interface()
 		pfnProcessTutorMessageDecayBuffer = nullptr;
 		pfnConstructTutorMessageDecayBuffer = nullptr;
 		pfnResetTutorMessageDecayData = nullptr;
+		[[fallthrough]];
 	case 155:
 		pfnQueryClientCvarValue = nullptr;
+		[[fallthrough]];
 	case 156:
 		pfnQueryClientCvarValue2 = nullptr;
+		[[fallthrough]];
 	case 157:
 		pfnEngCheckParm = nullptr;
+		break; // Add a break to terminate the switch - [APG]RoboCop[CL]
 	}
+
 }

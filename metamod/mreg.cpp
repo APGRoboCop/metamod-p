@@ -101,7 +101,8 @@ mBOOL DLLINTERNAL MRegCmd::call() {
 MRegCmdList::MRegCmdList()
 	: mlist(nullptr), size(REG_CMD_GROWSIZE), endlist(0)
 {
-	mlist = static_cast<MRegCmd*>(calloc(1, size * sizeof(MRegCmd)));
+	// Ensure size is unsigned to avoid sign-conversion warnings - [APG]RoboCop[CL]
+	mlist = static_cast<MRegCmd*>(calloc(1, static_cast<std::size_t>(size) * sizeof(MRegCmd)));
 	if (!mlist) {
 		META_ERROR("Failed to allocate MRegCmdList");
 		size = 0;
@@ -136,7 +137,7 @@ MRegCmd* DLLINTERNAL MRegCmdList::add(const char* addname) {
 	if (endlist == size) {
 		const int newsize = size + REG_CMD_GROWSIZE;
 		META_DEBUG(6, ("Growing reg cmd list from %d to %d", size, newsize));
-		MRegCmd* temp = static_cast<MRegCmd*>(realloc(mlist, newsize * sizeof(MRegCmd)));
+		MRegCmd* temp = static_cast<MRegCmd*>(realloc(mlist, static_cast<size_t>(newsize) * sizeof(MRegCmd)));
 		if (!temp) {
 			META_WARNING("Couldn't grow registered command list to %d for '%s': %s", newsize, addname, strerror(errno));
 			RETURN_ERRNO(NULL, ME_NOMEM);
@@ -278,7 +279,8 @@ mBOOL DLLINTERNAL MRegCvar::set(const cvar_t* src) const
 MRegCvarList::MRegCvarList()
 	: vlist(nullptr), size(REG_CVAR_GROWSIZE), endlist(0)
 {
-	vlist = static_cast<MRegCvar*>(calloc(1, size * sizeof(MRegCvar)));
+	// Ensure size is unsigned to avoid sign-conversion warnings - [APG]RoboCop[CL]
+	vlist = static_cast<MRegCvar*>(calloc(1, static_cast<std::size_t>(size) * sizeof(MRegCvar)));
 	// initialize array
 	for (int i = 0; i < size; i++)
 		vlist[i].init(i + 1);		// 1-based
@@ -294,7 +296,9 @@ MRegCvar* DLLINTERNAL MRegCvarList::add(const char* addname) {
 	if (endlist == size) {
 		const int newsize = size + REG_CVAR_GROWSIZE;
 		META_DEBUG(6, ("Growing reg cvar list from %d to %d", size, newsize));
-		MRegCvar* temp = static_cast<MRegCvar*>(realloc(vlist, newsize * sizeof(MRegCvar)));
+		MRegCvar* temp = static_cast<MRegCvar*>(
+			realloc(vlist, static_cast<unsigned int>(newsize) * sizeof(MRegCvar))
+			);
 		if (!temp) {
 			META_WARNING("Couldn't grow registered cvar list to %d for '%s'; %s", newsize, addname, strerror(errno));
 			RETURN_ERRNO(NULL, ME_NOMEM);
@@ -304,7 +308,7 @@ MRegCvar* DLLINTERNAL MRegCvarList::add(const char* addname) {
 		// initialize new (unused) entries
 		for (int i = endlist; i < size; i++) {
 			memset(&vlist[i], 0, sizeof(vlist[i]));
-			vlist[i].init(i + 1);		// 1-based
+			vlist[i].init(i + 1);        // 1-based
 		}
 	}
 
@@ -387,7 +391,7 @@ void DLLINTERNAL MRegCvarList::show() const
 		else
 			STRNCPY(bplug, "(unloaded)", sizeof(bplug));
 		STRNCPY(bname, icvar->data->name, sizeof(bname));
-		safevoid_snprintf(bval, sizeof(bval), "%f", icvar->data->value);
+		safevoid_snprintf(bval, sizeof(bval), "%f", static_cast<double>(icvar->data->value));
 		META_CONS(" [%*d] %-*s  %-*s  %*s  %s",
 			WIDTH_MAX_REG, icvar->index,
 			sizeof(bplug) - 1, bplug,
@@ -426,7 +430,7 @@ void DLLINTERNAL MRegCvarList::show(const int plugin_id) const
 		if (icvar->plugid != plugin_id)
 			continue;
 		STRNCPY(bname, icvar->data->name, sizeof(bname));
-		safevoid_snprintf(bval, sizeof(bval), "%f", icvar->data->value);
+		safevoid_snprintf(bval, sizeof(bval), "%f", static_cast<double>(icvar->data->value));
 		META_CONS("   %-*s  %*s  %s",
 			sizeof(bname) - 1, bname,
 			sizeof(bval) - 1, bval,

@@ -118,13 +118,20 @@ mBOOL DLLINTERNAL is_gamedll(const char *filename) {
 	has_GetEntityAPI = 0;
 	
 	// Try open file and get filesize
-	if((pf = fopen(filename, "rb"))) {
+	if ((pf = fopen(filename, "rb"))) {
 		fseek(pf, 0, SEEK_END);
-		filesize = ftell(pf);
+		long file_size_signed = ftell(pf);
+		if (file_size_signed == -1L) {
+			META_DEBUG(3, ("is_gamedll(%s): Failed, ftell() returned -1.", filename));
+			fclose(pf);
+			return mFALSE;
+		}
+		filesize = static_cast<unsigned long>(file_size_signed);
 		fseek(pf, 0, SEEK_SET);
-	} else {
+	}
+	else {
 		META_DEBUG(3, ("is_gamedll(%s): Failed, cannot fopen() file.", filename));
-				
+
 		return mFALSE;
 	}
 	
@@ -155,26 +162,26 @@ mBOOL DLLINTERNAL is_gamedll(const char *filename) {
 	}
 	
 	//In case that ELF file is incomplete (because bad upload etc), we protect memory-mapping access with signal-handler
-	if(!setjmp(signal_jmp_buf)) {
+	if (!setjmp(signal_jmp_buf)) {
 		memset(&action, 0, sizeof(struct sigaction));
 		memset(&oldaction, 0, sizeof(struct sigaction));
-		
+
 		// Not returning from signal, set SIGSEGV handler.
 		action.sa_handler = signal_handler_sigsegv;
-		action.sa_flags = SA_RESETHAND | SA_NODEFER;
+		action.sa_flags = static_cast<int>(SA_RESETHAND | SA_NODEFER); // Explicit cast to int - [APG]RoboCop[CL]
 		sigemptyset(&action.sa_mask);
 		sigaction(SIGSEGV, &action, &oldaction);
 	} else {
 		// Reset signal handler.
 		sigaction(SIGSEGV, &oldaction, 0);
-		
+
 		META_DEBUG(3, ("is_gamedll(%s): Failed, signal SIGSEGV.", filename));
-				
+
 		munmap(ehdr, filesize);
-		
+
 		return mFALSE;
 	}
-	
+		
 	if(mm_strncmp((char *)ehdr, ELFMAG, SELFMAG) != 0 || ehdr->e_ident[EI_VERSION] != EV_CURRENT) {
 		// Reset signal handler.
 		sigaction(SIGSEGV, &oldaction, 0);

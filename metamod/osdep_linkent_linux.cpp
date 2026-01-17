@@ -207,7 +207,7 @@ int DLLINTERNAL init_linkent_replacement(DLHANDLE MetamodHandle, DLHANDLE GameDl
 	construct_jmp_instruction(&dlsym_new_bytes[0], (void*)dlsym_original, (void*)&__replacement_dlsym);
 	
 	//Check if bytes overlap page border.	
-	const unsigned long start_of_page = PAGE_ALIGN((long)dlsym_original) - PAGE_SIZE;
+	const unsigned long start_of_page = PAGE_ALIGN((unsigned long)dlsym_original) - PAGE_SIZE;
 	unsigned long size_of_pages;
 	
 	if((unsigned long)dlsym_original + BYTES_SIZE > PAGE_ALIGN((unsigned long)dlsym_original))

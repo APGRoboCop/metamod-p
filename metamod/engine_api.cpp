@@ -75,11 +75,11 @@
 			va_start(vargs, szFmt); \
 			len = safe_vsnprintf(strbuf, sizeof(strbuf), szFmt, vargs); \
 			va_end(vargs); \
-			if((unsigned)len >= sizeof(strbuf)) { \
-				buf = (char *)malloc(len + 1); \
+			if(len >= 0 && (unsigned)len >= sizeof(strbuf)) { \
+				buf = (char *)malloc((size_t)len + 1); \
 				if(buf) { \
 					va_start(vargs, szFmt); \
-					safevoid_vsnprintf(buf, len + 1, szFmt, vargs); \
+					safevoid_vsnprintf(buf, (size_t)len + 1, szFmt, vargs); \
 					va_end(vargs); \
 				} else { \
 					buf=strbuf; \

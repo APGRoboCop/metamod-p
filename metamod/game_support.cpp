@@ -36,6 +36,8 @@
  *
  */
 #include <cstring>
+#include <cstddef> // For size_t
+//#include <unistd.h> // For write (if available on your platform)
 
 #include <fcntl.h>          // open, write
 
@@ -47,6 +49,10 @@
 #include "osdep.h"			// win32 snprintf, etc
 #include "game_autodetect.h"	// autodetect_gamedll
 #include "support_meta.h"	// MIN
+
+#ifdef _WIN32
+typedef long ssize_t; // Define ssize_t for Windows
+#endif
 
  // Adapted from adminmod h_export.cpp:
  //! this structure contains a list of supported mods and their dlls names
@@ -219,7 +225,12 @@ mBOOL DLLINTERNAL install_gamedll(char* from, const char* to) {
 			return mFALSE;
 		}
 
-		const int length_out = write(fd, cachefile, length_in);
+		const ssize_t length_out = write(fd, cachefile, static_cast<size_t>(length_in));
+		if (length_out < 0) {
+			// Handle the error
+			perror("write failed");
+			return mFALSE;
+		}
 		FREE_FILE(cachefile);
 		close(fd);
 

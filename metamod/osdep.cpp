@@ -86,7 +86,7 @@ char* DLLINTERNAL my_strlwr(char* s) {
 	if (!s)
 		return nullptr;
 	for (char* c = s; *c; c++)
-		*c = tolower(*c);
+		*c = static_cast<char>(tolower(static_cast<unsigned char>(*c)));
 	return s;
 }
 #endif
@@ -172,7 +172,7 @@ int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, va_l
 
 	if (res > 0 && n > 0) {
 		if (n > static_cast<unsigned>(res))
-			memcpy(s, tmpbuf, (res + 1) * sizeof(char));
+			memcpy(s, tmpbuf, static_cast<unsigned>(res + 1) * sizeof(char));
 		else {
 			memcpy(s, tmpbuf, (n - 1) * sizeof(char));
 			s[n - 1] = 0;

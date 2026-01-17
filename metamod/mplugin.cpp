@@ -512,8 +512,14 @@ mBOOL DLLINTERNAL MPlugin::platform_match(const MPlugin* other) const
 	if (end == nullptr || other_end == nullptr)
 		return mFALSE;
 
-	const int prefixlen = end - file;
-	if (other_end - other->file != prefixlen)
+	const ptrdiff_t diff = end - file;
+
+	if (diff < 0)
+		return mFALSE;
+
+	const size_t prefixlen = static_cast<size_t>(diff);
+
+	if (static_cast<size_t>(other_end - other->file) != prefixlen)
 		return mFALSE;
 
 	if (mm_strncmp(file, other->file, prefixlen) == 0)
@@ -921,12 +927,12 @@ mBOOL DLLINTERNAL MPlugin::attach(const PLUG_LOADTIME now) {
 	iface_vers = ENGINE_INTERFACE_VERSION;
 	GET_FUNC_TABLE_FROM_PLUGIN(pfnGetEngineFunctions,
 		"GetEngineFunctions", tables.engine,
-		GET_ENGINE_FUNCTIONS_FN, enginefuncs_t, (sizeof(enginefuncs_t) - sizeof(((enginefuncs_t*)0)->extra_functions)),
+		GET_ENGINE_FUNCTIONS_FN, enginefuncs_t, sizeof(enginefuncs_t),
 		&iface_vers, iface_vers, ENGINE_INTERFACE_VERSION)
 	iface_vers = ENGINE_INTERFACE_VERSION;
 	GET_FUNC_TABLE_FROM_PLUGIN(pfnGetEngineFunctions_Post,
 		"GetEngineFunctions_Post", post_tables.engine,
-		GET_ENGINE_FUNCTIONS_FN, enginefuncs_t, (sizeof(enginefuncs_t) - sizeof(((enginefuncs_t*)0)->extra_functions)),
+		GET_ENGINE_FUNCTIONS_FN, enginefuncs_t, sizeof(enginefuncs_t),
 		&iface_vers, iface_vers, ENGINE_INTERFACE_VERSION)
 
 	if (!tables.dllapi && !post_tables.dllapi

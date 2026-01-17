@@ -15,6 +15,11 @@
 //
 // Misc utility code
 //
+
+#ifdef _WIN32
+#include <WinDef.h>
+#endif
+
 #define	SVC_DIRECTOR		51
 
 inline void MESSAGE_BEGIN( int msg_dest, int msg_type, const float *pOrigin, entvars_t *ent );  // implementation later in this file
@@ -148,13 +153,13 @@ inline BOOL FStringNull(int iString)                    { return iString == iStr
 #define cchMapNameMost 32
 
 // Dot products for view cone checking
-#define VIEW_FIELD_FULL         (float)-1.0 // +-180 degrees
-#define VIEW_FIELD_WIDE         (float)-0.7 // +-135 degrees 0.1 // +-85 degrees, used for full FOV checks 
-#define VIEW_FIELD_NARROW       (float)0.7 // +-45 degrees, more narrow check used to set up ranged attacks
-#define VIEW_FIELD_ULTRA_NARROW (float)0.9 // +-25 degrees, more narrow check used to set up ranged attacks
+#define VIEW_FIELD_FULL         (-1.0f) // +-180 degrees
+#define VIEW_FIELD_WIDE         (0.7f) // +-135 degrees 0.1 // +-85 degrees, used for full FOV checks 
+#define VIEW_FIELD_NARROW       0.7f // +-45 degrees, more narrow check used to set up ranged attacks
+#define VIEW_FIELD_ULTRA_NARROW 0.9f // +-25 degrees, more narrow check used to set up ranged attacks
 
 // All monsters need this data
-#define         DONT_BLEED                      -1
+#define         DONT_BLEED                      (-1)
 #define         BLOOD_COLOR_RED         (BYTE)247
 #define         BLOOD_COLOR_YELLOW      (BYTE)195
 #define         BLOOD_COLOR_GREEN       BLOOD_COLOR_YELLOW
@@ -483,7 +488,7 @@ void EMIT_GROUPNAME_SUIT(edict_t *entity, const char *groupname);
         { for (int i = 0; i < ARRAYSIZE( a ); i++ ) PRECACHE_SOUND((char *) a [i]); }
 
 #define EMIT_SOUND_ARRAY_DYN( chan, array ) \
-        EMIT_SOUND_DYN ( ENT(pev), chan , array [ RANDOM_LONG(0,ARRAYSIZE( array )-1) ], 1.0, ATTN_NORM, 0, RANDOM_LONG(95,105) ); 
+        EMIT_SOUND_DYN ( ENT(pev), chan , array [ RANDOM_LONG(0,ARRAYSIZE( array )-1) ], 1.0f, ATTN_NORM, 0, RANDOM_LONG(95,105) ); 
 
 #define RANDOM_SOUND_ARRAY( array ) (array) [ RANDOM_LONG(0,ARRAYSIZE( (array) )-1) ]
 

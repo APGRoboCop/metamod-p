@@ -191,7 +191,7 @@ INCLUDEDIRS+=-I$(SRCDIR) -I$(METADIR) -I$(SDKSRC)/engine -I$(SDKSRC)/common -I$(
 FILES_ALL = *.cpp *.h [A-Z]* *.rc
 
 CFLAGS = -Wall -Wno-unknown-pragmas -Wno-attributes -Wno-write-strings $(CFLAGS_GCC12)
-CFLAGS += -Wextra -Wshadow -Wnon-virtual-dtor -Wold-style-cast -Wcast-align
+CFLAGS += -Wextra -Wshadow -Wnon-virtual-dtor -Wcast-align#-Wold-style-cast
 CFLAGS += -Wunused -Woverloaded-virtual -Wpedantic -Wconversion -Wsign-conversion
 CFLAGS += -Wnull-dereference -Wdouble-promotion -Wformat=2 -Wformat-security
 

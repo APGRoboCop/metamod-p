@@ -95,6 +95,9 @@
 #else
 #define likely(x) __builtin_expect((long int)(x), true)
 #define unlikely(x) __builtin_expect((long int)(x), false)
+//TODO: check static_cast<bool> necessity - [APG]RoboCop[CL]
+//#define likely(x) __builtin_expect(static_cast<long int>(static_cast<bool>(x)), true)
+//#define unlikely(x) __builtin_expect(static_cast<long int>(static_cast<bool>(x)), false)
 #endif
 
 #endif /*COMP_DEP_H*/

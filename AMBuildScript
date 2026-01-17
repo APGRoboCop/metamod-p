@@ -47,7 +47,7 @@ if builder.cxx.target.platform == 'linux':
     '-Wextra',
     '-Wshadow',
     '-Wnon-virtual-dtor',
-    '-Wold-style-cast',
+    #'-Wold-style-cast',
     '-Wcast-align',
     '-Wunused',
     '-Woverloaded-virtual',
