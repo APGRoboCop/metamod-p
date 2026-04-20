@@ -6,6 +6,7 @@ metamod/UpgradeLog.htm
 *.tlog
 *.ipch
 metamod/Debug/*
+metamod/Fast/*
 metamod/Release/*
 *.dll
 *.rsp
