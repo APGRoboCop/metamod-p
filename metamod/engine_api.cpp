@@ -461,11 +461,19 @@ static int mm_RegUserMsg(const char* pszName, int iSize) {
 
 	// Add the msgid, name, and size to our saved list, if we haven't
 	// already.
-	const MRegMsg* nmsg = RegMsgs->find(imsgid);
+	MRegMsg* nmsg = RegMsgs->find(imsgid);
 	if (nmsg) {
-		if (FStrEq(pszName, nmsg->name))
+		if (nmsg->name && nmsg->name[0] && FStrEq(pszName, nmsg->name))
 			// This name/msgid pair was already registered.
 			META_DEBUG(3, ("user message registered again: name=%s, msgid=%d", pszName, imsgid));
+		else if (!nmsg->name || !nmsg->name[0]) {
+			// Previously registered with empty or null name; update with
+			// the actual name.  This is normal for some mods (e.g. DoD)
+			// that register message IDs before assigning names.
+			META_DEBUG(3, ("user message id updated with name: msgid=%d, name=%s", imsgid, pszName));
+			nmsg->name = pszName;
+			nmsg->size = iSize;
+		}
 		else
 			// This msgid was previously used by a different message name.
 			META_WARNING("user message id reused: msgid=%d, oldname=%s, newname=%s", imsgid, nmsg->name, pszName);
