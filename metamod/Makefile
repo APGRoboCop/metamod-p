@@ -38,7 +38,9 @@ endif
 # CONFIGURATION
 #############################################################################
 
-# TARGET amd64 disabled since Valve has dropped support for x86-64 server
+# TARGET amd64: targets hlds_amd64 / cs_amd64.so deployments.
+# Some servers still run the 64-bit GoldSrc engine branch shipped by Valve
+# around 2006-2007, and some plugin authors maintain AMD64 compatibility.
 ifeq "$(TARGET)" "amd64"
 	TARGETTYPE = amd64
 else
@@ -165,7 +167,14 @@ endif
 CCOPT = $(CCO) $(CCOPT_ARCH) -fno-exceptions -fno-rtti
 
 # optimization level; overridden for certain problematic files
+# -msse, -msse2, -mfpmath=sse are x86-only: on x86_64 SSE2 is mandatory in
+# the ABI so these flags are implicit defaults, and GCC 12+ specifically warns
+# about -mfpmath=sse being redundant on x86_64.
+ifeq "$(TARGETTYPE)" "i386"
 CCO = -O2 -msse -msse2 -mfpmath=sse -pipe -flto=auto -fvisibility=hidden -fvisibility-inlines-hidden
+else
+CCO = -O2 -pipe -flto=auto -fvisibility=hidden -fvisibility-inlines-hidden
+endif
 CCO += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CCO += -fno-aggressive-loop-optimizations -fstack-protector-strong -D_FORTIFY_SOURCE=2
 CCO += -fstack-clash-protection -fcf-protection

@@ -3,21 +3,27 @@ name: Build
 on: ["push", "workflow_dispatch"]
 
 # ---------------------------------------------------------------------------
-# This workflow produces four separate artifact sets for comparison:
+# This workflow produces six separate artifact sets for comparison:
 #
 #   AMBuild jobs  (build_ambuild):
-#     - Linux  (Ubuntu 18.04 + GCC-7,  32-bit, release & fast variants)
-#     - Win32  (Windows 2022 + MSVC via AMBuild, release & fast variants)
+#     - Linux x86    (Ubuntu 18.04 + GCC-7,  32-bit, release & fast)
+#     - Linux AMD64  (Ubuntu 22.04 + GCC,    64-bit, release & fast)
+#     - Win32        (Windows 2022 + MSVC,   32-bit, release & fast)
 #
 #   Native jobs   (build_native):
-#     - Linux  (Ubuntu 18.04 + GCC-7,  32-bit, Makefile, release & fast)
-#     - Win32  (Windows 2022 + MSVC,   32-bit, MSBuild .vcxproj, release & fast)
+#     - Linux x86    (Ubuntu 18.04 + GCC-7,  32-bit, Makefile, release & fast)
+#     - Linux AMD64  (Ubuntu 22.04 + GCC,    64-bit, Makefile, release & fast)
+#     - Win32        (Windows 2022 + MSVC,   32-bit, MSBuild .vcxproj, release & fast)
 #
-# Ubuntu 18.04 is used for Linux builds to avoid glibc/compiler compatibility
-# issues that appear with newer toolchains and glibc versions when the
-# resulting .so is loaded by GoldSrc engine binaries built against older ABIs.
-# GCC-7 (the default for 18.04) produces output closest to what Valve's own
-# toolchain would have generated for that era of GoldSrc.
+# Ubuntu 18.04 is used for 32-bit Linux builds because:
+#   (a) it still has solid first-class i386 support (multilib packages,
+#       libc6-dev:i386, etc.) which Ubuntu 22.04+ has largely dropped, and
+#   (b) GCC-7 produces output linked against an older glibc ABI, avoiding
+#       symbol-version mismatches when GoldSrc loads the plugin.
+#
+# Ubuntu 22.04 is used for AMD64 Linux builds because no i386 multilib is
+# needed — the host and target word size are the same — and modern runners
+# are fine for 64-bit GoldSrc engine deployments (hlds_amd64 / cs_amd64.so).
 # ---------------------------------------------------------------------------
 
 # Skip build when commit message contains '[ci skip]'
@@ -41,7 +47,8 @@ jobs:
       matrix:
         include:
           # ------------------------------------------------------------------
-          # Linux Release  (AMBuild / GCC / Ubuntu 18.04)
+          # Linux x86 Release  (AMBuild / GCC / Ubuntu 18.04)
+          # Ubuntu 18.04: solid i386 multilib support, older glibc ABI.
           # ------------------------------------------------------------------
           - os_short: linux
             os_version: ubuntu-18.04
@@ -51,12 +58,13 @@ jobs:
             cxx: g++
             vs_arch: unused
             am_arch: x86
+            multilib: true
             build_type: release
             artifact_suffix: ""
             configure_flags: "--symbol-files --enable-optimize"
 
           # ------------------------------------------------------------------
-          # Linux Fast  (AMBuild / GCC / Ubuntu 18.04)
+          # Linux x86 Fast  (AMBuild / GCC / Ubuntu 18.04)
           # ------------------------------------------------------------------
           - os_short: linux
             os_version: ubuntu-18.04
@@ -66,9 +74,44 @@ jobs:
             cxx: g++
             vs_arch: unused
             am_arch: x86
+            multilib: true
             build_type: fast
             artifact_suffix: "-fast"
             configure_flags: "--symbol-files --enable-optimize --extra-cppflags=-D__BUILD_FAST_METAMOD__"
+
+          # ------------------------------------------------------------------
+          # Linux AMD64 Release  (AMBuild / GCC / Ubuntu 22.04)
+          # Ubuntu 22.04: no i386 multilib needed; native 64-bit build.
+          # Targets hlds_amd64 / cs_amd64.so deployments.
+          # ------------------------------------------------------------------
+          - os_short: linux-amd64
+            os_version: ubuntu-22.04
+            package_ext: tar.gz
+            dbg_ext: dbg
+            cc: gcc
+            cxx: g++
+            vs_arch: unused
+            am_arch: x86_64
+            multilib: false
+            build_type: release
+            artifact_suffix: ""
+            configure_flags: "--symbol-files --enable-optimize --target-arch=x86_64"
+
+          # ------------------------------------------------------------------
+          # Linux AMD64 Fast  (AMBuild / GCC / Ubuntu 22.04)
+          # ------------------------------------------------------------------
+          - os_short: linux-amd64
+            os_version: ubuntu-22.04
+            package_ext: tar.gz
+            dbg_ext: dbg
+            cc: gcc
+            cxx: g++
+            vs_arch: unused
+            am_arch: x86_64
+            multilib: false
+            build_type: fast
+            artifact_suffix: "-fast"
+            configure_flags: "--symbol-files --enable-optimize --target-arch=x86_64 --extra-cppflags=-D__BUILD_FAST_METAMOD__"
 
           # ------------------------------------------------------------------
           # Windows Release  (AMBuild / MSVC / Windows 2022)
@@ -81,6 +124,7 @@ jobs:
             cxx: not-used
             vs_arch: x32
             am_arch: x86
+            multilib: false
             build_type: release
             artifact_suffix: ""
             configure_flags: "--symbol-files --enable-optimize"
@@ -96,6 +140,7 @@ jobs:
             cxx: not-used
             vs_arch: x32
             am_arch: x86
+            multilib: false
             build_type: fast
             artifact_suffix: "-fast"
             configure_flags: "--symbol-files --enable-optimize --extra-cppflags=-D__BUILD_FAST_METAMOD__"
@@ -104,12 +149,20 @@ jobs:
       # -----------------------------------------------------------------------
       # Linux setup
       # -----------------------------------------------------------------------
-      - name: Install dependencies (Linux)
-        if: runner.os == 'Linux'
+      - name: Install dependencies (Linux x86)
+        if: runner.os == 'Linux' && matrix.multilib == true
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
           sudo apt-get install -y gcc g++ gcc-multilib g++-multilib
+          echo "CC=${{ matrix.cc }}"   >> $GITHUB_ENV
+          echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
+
+      - name: Install dependencies (Linux AMD64)
+        if: runner.os == 'Linux' && matrix.multilib == false
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc g++
           echo "CC=${{ matrix.cc }}"   >> $GITHUB_ENV
           echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
 
@@ -118,7 +171,7 @@ jobs:
       # -----------------------------------------------------------------------
       - name: Add MSBuild to PATH (Windows)
         if: runner.os == 'Windows'
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v2.0.0
 
       - name: Set up MSVC environment (Windows)
         if: runner.os == 'Windows'
@@ -135,7 +188,7 @@ jobs:
       # Node.js 24  — required by newer AMBuild versions
       # -----------------------------------------------------------------------
       - name: Set up Node.js 24
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4.4.0
         with:
           node-version: '24'
 
@@ -143,7 +196,7 @@ jobs:
       # Python + AMBuild
       # -----------------------------------------------------------------------
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v5.6.0
         with:
           python-version: '3.11'
 
@@ -156,7 +209,7 @@ jobs:
       # Checkout & build
       # -----------------------------------------------------------------------
       - name: Fetch Metamod-P
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           path: metamod-p
           submodules: recursive
@@ -173,17 +226,17 @@ jobs:
       # -----------------------------------------------------------------------
       # Artifacts
       # -----------------------------------------------------------------------
-      - uses: benjlevesque/short-sha@v2.2
+      - uses: benjlevesque/short-sha@v3.0.0
         id: short-sha
 
       - name: Upload binary (AMBuild)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: metamod-p-ambuild-${{ matrix.os_short }}${{ matrix.artifact_suffix }}-${{ steps.short-sha.outputs.sha }}
           path: metamod-p/post/*
 
       - name: Upload debug symbols (AMBuild)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: metamod-p-ambuild-dbgsym-${{ matrix.os_short }}${{ matrix.artifact_suffix }}-${{ steps.short-sha.outputs.sha }}
           path: metamod-p/post/**/*.${{ matrix.dbg_ext }}
@@ -203,30 +256,51 @@ jobs:
       matrix:
         include:
           # ------------------------------------------------------------------
-          # Linux Release  (Makefile / GCC-7 / Ubuntu 18.04)
-          # The toplevel Makefile dispatches to subdirs defined in Config.mak.
-          # We target the metamod subdir directly; the .so lands in dlls/.
+          # Linux x86 Release  (Makefile / GCC-7 / Ubuntu 18.04)
+          # OPT=opt  →  optimised build, NDEBUG set, output to opt.linux_i386/
+          # do_dll_linux copies the final .so to ../dlls/metamod.so
           # ------------------------------------------------------------------
           - os_short: linux
             os_version: ubuntu-18.04
             build_type: release
             artifact_suffix: ""
-            # Passed as OPT= so they supplement rather than override the
-            # flags the metamod sub-Makefile already sets.
-            make_opt: "OPT=-O2"
-            make_extra_cppflags: ""
+            multilib: true
+            make_args: "OPT=opt"
 
           # ------------------------------------------------------------------
-          # Linux Fast  (Makefile / GCC-7 / Ubuntu 18.04)
-          # __BUILD_FAST_METAMOD__ matches the same define used by AMBuild
-          # and baked into the MSVC Fast configuration.
+          # Linux x86 Fast  (Makefile / GCC-7 / Ubuntu 18.04)
+          # OPT=opt-fast  →  OPT=opt + -D__BUILD_FAST_METAMOD__ (line 204 of
+          # the Makefile injects this automatically; no EXTRA_CPPFLAGS needed)
           # ------------------------------------------------------------------
           - os_short: linux
             os_version: ubuntu-18.04
             build_type: fast
             artifact_suffix: "-fast"
-            make_opt: "OPT=-O2"
-            make_extra_cppflags: "EXTRA_CPPFLAGS=-D__BUILD_FAST_METAMOD__"
+            multilib: true
+            make_args: "OPT=opt-fast"
+
+          # ------------------------------------------------------------------
+          # Linux AMD64 Release  (Makefile / GCC / Ubuntu 22.04)
+          # TARGET=amd64  →  CC="gcc -m64", CCOPT_ARCH=-march=x86-64,
+          # output to opt.linux_amd64/metamod.so
+          # No i386 multilib needed; native 64-bit host and target.
+          # ------------------------------------------------------------------
+          - os_short: linux-amd64
+            os_version: ubuntu-22.04
+            build_type: release
+            artifact_suffix: ""
+            multilib: false
+            make_args: "OPT=opt TARGET=amd64"
+
+          # ------------------------------------------------------------------
+          # Linux AMD64 Fast  (Makefile / GCC / Ubuntu 22.04)
+          # ------------------------------------------------------------------
+          - os_short: linux-amd64
+            os_version: ubuntu-22.04
+            build_type: fast
+            artifact_suffix: "-fast"
+            multilib: false
+            make_args: "OPT=opt-fast TARGET=amd64"
 
           # ------------------------------------------------------------------
           # Windows Release  (MSBuild / MSVC / Windows 2022)
@@ -238,6 +312,7 @@ jobs:
             os_version: windows-2022
             build_type: release
             artifact_suffix: ""
+            multilib: false
             msbuild_config: "Release"
             msbuild_platform: "Win32"
 
@@ -251,6 +326,7 @@ jobs:
             os_version: windows-2022
             build_type: fast
             artifact_suffix: "-fast"
+            multilib: false
             msbuild_config: "Fast"
             msbuild_platform: "Win32"
 
@@ -258,12 +334,20 @@ jobs:
       # -----------------------------------------------------------------------
       # Linux setup
       # -----------------------------------------------------------------------
-      - name: Install dependencies (Linux)
-        if: runner.os == 'Linux'
+      - name: Install dependencies (Linux x86)
+        if: runner.os == 'Linux' && matrix.multilib == true
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
           sudo apt-get install -y gcc g++ gcc-multilib g++-multilib make
+          echo "CC=gcc"   >> $GITHUB_ENV
+          echo "CXX=g++"  >> $GITHUB_ENV
+
+      - name: Install dependencies (Linux AMD64)
+        if: runner.os == 'Linux' && matrix.multilib == false
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc g++ make
           echo "CC=gcc"   >> $GITHUB_ENV
           echo "CXX=g++"  >> $GITHUB_ENV
 
@@ -272,13 +356,13 @@ jobs:
       # -----------------------------------------------------------------------
       - name: Add MSBuild to PATH (Windows)
         if: runner.os == 'Windows'
-        uses: microsoft/setup-msbuild@v2
+        uses: microsoft/setup-msbuild@v2.0.0
 
       # -----------------------------------------------------------------------
       # Checkout
       # -----------------------------------------------------------------------
       - name: Fetch Metamod-P
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
         with:
           path: metamod-p
           submodules: recursive
@@ -292,19 +376,22 @@ jobs:
         run: |
           mkdir -p native_out
 
-          # The toplevel Makefile loops over $(SUBDIRS) from Config.mak.
-          # Drive the metamod subdir directly so we build only what we need.
-          # OPT and EXTRA_CPPFLAGS are passed on the command line so they
-          # supplement the sub-Makefile's own flags without clobbering them.
-          make -C metamod \
-            ${{ matrix.make_opt }} \
-            ${{ matrix.make_extra_cppflags }} \
-            -j$(nproc)
+          # Drive the metamod subdir directly (the toplevel Makefile just
+          # loops over $(SUBDIRS) from Config.mak; we only need metamod).
+          #
+          # The Makefile's OPT= and TARGET= variables control everything:
+          #   OPT=opt        → release build  (NDEBUG, -O2, LTO)
+          #   OPT=opt-fast   → fast build     (above + __BUILD_FAST_METAMOD__)
+          #   TARGET=amd64   → 64-bit         (CC="gcc -m64", march=x86-64)
+          #   (default)      → 32-bit         (CC="gcc -m32", march=i686)
+          #
+          # do_dll_linux builds the .so and installs it to ../dlls/metamod.so
+          make -C metamod do_dll_linux ${{ matrix.make_args }} -j$(nproc)
 
-          # The toplevel clean target shows outputs go to dlls/ and dlls/debug/.
-          # Copy every .so and .dbg from there into our staging folder.
-          find dlls -name "*.so" -o -name "*.dbg" | \
-            xargs -I{} cp --parents {} native_out/ 2>/dev/null || true
+          # Collect the final .so from dlls/ into the staging folder.
+          # dlls/debug/ holds sanitizer builds (not built here).
+          find dlls -maxdepth 1 -name "*.so" | \
+            xargs -I{} cp {} native_out/ 2>/dev/null || true
 
       # -----------------------------------------------------------------------
       # Windows — MSBuild build
@@ -314,10 +401,11 @@ jobs:
         working-directory: metamod-p
         shell: cmd
         run: |
-          :: The .sln and .vcxproj both live in the metamod\ subdirectory.
-          :: OutDir is $(SolutionDir)$(Configuration)\ so outputs land at:
-          ::   metamod\Release\metamod.dll   (Release config)
-          ::   metamod\Fast\metamod.dll      (Fast config)
+          :: The .sln and .vcxproj both live in metamod\.
+          :: $(SolutionDir) resolves to the directory containing the .sln,
+          :: i.e. <repo>\metamod-p\metamod\, so OutDir expands to:
+          ::   <repo>\metamod-p\metamod\Release\metamod.dll
+          ::   <repo>\metamod-p\metamod\Fast\metamod.dll
           :: Release and Fast have GenerateDebugInformation=false → no PDB.
           msbuild metamod\metamod.sln ^
             /p:Configuration=${{ matrix.msbuild_config }} ^
@@ -326,32 +414,32 @@ jobs:
             /v:minimal
 
           mkdir native_out
-          xcopy /s /y metamod\${{ matrix.msbuild_config }}\*.dll native_out\ 2>nul || ver>nul
+          xcopy /s /y metamod\metamod\${{ matrix.msbuild_config }}\*.dll native_out\ 2>nul || ver>nul
           :: Collect PDBs too in case the config ever has them enabled.
-          xcopy /s /y metamod\${{ matrix.msbuild_config }}\*.pdb native_out\ 2>nul || ver>nul
+          xcopy /s /y metamod\metamod\${{ matrix.msbuild_config }}\*.pdb native_out\ 2>nul || ver>nul
 
       # -----------------------------------------------------------------------
       # Artifacts
       # -----------------------------------------------------------------------
-      - uses: benjlevesque/short-sha@v2.2
+      - uses: benjlevesque/short-sha@v3.0.0
         id: short-sha
 
       - name: Upload binary (Native)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: metamod-p-native-${{ matrix.os_short }}${{ matrix.artifact_suffix }}-${{ steps.short-sha.outputs.sha }}
           path: metamod-p/native_out/*
 
       - name: Upload debug symbols (Native / Linux)
         if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: metamod-p-native-dbgsym-${{ matrix.os_short }}${{ matrix.artifact_suffix }}-${{ steps.short-sha.outputs.sha }}
           path: metamod-p/native_out/**/*.dbg
 
       - name: Upload debug symbols (Native / Windows)
         if: runner.os == 'Windows'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.2
         with:
           name: metamod-p-native-dbgsym-${{ matrix.os_short }}${{ matrix.artifact_suffix }}-${{ steps.short-sha.outputs.sha }}
           path: metamod-p/native_out/**/*.pdb

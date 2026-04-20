@@ -2,7 +2,33 @@
 # vim: set sts=4 ts=8 sw=4 tw=99 et ft=python:
 import os, sys
 
-builder.cxx = builder.DetectCxx(target_arch = 'x86')
+# ---------------------------------------------------------------------------
+# Architecture detection
+# ---------------------------------------------------------------------------
+# The target architecture is driven by the AM_ARCH environment variable,
+# which is set by the CI workflow (or by the developer on the command line).
+# Supported values: 'x86' (32-bit) and 'x86_64' (64-bit AMD64).
+# Defaults to 'x86' for backwards compatibility with GoldSrc servers that
+# still run the 32-bit HLDS binary.
+#
+# Note: Valve shipped an hlds_amd64 binary and 64-bit game DLLs (e.g.
+# cs_amd64.so) around 2006-2007.  While that branch was never officially
+# supported long-term, some servers still run it, and some plugin authors
+# maintain AMD64 compatibility.  Ubuntu/Debian have also dropped first-class
+# i386 support in recent releases, making a native AMD64 build preferable on
+# modern distros.
+# ---------------------------------------------------------------------------
+am_arch = os.environ.get('AM_ARCH', 'x86')
+if am_arch not in ('x86', 'x86_64'):
+  raise Exception('AM_ARCH must be x86 or x86_64, got: ' + am_arch)
+
+is_x86    = (am_arch == 'x86')
+is_amd64  = (am_arch == 'x86_64')
+
+# Map our arch name to what AMBuild's DetectCxx expects.
+target_arch = 'x86' if is_x86 else 'x86_64'
+
+builder.cxx = builder.DetectCxx(target_arch = target_arch)
 
 # Include search paths
 hlsdk_path = os.path.join(builder.currentSourcePath, 'hlsdk')
@@ -26,12 +52,18 @@ if builder.options.extra_cppflags:
 if builder.cxx.target.platform == 'linux':
   # Linux defines
   builder.cxx.defines += ['_LINUX', 'POSIX', 'LINUX', 'linux', '_FORTIFY_SOURCE=2']
-  # Linux compiler C flags
+  # Linux compiler C flags (shared between x86 and AMD64)
   builder.cxx.cflags += [
     '-pipe',
     '-msse',
     '-msse2',
-    '-mfpmath=sse',
+    # -mfpmath=sse is only meaningful on x86 where the default FPU is x87.
+    # On x86_64 SSE2 is always the FP unit so the flag is redundant (and
+    # some GCC versions warn about it).
+  ]
+  if is_x86:
+    builder.cxx.cflags += ['-mfpmath=sse']
+  builder.cxx.cflags += [
     '-fno-strict-aliasing',
     '-fno-exceptions',
     '-fno-rtti',
@@ -61,8 +93,12 @@ if builder.cxx.target.platform == 'linux':
     '-Wno-uninitialized',
     '-Wno-unused',
     '-Wno-switch',
-    '-m32',
   ]
+  # Architecture word-size flag
+  if is_x86:
+    builder.cxx.cflags += ['-m32']
+  else:
+    builder.cxx.cflags += ['-m64']
   # GCC-specific warning suppressions
   if builder.cxx.like('gcc'):
     builder.cxx.cflags += [
@@ -85,10 +121,12 @@ if builder.cxx.target.platform == 'linux':
     '-Wno-write-strings',
     '-std=c++17',
   ]
-  # TODO: Not important but maybe add AMD64 -m64 compile flag
   # Linux linker flags
+  if is_x86:
+    builder.cxx.linkflags += ['-m32']
+  else:
+    builder.cxx.linkflags += ['-m64']
   builder.cxx.linkflags += [
-    '-m32',
     '-ldl',
     '-lm',
     '-Wl,--gc-sections',
@@ -122,6 +160,8 @@ elif builder.cxx.target.platform == 'windows':
     '/GR-',
   ]
   # Windows linker flags
+  # /MACHINE reflects the target word size; Win32 AMBuild builds are always
+  # x86 since there is no 64-bit GoldSrc Windows engine binary.
   builder.cxx.linkflags += [
     '/EXPORT:GiveFnptrsToDll=_GiveFnptrsToDll@8,@1',
     '/SECTION:.data,RW',
@@ -146,7 +186,7 @@ if builder.options.optimize:
       '-Wl,-z,noexecstack',
     ]
   elif builder.cxx.target.platform == 'windows':
-    # Windows optimization flags - /Ob2 needs to be after /O2, enables aggressive function inling -caxanga334
+    # Windows optimization flags - /Ob2 needs to be after /O2, enables aggressive function inlining -caxanga334
     builder.cxx.cflags += [
       '/O2',
       '/Ob2',
