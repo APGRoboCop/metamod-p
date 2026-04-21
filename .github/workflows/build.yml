@@ -31,12 +31,6 @@ on: ["push", "workflow_dispatch"]
 #   action — v2.2 runs on deprecated Node 20 and v3.0.0 was never published.
 # ---------------------------------------------------------------------------
 
-# Force all actions to run on Node.js 24.
-# The pinned action versions (checkout, upload-artifact, setup-msbuild, etc.)
-# were built against Node 20 but GitHub will force Node 24 from June 2026.
-# Setting this env var opts in now and silences all deprecation warnings.
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 # Skip build when commit message contains '[ci skip]'
 defaults:
@@ -167,6 +161,60 @@ jobs:
             artifact_suffix: "-fast"
             configure_flags: "--symbol-files --enable-optimize --extra-cppflags=-D__BUILD_FAST_METAMOD__"
 
+          # ------------------------------------------------------------------
+          # Linux x86 Debug  (AMBuild / GCC-7 / Docker ubuntu:18.04)
+          # Produces a debug .so with -g3 -ggdb3 -O0 + ASan/UBSan/LSan.
+          # No --enable-optimize; AMBuildScript debug path sets these flags.
+          # ------------------------------------------------------------------
+          - os_short: linux
+            os_version: ubuntu-22.04
+            container: ubuntu:18.04
+            package_ext: tar.gz
+            dbg_ext: dbg
+            cc: gcc
+            cxx: g++
+            vs_arch: unused
+            am_arch: x86
+            multilib: true
+            build_type: debug
+            artifact_suffix: "-debug"
+            configure_flags: "--symbol-files --enable-debug"
+
+          # ------------------------------------------------------------------
+          # Linux AMD64 Debug  (AMBuild / GCC / ubuntu-22.04)
+          # ------------------------------------------------------------------
+          - os_short: linux-amd64
+            os_version: ubuntu-22.04
+            container: ""
+            package_ext: tar.gz
+            dbg_ext: dbg
+            cc: gcc
+            cxx: g++
+            vs_arch: unused
+            am_arch: x86_64
+            multilib: false
+            build_type: debug
+            artifact_suffix: "-debug"
+            configure_flags: "--symbol-files --enable-debug --target-arch=x86_64"
+
+          # ------------------------------------------------------------------
+          # Windows Debug  (AMBuild / MSVC / windows-2022)
+          # /Od /RTC1 /MDd with debug info; no WPO.
+          # ------------------------------------------------------------------
+          - os_short: win32
+            os_version: windows-2022
+            container: ""
+            package_ext: zip
+            dbg_ext: pdb
+            cc: not-used
+            cxx: not-used
+            vs_arch: x32
+            am_arch: x86
+            multilib: false
+            build_type: debug
+            artifact_suffix: "-debug"
+            configure_flags: "--symbol-files --enable-debug"
+
     steps:
       # -----------------------------------------------------------------------
       # Linux x86 setup (inside ubuntu:18.04 container)
@@ -199,7 +247,7 @@ jobs:
       # -----------------------------------------------------------------------
       - name: Add MSBuild to PATH (Windows)
         if: runner.os == 'Windows'
-        uses: microsoft/setup-msbuild@v2.0.0
+        uses: microsoft/setup-msbuild@v3
 
       - name: Set up MSVC environment (Windows)
         if: runner.os == 'Windows'
@@ -216,7 +264,7 @@ jobs:
       # Node.js 24  — required by newer AMBuild versions
       # -----------------------------------------------------------------------
       - name: Set up Node.js 24
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@v5
         with:
           node-version: '24'
 
@@ -224,7 +272,7 @@ jobs:
       # Python + AMBuild
       # -----------------------------------------------------------------------
       - name: Set up Python
-        uses: actions/setup-python@v5.6.0
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
@@ -237,7 +285,7 @@ jobs:
       # Checkout & build
       # -----------------------------------------------------------------------
       - name: Fetch Metamod-P
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
         with:
           path: metamod-p
           submodules: recursive
@@ -257,13 +305,13 @@ jobs:
       # No third-party short-sha action is needed or used.
       # -----------------------------------------------------------------------
       - name: Upload binary (AMBuild)
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v6
         with:
           name: metamod-p-ambuild-${{ matrix.os_short }}${{ matrix.artifact_suffix }}-${{ github.sha }}
           path: metamod-p/post/*
 
       - name: Upload debug symbols (AMBuild)
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v6
         with:
           name: metamod-p-ambuild-dbgsym-${{ matrix.os_short }}${{ matrix.artifact_suffix }}-${{ github.sha }}
           path: metamod-p/post/**/*.${{ matrix.dbg_ext }}
@@ -366,6 +414,44 @@ jobs:
             msbuild_config: "Fast"
             msbuild_platform: "Win32"
 
+          # ------------------------------------------------------------------
+          # Linux x86 Debug  (Makefile / GCC-7 / Docker ubuntu:18.04)
+          # Default OPT (no value) → debug build: -g3 -ggdb3 -O0 + sanitizers.
+          # Output goes to debug.linux_i386/ and ../dlls/debug/metamod.so
+          # ------------------------------------------------------------------
+          - os_short: linux
+            os_version: ubuntu-22.04
+            container: ubuntu:18.04
+            build_type: debug
+            artifact_suffix: "-debug"
+            multilib: true
+            make_args: ""
+
+          # ------------------------------------------------------------------
+          # Linux AMD64 Debug  (Makefile / GCC / ubuntu-22.04)
+          # ------------------------------------------------------------------
+          - os_short: linux-amd64
+            os_version: ubuntu-22.04
+            container: ""
+            build_type: debug
+            artifact_suffix: "-debug"
+            multilib: false
+            make_args: "TARGET=amd64"
+
+          # ------------------------------------------------------------------
+          # Windows Debug  (MSBuild / MSVC / windows-2022)
+          # Debug|Win32 config: /Od /RTC1 /MDd /ZI, GenerateDebugInformation=true
+          # OutDir → metamod\Debug\ → produces metamod.dll + metamod.pdb
+          # ------------------------------------------------------------------
+          - os_short: win32
+            os_version: windows-2022
+            container: ""
+            build_type: debug
+            artifact_suffix: "-debug"
+            multilib: false
+            msbuild_config: "Debug"
+            msbuild_platform: "Win32"
+
     steps:
       # -----------------------------------------------------------------------
       # Linux x86 setup (inside ubuntu:18.04 container, no sudo)
@@ -396,13 +482,13 @@ jobs:
       # -----------------------------------------------------------------------
       - name: Add MSBuild to PATH (Windows)
         if: runner.os == 'Windows'
-        uses: microsoft/setup-msbuild@v2.0.0
+        uses: microsoft/setup-msbuild@v3
 
       # -----------------------------------------------------------------------
       # Checkout
       # -----------------------------------------------------------------------
       - name: Fetch Metamod-P
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v5
         with:
           path: metamod-p
           submodules: recursive
@@ -426,11 +512,13 @@ jobs:
           #   (default)      → 32-bit         (CC="gcc -m32", march=i686)
           #
           # do_dll_linux builds the .so and installs it to ../dlls/metamod.so
+          # (or ../dlls/debug/metamod.so for the debug OPT= default build).
           make -C metamod do_dll_linux ${{ matrix.make_args }} -j$(nproc)
 
-          # Collect the final .so from dlls/ (dlls/debug/ is for sanitizer
-          # builds only and is not produced by OPT=opt or OPT=opt-fast).
-          find dlls -maxdepth 1 -name "*.so" | \
+          # Collect the final .so — release/fast land in dlls/, debug lands
+          # in dlls/debug/ (the Makefile sets DLLS_DIR := $(DLLS_DIR)/debug
+          # when no OPT is specified).
+          find dlls -name "*.so" | \
             xargs -I{} cp {} native_out/ 2>/dev/null || true
 
       # -----------------------------------------------------------------------
@@ -453,25 +541,26 @@ jobs:
             /m ^
             /v:minimal
 
-          mkdir native_out
+          mkdir native_out 2>nul || ver>nul
           :: working-directory is metamod-p\ so the .sln is at metamod\metamod.sln
           :: $(SolutionDir) = metamod-p\metamod\ → OutDir = metamod-p\metamod\<config>\
-          xcopy /s /y metamod\${{ matrix.msbuild_config }}\*.dll native_out\ 2>nul || ver>nul
-          :: Collect PDBs too in case the config ever has them enabled.
-          xcopy /s /y metamod\${{ matrix.msbuild_config }}\*.pdb native_out\ 2>nul || ver>nul
+          :: Release/Fast: no PDB (GenerateDebugInformation=false)
+          :: Debug: full PDB at metamod\Debug\metamod.pdb
+          xcopy /y metamod\${{ matrix.msbuild_config }}\metamod.dll native_out\ 2>nul || ver>nul
+          xcopy /y metamod\${{ matrix.msbuild_config }}\metamod.pdb native_out\ 2>nul || ver>nul
 
       # -----------------------------------------------------------------------
       # Artifacts
       # -----------------------------------------------------------------------
       - name: Upload binary (Native)
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v6
         with:
           name: metamod-p-native-${{ matrix.os_short }}${{ matrix.artifact_suffix }}-${{ github.sha }}
           path: metamod-p/native_out/*
 
       - name: Upload debug symbols (Native / Linux)
         if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v6
         with:
           name: metamod-p-native-dbgsym-${{ matrix.os_short }}${{ matrix.artifact_suffix }}-${{ github.sha }}
           path: metamod-p/native_out/**/*.dbg
@@ -479,7 +568,7 @@ jobs:
 
       - name: Upload debug symbols (Native / Windows)
         if: runner.os == 'Windows'
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v6
         with:
           name: metamod-p-native-dbgsym-${{ matrix.os_short }}${{ matrix.artifact_suffix }}-${{ github.sha }}
           path: metamod-p/native_out/**/*.pdb
