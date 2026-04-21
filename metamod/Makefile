@@ -186,9 +186,13 @@ else
 	CCOPT_ARCH = -march=i686 -mtune=generic
 endif
 
-# debugging; halt on warnings
-CCDEBUG = -fsanitize=address -fsanitize=undefined -fsanitize=leak
-CCDEBUG += -ggdb3 -g3
+# debugging
+# Note: -fsanitize=address/undefined/leak are intentionally omitted.
+# Metamod-P is a shared library loaded by HLDS, which is not itself
+# instrumented with ASan/UBSan.  Mixing an instrumented .so into an
+# uninstrumented host binary causes a crash on load.  Use -g3/-ggdb3
+# and -O0 for debug symbols and step-through debugging only. [APG]RoboCop[CL]
+CCDEBUG = -ggdb3 -g3 -O0
 
 
 #############################################################################

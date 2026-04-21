@@ -207,8 +207,13 @@ if builder.options.debug:
   # Shared debug definitions
   builder.cxx.defines += ['DEBUG', '_DEBUG']
   if builder.cxx.target.platform == 'linux':
-    # Linux debug flags
-    builder.cxx.cflags += ['-g3', '-O0', '-fsanitize=address', '-fsanitize=undefined', '-fsanitize=leak']
+    # Linux debug flags.
+    # Note: -fsanitize=address/undefined/leak are intentionally omitted.
+    # Metamod-P is a shared library loaded by HLDS, which is not itself
+    # instrumented with ASan/UBSan.  Mixing an instrumented .so into an
+    # uninstrumented host binary causes a crash on load.  Use -g3 -O0 for
+    # debug symbols and step-through debugging only. [APG]RoboCop[CL]
+    builder.cxx.cflags += ['-g3', '-O0']
   elif builder.cxx.target.platform == 'windows':
     # Windows debug flags
     builder.cxx.cflags += ['/Od', '/RTC1', '/MDd']

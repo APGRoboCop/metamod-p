@@ -8,12 +8,12 @@ on: ["push", "workflow_dispatch"]
 #   AMBuild jobs  (build_ambuild):
 #     - Linux x86    (ubuntu-22.04 runner, GCC, 32-bit, gcc-multilib)
 #     - Linux AMD64  (ubuntu-22.04 runner, GCC, 64-bit)
-#     - Win32        (windows-2022 runner, MSVC, 32-bit)
+#     - Win32        (windows-latest runner, MSVC, 32-bit)
 #
 #   Native jobs   (build_native):
 #     - Linux x86    (ubuntu-22.04 runner, GCC, 32-bit, gcc-multilib)
 #     - Linux AMD64  (ubuntu-22.04 runner, GCC, 64-bit)
-#     - Win32        (windows-2022 runner, MSVC, 32-bit)
+#     - Win32        (windows-latest runner, MSVC, 32-bit)
 #
 # Why ubuntu-22.04 for all Linux builds:
 #   Node 24 (used by actions/checkout, upload-artifact, etc.) requires
@@ -116,10 +116,10 @@ jobs:
             configure_flags: "--symbol-files --enable-optimize --target-arch=x86_64 --extra-cppflags=-D__BUILD_FAST_METAMOD__"
 
           # ------------------------------------------------------------------
-          # Windows Release  (AMBuild / MSVC / windows-2022)
+          # Windows Release  (AMBuild / MSVC / windows-latest)
           # ------------------------------------------------------------------
           - os_short: win32
-            os_version: windows-2022
+            os_version: windows-latest
             package_ext: zip
             dbg_ext: pdb
             cc: not-used
@@ -132,10 +132,10 @@ jobs:
             configure_flags: "--symbol-files --enable-optimize"
 
           # ------------------------------------------------------------------
-          # Windows Fast  (AMBuild / MSVC / windows-2022)
+          # Windows Fast  (AMBuild / MSVC / windows-latest)
           # ------------------------------------------------------------------
           - os_short: win32
-            os_version: windows-2022
+            os_version: windows-latest
             package_ext: zip
             dbg_ext: pdb
             cc: not-used
@@ -182,11 +182,11 @@ jobs:
             configure_flags: "--symbol-files --enable-debug --target-arch=x86_64"
 
           # ------------------------------------------------------------------
-          # Windows Debug  (AMBuild / MSVC / windows-2022)
+          # Windows Debug  (AMBuild / MSVC / windows-latest)
           # /Od /RTC1 /MDd with debug info; no WPO.
           # ------------------------------------------------------------------
           - os_short: win32
-            os_version: windows-2022
+            os_version: windows-latest
             package_ext: zip
             dbg_ext: pdb
             cc: not-used
@@ -207,9 +207,7 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          # libasan6 + libubsan1 required for -fsanitize=address/undefined/leak
-          # in debug builds on ubuntu-22.04 (GCC 11 runtime).
-          sudo apt-get install -y gcc g++ gcc-multilib g++-multilib libasan6 libubsan1
+          sudo apt-get install -y gcc g++ gcc-multilib g++-multilib
           echo "CC=${{ matrix.cc }}"   >> $GITHUB_ENV
           echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
 
@@ -220,9 +218,7 @@ jobs:
         if: runner.os == 'Linux' && matrix.multilib == false
         run: |
           sudo apt-get update
-          # libasan6 + libubsan1 required for -fsanitize=address/undefined/leak
-          # in debug builds on ubuntu-22.04 (GCC 11 runtime).
-          sudo apt-get install -y gcc g++ libasan6 libubsan1
+          sudo apt-get install -y gcc g++
           echo "CC=${{ matrix.cc }}"   >> $GITHUB_ENV
           echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
 
@@ -362,13 +358,13 @@ jobs:
             make_args: "OPT=opt-fast TARGET=amd64"
 
           # ------------------------------------------------------------------
-          # Windows Release  (MSBuild / MSVC / windows-2022)
+          # Windows Release  (MSBuild / MSVC / windows-latest)
           # .sln and .vcxproj both live in metamod\.
           # OutDir = $(SolutionDir)$(Configuration)\ → metamod\Release\
           # Release config has GenerateDebugInformation=false → no PDB.
           # ------------------------------------------------------------------
           - os_short: win32
-            os_version: windows-2022
+            os_version: windows-latest
             build_type: release
             artifact_suffix: ""
             multilib: false
@@ -376,13 +372,13 @@ jobs:
             msbuild_platform: "Win32"
 
           # ------------------------------------------------------------------
-          # Windows Fast  (MSBuild / MSVC / windows-2022)
+          # Windows Fast  (MSBuild / MSVC / windows-latest)
           # Fast is a first-class .sln configuration; __BUILD_FAST_METAMOD__
           # is already in its PreprocessorDefinitions — no injection needed.
           # OutDir → metamod\Fast\
           # ------------------------------------------------------------------
           - os_short: win32
-            os_version: windows-2022
+            os_version: windows-latest
             build_type: fast
             artifact_suffix: "-fast"
             multilib: false
@@ -412,12 +408,12 @@ jobs:
             make_args: "TARGET=amd64"
 
           # ------------------------------------------------------------------
-          # Windows Debug  (MSBuild / MSVC / windows-2022)
+          # Windows Debug  (MSBuild / MSVC / windows-latest)
           # Debug|Win32 config: /Od /RTC1 /MDd /ZI, GenerateDebugInformation=true
           # OutDir → metamod\Debug\ → produces metamod.dll + metamod.pdb
           # ------------------------------------------------------------------
           - os_short: win32
-            os_version: windows-2022
+            os_version: windows-latest
             build_type: debug
             artifact_suffix: "-debug"
             multilib: false
@@ -433,9 +429,7 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          # libasan6 + libubsan1 required for -fsanitize=address/undefined/leak
-          # in debug builds (GCC 11 runtime on ubuntu-22.04).
-          sudo apt-get install -y gcc g++ gcc-multilib g++-multilib libasan6 libubsan1
+          sudo apt-get install -y gcc g++ gcc-multilib g++-multilib
           echo "CC=gcc"  >> $GITHUB_ENV
           echo "CXX=g++" >> $GITHUB_ENV
 
@@ -446,10 +440,8 @@ jobs:
         if: runner.os == 'Linux' && matrix.multilib == false
         run: |
           sudo apt-get update
-          # libasan6 + libubsan1 are required for -fsanitize=address/undefined/leak
-          # in debug builds. gcc and g++ pull in the right runtime stubs but the
           # shared library packages must be present for the linker to resolve them.
-          sudo apt-get install -y gcc g++ make libasan6 libubsan1
+          sudo apt-get install -y gcc g++ make
           echo "CC=gcc"  >> $GITHUB_ENV
           echo "CXX=g++" >> $GITHUB_ENV
 
@@ -517,7 +509,6 @@ jobs:
           msbuild metamod\metamod.sln ^
             /p:Configuration=${{ matrix.msbuild_config }} ^
             /p:Platform=${{ matrix.msbuild_platform }} ^
-            /p:PlatformToolset=v145 ^
             /m ^
             /v:normal
 
