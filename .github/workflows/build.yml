@@ -238,7 +238,9 @@ jobs:
         if: runner.os == 'Linux' && matrix.multilib == false
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc g++
+          # libasan6 + libubsan1 required for -fsanitize=address/undefined/leak
+          # in debug builds on ubuntu-22.04 (GCC 11 runtime).
+          sudo apt-get install -y gcc g++ libasan6 libubsan1
           echo "CC=${{ matrix.cc }}"   >> $GITHUB_ENV
           echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
 
@@ -473,7 +475,10 @@ jobs:
         if: runner.os == 'Linux' && matrix.multilib == false
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc g++ make
+          # libasan6 + libubsan1 are required for -fsanitize=address/undefined/leak
+          # in debug builds. gcc and g++ pull in the right runtime stubs but the
+          # shared library packages must be present for the linker to resolve them.
+          sudo apt-get install -y gcc g++ make libasan6 libubsan1
           echo "CC=gcc"  >> $GITHUB_ENV
           echo "CXX=g++" >> $GITHUB_ENV
 
@@ -530,24 +535,34 @@ jobs:
         shell: cmd
         run: |
           :: The .sln and .vcxproj both live in metamod\.
-          :: $(SolutionDir) resolves to the directory containing the .sln,
-          :: i.e. <repo>\metamod-p\metamod\, so OutDir expands to:
-          ::   <repo>\metamod-p\metamod\Release\metamod.dll
-          ::   <repo>\metamod-p\metamod\Fast\metamod.dll
-          :: Release and Fast have GenerateDebugInformation=false → no PDB.
+          :: working-directory is metamod-p so we invoke: msbuild metamod\metamod.sln
+          :: $(SolutionDir) = <ws>\metamod-p\metamod\ (folder containing the .sln)
+          :: OutDir = $(SolutionDir)$(Configuration)\ e.g. metamod-p\metamod\Release\
+          :: /v:normal so build errors are visible in the Actions log.
           msbuild metamod\metamod.sln ^
             /p:Configuration=${{ matrix.msbuild_config }} ^
             /p:Platform=${{ matrix.msbuild_platform }} ^
             /m ^
-            /v:minimal
+            /v:normal
 
+          :: Show what MSBuild actually produced so path issues are visible.
+          echo --- Build output tree ---
+          dir /s /b metamod\${{ matrix.msbuild_config }}\* 2>nul || echo (directory not found)
+
+          :: Copy outputs into the staging folder.
+          :: Release/Fast: GenerateDebugInformation=false → no .pdb
+          :: Debug:        GenerateDebugInformation=true  → .pdb present
           mkdir native_out 2>nul || ver>nul
-          :: working-directory is metamod-p\ so the .sln is at metamod\metamod.sln
-          :: $(SolutionDir) = metamod-p\metamod\ → OutDir = metamod-p\metamod\<config>\
-          :: Release/Fast: no PDB (GenerateDebugInformation=false)
-          :: Debug: full PDB at metamod\Debug\metamod.pdb
-          xcopy /y metamod\${{ matrix.msbuild_config }}\metamod.dll native_out\ 2>nul || ver>nul
-          xcopy /y metamod\${{ matrix.msbuild_config }}\metamod.pdb native_out\ 2>nul || ver>nul
+          if exist metamod\${{ matrix.msbuild_config }}\metamod.dll (
+            copy /y metamod\${{ matrix.msbuild_config }}\metamod.dll native_out\
+          ) else (
+            echo ERROR: metamod.dll not found at expected path
+            dir /s /b metamod\ 2>nul
+            exit /b 1
+          )
+          if exist metamod\${{ matrix.msbuild_config }}\metamod.pdb (
+            copy /y metamod\${{ matrix.msbuild_config }}\metamod.pdb native_out\
+          )
 
       # -----------------------------------------------------------------------
       # Artifacts
