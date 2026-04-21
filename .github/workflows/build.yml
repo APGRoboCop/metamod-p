@@ -31,6 +31,13 @@ on: ["push", "workflow_dispatch"]
 #   action — v2.2 runs on deprecated Node 20 and v3.0.0 was never published.
 # ---------------------------------------------------------------------------
 
+# Force all actions to run on Node.js 24.
+# The pinned action versions (checkout, upload-artifact, setup-msbuild, etc.)
+# were built against Node 20 but GitHub will force Node 24 from June 2026.
+# Setting this env var opts in now and silences all deprecation warnings.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 # Skip build when commit message contains '[ci skip]'
 defaults:
   run:
@@ -260,6 +267,7 @@ jobs:
         with:
           name: metamod-p-ambuild-dbgsym-${{ matrix.os_short }}${{ matrix.artifact_suffix }}-${{ github.sha }}
           path: metamod-p/post/**/*.${{ matrix.dbg_ext }}
+          if-no-files-found: ignore
 
 
 # ===========================================================================
@@ -446,9 +454,11 @@ jobs:
             /v:minimal
 
           mkdir native_out
-          xcopy /s /y metamod\metamod\${{ matrix.msbuild_config }}\*.dll native_out\ 2>nul || ver>nul
+          :: working-directory is metamod-p\ so the .sln is at metamod\metamod.sln
+          :: $(SolutionDir) = metamod-p\metamod\ → OutDir = metamod-p\metamod\<config>\
+          xcopy /s /y metamod\${{ matrix.msbuild_config }}\*.dll native_out\ 2>nul || ver>nul
           :: Collect PDBs too in case the config ever has them enabled.
-          xcopy /s /y metamod\metamod\${{ matrix.msbuild_config }}\*.pdb native_out\ 2>nul || ver>nul
+          xcopy /s /y metamod\${{ matrix.msbuild_config }}\*.pdb native_out\ 2>nul || ver>nul
 
       # -----------------------------------------------------------------------
       # Artifacts
@@ -465,6 +475,7 @@ jobs:
         with:
           name: metamod-p-native-dbgsym-${{ matrix.os_short }}${{ matrix.artifact_suffix }}-${{ github.sha }}
           path: metamod-p/native_out/**/*.dbg
+          if-no-files-found: ignore
 
       - name: Upload debug symbols (Native / Windows)
         if: runner.os == 'Windows'
@@ -472,3 +483,4 @@ jobs:
         with:
           name: metamod-p-native-dbgsym-${{ matrix.os_short }}${{ matrix.artifact_suffix }}-${{ github.sha }}
           path: metamod-p/native_out/**/*.pdb
+          if-no-files-found: ignore
