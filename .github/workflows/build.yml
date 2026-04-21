@@ -6,26 +6,23 @@ on: ["push", "workflow_dispatch"]
 # This workflow produces six separate artifact sets for comparison:
 #
 #   AMBuild jobs  (build_ambuild):
-#     - Linux x86    (Docker ubuntu:18.04 on ubuntu-22.04 runner, GCC-7, 32-bit)
+#     - Linux x86    (ubuntu-22.04 runner, GCC, 32-bit, gcc-multilib)
 #     - Linux AMD64  (ubuntu-22.04 runner, GCC, 64-bit)
 #     - Win32        (windows-2022 runner, MSVC, 32-bit)
 #
 #   Native jobs   (build_native):
-#     - Linux x86    (Docker ubuntu:18.04 on ubuntu-22.04 runner, GCC-7, 32-bit)
+#     - Linux x86    (ubuntu-22.04 runner, GCC, 32-bit, gcc-multilib)
 #     - Linux AMD64  (ubuntu-22.04 runner, GCC, 64-bit)
 #     - Win32        (windows-2022 runner, MSVC, 32-bit)
 #
-# Why Docker for 32-bit Linux builds:
-#   GitHub retired the ubuntu-18.04 runner image in April 2023.  To preserve
-#   the old glibc ABI (avoiding symbol-version mismatches when GoldSrc loads
-#   the plugin) we run the 32-bit jobs inside an ubuntu:18.04 Docker container
-#   on a modern ubuntu-22.04 runner.  The container provides GCC-7 and solid
-#   first-class i386/multilib support exactly as the retired image did.
-#
-# Why ubuntu-22.04 bare for AMD64 builds:
-#   No i386 multilib is needed — host and target word size are the same — and
-#   modern runners are fine for 64-bit GoldSrc engine deployments
-#   (hlds_amd64 / cs_amd64.so).
+# Why ubuntu-22.04 for all Linux builds:
+#   Node 24 (used by actions/checkout, upload-artifact, etc.) requires
+#   glibc 2.28+, but ubuntu:18.04 only provides glibc 2.27, making Node 24
+#   actions fail inside that container.  All Linux jobs therefore run on a
+#   bare ubuntu-22.04 runner.  For 32-bit builds, gcc-multilib/g++-multilib
+#   provide the i386 cross-compilation support.  The resulting .so will be
+#   linked against glibc 2.35 (ubuntu-22.04) rather than 2.27, which is
+#   acceptable for modern GoldSrc server deployments.
 #
 # short-sha: we use github.sha directly instead of the benjlevesque/short-sha
 #   action — v2.2 runs on deprecated Node 20 and v3.0.0 was never published.
@@ -46,10 +43,6 @@ jobs:
     name: "[AMBuild] ${{ matrix.build_type }} for ${{ matrix.os_short }}"
     runs-on: ${{ matrix.os_version }}
 
-    # Run 32-bit Linux jobs inside an Ubuntu 18.04 container for glibc
-    # compatibility. AMD64 and Windows jobs leave container empty (no-op).
-    container: ${{ matrix.container }}
-
     if: "!contains(github.event.head_commit.message, '[ci skip]')"
 
     strategy:
@@ -57,12 +50,10 @@ jobs:
       matrix:
         include:
           # ------------------------------------------------------------------
-          # Linux x86 Release  (AMBuild / GCC-7 / Docker ubuntu:18.04)
-          # Container provides GCC-7 + i386 multilib + glibc 2.27 ABI.
+          # Linux x86 Release  (AMBuild / GCC / ubuntu-22.04, gcc-multilib)
           # ------------------------------------------------------------------
           - os_short: linux
             os_version: ubuntu-22.04
-            container: ubuntu:18.04
             package_ext: tar.gz
             dbg_ext: dbg
             cc: gcc
@@ -75,11 +66,10 @@ jobs:
             configure_flags: "--symbol-files --enable-optimize"
 
           # ------------------------------------------------------------------
-          # Linux x86 Fast  (AMBuild / GCC-7 / Docker ubuntu:18.04)
+          # Linux x86 Fast  (AMBuild / GCC / ubuntu-22.04, gcc-multilib)
           # ------------------------------------------------------------------
           - os_short: linux
             os_version: ubuntu-22.04
-            container: ubuntu:18.04
             package_ext: tar.gz
             dbg_ext: dbg
             cc: gcc
@@ -93,12 +83,11 @@ jobs:
 
           # ------------------------------------------------------------------
           # Linux AMD64 Release  (AMBuild / GCC / ubuntu-22.04)
-          # No container needed — native 64-bit host and target.
+          # No container needed — native 64-bit, no multilib required.
           # Targets hlds_amd64 / cs_amd64.so deployments.
           # ------------------------------------------------------------------
           - os_short: linux-amd64
             os_version: ubuntu-22.04
-            container: ""
             package_ext: tar.gz
             dbg_ext: dbg
             cc: gcc
@@ -115,7 +104,6 @@ jobs:
           # ------------------------------------------------------------------
           - os_short: linux-amd64
             os_version: ubuntu-22.04
-            container: ""
             package_ext: tar.gz
             dbg_ext: dbg
             cc: gcc
@@ -132,7 +120,6 @@ jobs:
           # ------------------------------------------------------------------
           - os_short: win32
             os_version: windows-2022
-            container: ""
             package_ext: zip
             dbg_ext: pdb
             cc: not-used
@@ -149,7 +136,6 @@ jobs:
           # ------------------------------------------------------------------
           - os_short: win32
             os_version: windows-2022
-            container: ""
             package_ext: zip
             dbg_ext: pdb
             cc: not-used
@@ -162,13 +148,12 @@ jobs:
             configure_flags: "--symbol-files --enable-optimize --extra-cppflags=-D__BUILD_FAST_METAMOD__"
 
           # ------------------------------------------------------------------
-          # Linux x86 Debug  (AMBuild / GCC-7 / Docker ubuntu:18.04)
+          # Linux x86 Debug  (AMBuild / GCC / ubuntu-22.04, gcc-multilib)
           # Produces a debug .so with -g3 -ggdb3 -O0 + ASan/UBSan/LSan.
           # No --enable-optimize; AMBuildScript debug path sets these flags.
           # ------------------------------------------------------------------
           - os_short: linux
             os_version: ubuntu-22.04
-            container: ubuntu:18.04
             package_ext: tar.gz
             dbg_ext: dbg
             cc: gcc
@@ -185,7 +170,6 @@ jobs:
           # ------------------------------------------------------------------
           - os_short: linux-amd64
             os_version: ubuntu-22.04
-            container: ""
             package_ext: tar.gz
             dbg_ext: dbg
             cc: gcc
@@ -203,7 +187,6 @@ jobs:
           # ------------------------------------------------------------------
           - os_short: win32
             os_version: windows-2022
-            container: ""
             package_ext: zip
             dbg_ext: pdb
             cc: not-used
@@ -217,17 +200,16 @@ jobs:
 
     steps:
       # -----------------------------------------------------------------------
-      # Linux x86 setup (inside ubuntu:18.04 container)
-      # The container runs as root with no sudo available.
-      # python3, pip and git must be installed here as the container image
-      # does not include them, and setup-python/checkout need git.
+      # Linux x86 setup (ubuntu-22.04 runner, gcc-multilib for 32-bit cross)
       # -----------------------------------------------------------------------
       - name: Install dependencies (Linux x86)
         if: runner.os == 'Linux' && matrix.multilib == true
         run: |
-          dpkg --add-architecture i386
-          apt-get update
-          apt-get install -y gcc g++ gcc-multilib g++-multilib python3 python3-pip git
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          # libasan6 + libubsan1 required for -fsanitize=address/undefined/leak
+          # in debug builds on ubuntu-22.04 (GCC 11 runtime).
+          sudo apt-get install -y gcc g++ gcc-multilib g++-multilib libasan6 libubsan1
           echo "CC=${{ matrix.cc }}"   >> $GITHUB_ENV
           echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
 
@@ -327,9 +309,6 @@ jobs:
     name: "[Native] ${{ matrix.build_type }} for ${{ matrix.os_short }}"
     runs-on: ${{ matrix.os_version }}
 
-    # Same Docker container strategy as build_ambuild for 32-bit Linux rows.
-    container: ${{ matrix.container }}
-
     if: "!contains(github.event.head_commit.message, '[ci skip]')"
 
     strategy:
@@ -337,26 +316,24 @@ jobs:
       matrix:
         include:
           # ------------------------------------------------------------------
-          # Linux x86 Release  (Makefile / GCC-7 / Docker ubuntu:18.04)
+          # Linux x86 Release  (Makefile / GCC / ubuntu-22.04, gcc-multilib)
           # OPT=opt  →  optimised build, NDEBUG, output to opt.linux_i386/
           # do_dll_linux copies the final .so to ../dlls/metamod.so
           # ------------------------------------------------------------------
           - os_short: linux
             os_version: ubuntu-22.04
-            container: ubuntu:18.04
             build_type: release
             artifact_suffix: ""
             multilib: true
             make_args: "OPT=opt"
 
           # ------------------------------------------------------------------
-          # Linux x86 Fast  (Makefile / GCC-7 / Docker ubuntu:18.04)
+          # Linux x86 Fast  (Makefile / GCC / ubuntu-22.04, gcc-multilib)
           # OPT=opt-fast  →  OPT=opt + -D__BUILD_FAST_METAMOD__ (the Makefile
           # injects the define automatically; no EXTRA_CPPFLAGS needed)
           # ------------------------------------------------------------------
           - os_short: linux
             os_version: ubuntu-22.04
-            container: ubuntu:18.04
             build_type: fast
             artifact_suffix: "-fast"
             multilib: true
@@ -369,7 +346,6 @@ jobs:
           # ------------------------------------------------------------------
           - os_short: linux-amd64
             os_version: ubuntu-22.04
-            container: ""
             build_type: release
             artifact_suffix: ""
             multilib: false
@@ -380,7 +356,6 @@ jobs:
           # ------------------------------------------------------------------
           - os_short: linux-amd64
             os_version: ubuntu-22.04
-            container: ""
             build_type: fast
             artifact_suffix: "-fast"
             multilib: false
@@ -394,7 +369,6 @@ jobs:
           # ------------------------------------------------------------------
           - os_short: win32
             os_version: windows-2022
-            container: ""
             build_type: release
             artifact_suffix: ""
             multilib: false
@@ -409,7 +383,6 @@ jobs:
           # ------------------------------------------------------------------
           - os_short: win32
             os_version: windows-2022
-            container: ""
             build_type: fast
             artifact_suffix: "-fast"
             multilib: false
@@ -417,13 +390,12 @@ jobs:
             msbuild_platform: "Win32"
 
           # ------------------------------------------------------------------
-          # Linux x86 Debug  (Makefile / GCC-7 / Docker ubuntu:18.04)
+          # Linux x86 Debug  (Makefile / GCC / ubuntu-22.04, gcc-multilib)
           # Default OPT (no value) → debug build: -g3 -ggdb3 -O0 + sanitizers.
           # Output goes to debug.linux_i386/ and ../dlls/debug/metamod.so
           # ------------------------------------------------------------------
           - os_short: linux
             os_version: ubuntu-22.04
-            container: ubuntu:18.04
             build_type: debug
             artifact_suffix: "-debug"
             multilib: true
@@ -434,7 +406,6 @@ jobs:
           # ------------------------------------------------------------------
           - os_short: linux-amd64
             os_version: ubuntu-22.04
-            container: ""
             build_type: debug
             artifact_suffix: "-debug"
             multilib: false
@@ -447,7 +418,6 @@ jobs:
           # ------------------------------------------------------------------
           - os_short: win32
             os_version: windows-2022
-            container: ""
             build_type: debug
             artifact_suffix: "-debug"
             multilib: false
@@ -456,15 +426,16 @@ jobs:
 
     steps:
       # -----------------------------------------------------------------------
-      # Linux x86 setup (inside ubuntu:18.04 container, no sudo)
-      # git is required for actions/checkout to work inside the container.
+      # Linux x86 setup (ubuntu-22.04 runner, gcc-multilib for 32-bit cross)
       # -----------------------------------------------------------------------
       - name: Install dependencies (Linux x86)
         if: runner.os == 'Linux' && matrix.multilib == true
         run: |
-          dpkg --add-architecture i386
-          apt-get update
-          apt-get install -y gcc g++ gcc-multilib g++-multilib make git
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          # libasan6 + libubsan1 required for -fsanitize=address/undefined/leak
+          # in debug builds (GCC 11 runtime on ubuntu-22.04).
+          sudo apt-get install -y gcc g++ gcc-multilib g++-multilib libasan6 libubsan1
           echo "CC=gcc"  >> $GITHUB_ENV
           echo "CXX=g++" >> $GITHUB_ENV
 
@@ -516,6 +487,10 @@ jobs:
           #   TARGET=amd64   → 64-bit         (CC="gcc -m64", march=x86-64)
           #   (default)      → 32-bit         (CC="gcc -m32", march=i686)
           #
+          # Pre-create dlls/ and dlls/debug/ so the Makefile's $(DLLS_DIR)
+          # prerequisite doesn't fail when trying to mkdir into a missing parent.
+          mkdir -p dlls/debug
+
           # do_dll_linux builds the .so and installs it to ../dlls/metamod.so
           # (or ../dlls/debug/metamod.so for the debug OPT= default build).
           make -C metamod do_dll_linux ${{ matrix.make_args }} -j$(nproc)
@@ -542,6 +517,7 @@ jobs:
           msbuild metamod\metamod.sln ^
             /p:Configuration=${{ matrix.msbuild_config }} ^
             /p:Platform=${{ matrix.msbuild_platform }} ^
+            /p:PlatformToolset=v145 ^
             /m ^
             /v:normal
 
