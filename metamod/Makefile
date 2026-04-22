@@ -143,7 +143,7 @@ endif
 
 # Note! About gcc optimization levels.
 #  There is four optimization levels:
-#	-O0	No optimizations.
+#	-Og	No optimizations.
 #	-O1	Optimize for smaller size.
 #	-O2	Optimize for speed without increasing size (alot).
 #	-O3	Optimize for speed, can result much greater filesize.
@@ -171,7 +171,12 @@ CCOPT = $(CCO) $(CCOPT_ARCH) -fno-exceptions -fno-rtti
 # the ABI so these flags are implicit defaults, and GCC 12+ specifically warns
 # about -mfpmath=sse being redundant on x86_64.
 ifeq "$(TARGETTYPE)" "i386"
-CCO = -O2 -msse -msse2 -mfpmath=sse -pipe -flto=auto -fvisibility=hidden -fvisibility-inlines-hidden
+# -mincoming-stack-boundary=2: GoldSrc/HLDS was built with MSVC 6/7 which
+# only guaranteed 4-byte stack alignment.  Without this flag GCC may emit
+# movaps/movdqa with a 16-byte alignment assumption that the engine violates,
+# causing SIGBUS or silent data corruption.  AMD64 always aligns to 16 bytes
+# so this is i386-only. [APG]RoboCop[CL]
+CCO = -O2 -msse -msse2 -mfpmath=sse -mincoming-stack-boundary=2 -pipe -flto=auto -fvisibility=hidden -fvisibility-inlines-hidden
 else
 CCO = -O2 -pipe -flto=auto -fvisibility=hidden -fvisibility-inlines-hidden
 endif
@@ -191,8 +196,16 @@ endif
 # Metamod-P is a shared library loaded by HLDS, which is not itself
 # instrumented with ASan/UBSan.  Mixing an instrumented .so into an
 # uninstrumented host binary causes a crash on load.  Use -g3/-ggdb3
-# and -O0 for debug symbols and step-through debugging only. [APG]RoboCop[CL]
-CCDEBUG = -ggdb3 -g3 -O0
+# and -Og for debug symbols and step-through debugging only. [APG]RoboCop[CL]
+ifeq "$(TARGETTYPE)" "i386"
+# See CCO comment above — required for i386 GoldSrc compatibility.
+# -Og: optimise for debugging experience rather than disabling all opts (-O0).
+# Preserves source-line correspondence and variable liveness for GDB while
+# keeping the plugin fast enough to test on a live server.
+CCDEBUG = -ggdb3 -g3 -Og -mincoming-stack-boundary=2
+else
+CCDEBUG = -ggdb3 -g3 -Og
+endif
 
 
 #############################################################################

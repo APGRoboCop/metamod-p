@@ -62,7 +62,20 @@ if builder.cxx.target.platform == 'linux':
     # some GCC versions warn about it).
   ]
   if is_x86:
-    builder.cxx.cflags += ['-mfpmath=sse']
+    builder.cxx.cflags += [
+      '-mfpmath=sse',
+      # GoldSrc engine (HLDS) and many old mods were compiled with MSVC 6/7
+      # which only guaranteed 4-byte (2^2) stack alignment, not the standard
+      # x86 ABI 16-byte alignment.  Tell GCC to assume the worst so it never
+      # emits movaps/movdqa with an alignment assumption that HLDS can violate,
+      # which would cause a SIGBUS or silent data corruption.
+      # AMD64 always guarantees 16-byte alignment at call boundaries so this
+      # flag is x86-only. [APG]RoboCop[CL]
+      '-mincoming-stack-boundary=2',
+      # With -mincoming-stack-boundary=2 GCC knows casts may hit 4-byte
+      # alignment; -Wcast-align warnings become expected/intended, suppress.
+      '-Wno-cast-align',
+    ]
   builder.cxx.cflags += [
     '-fno-strict-aliasing',
     '-fno-exceptions',
@@ -219,9 +232,13 @@ if builder.options.debug:
     # Note: -fsanitize=address/undefined/leak are intentionally omitted.
     # Metamod-P is a shared library loaded by HLDS, which is not itself
     # instrumented with ASan/UBSan.  Mixing an instrumented .so into an
-    # uninstrumented host binary causes a crash on load.  Use -g3 -O0 for
+    # uninstrumented host binary causes a crash on load.  Use -g3 -Og for
     # debug symbols and step-through debugging only. [APG]RoboCop[CL]
-    builder.cxx.cflags += ['-g3', '-O0']
+    # -Og: optimise for debugging experience — preserves source-to-instruction
+    # correspondence and variable liveness for GDB while still being fast
+    # enough to run a live test server.  Preferable to -O0 which disables so
+    # much that it can mask real bugs and produces unreadably noisy disassembly.
+    builder.cxx.cflags += ['-g3', '-Og']
   elif builder.cxx.target.platform == 'windows':
     # Windows debug flags
     builder.cxx.cflags += ['/Od', '/RTC1', '/MDd']
