@@ -121,7 +121,11 @@ if builder.cxx.target.platform == 'linux':
     '-Wno-write-strings',
     '-std=c++17',
   ]
-  # Linux linker flags
+  # -fPIC is required for all shared library object files.
+  # AMBuild's Library() target should set this automatically but we add it
+  # explicitly to ensure it is always present regardless of AMBuild version.
+  builder.cxx.cflags += ['-fPIC']
+  # Linux linker flags (applied to all build types)
   if is_x86:
     builder.cxx.linkflags += ['-m32']
   else:
@@ -129,10 +133,7 @@ if builder.cxx.target.platform == 'linux':
   builder.cxx.linkflags += [
     '-ldl',
     '-lm',
-    '-Wl,--gc-sections',
     '-Wl,--as-needed',
-    '-Wl,--no-undefined',
-    '-Wl,--strip-all',
   ]
 elif builder.cxx.target.platform == 'windows':
   # Windows defines
@@ -179,9 +180,16 @@ if builder.options.optimize:
       '-flto=auto',
     ]
     # LTO must be in link flags too - [APG]RoboCop[CL]
+    # --gc-sections, --no-undefined, and --strip-all are release-only:
+    # --strip-all discards all debug symbols (wrong for debug builds) and
+    # --gc-sections with -fdata-sections/-ffunction-sections can interfere
+    # with GDB when sections are removed.
     builder.cxx.linkflags += [
       '-flto=auto',
       '-s',
+      '-Wl,--gc-sections',
+      '-Wl,--no-undefined',
+      '-Wl,--strip-all',
       '-Wl,-z,relro,-z,now',
       '-Wl,-z,noexecstack',
     ]

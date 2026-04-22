@@ -8,12 +8,12 @@ on: ["push", "workflow_dispatch"]
 #   AMBuild jobs  (build_ambuild):
 #     - Linux x86    (ubuntu-22.04 runner, GCC, 32-bit, gcc-multilib)
 #     - Linux AMD64  (ubuntu-22.04 runner, GCC, 64-bit)
-#     - Win32        (windows-latest runner, MSVC, 32-bit)
+#     - Win32        (windows-2022 runner, MSVC, 32-bit)
 #
 #   Native jobs   (build_native):
 #     - Linux x86    (ubuntu-22.04 runner, GCC, 32-bit, gcc-multilib)
 #     - Linux AMD64  (ubuntu-22.04 runner, GCC, 64-bit)
-#     - Win32        (windows-latest runner, MSVC, 32-bit)
+#     - Win32        (windows-2022 runner, MSVC, 32-bit)
 #
 # Why ubuntu-22.04 for all Linux builds:
 #   Node 24 (used by actions/checkout, upload-artifact, etc.) requires
@@ -116,10 +116,10 @@ jobs:
             configure_flags: "--symbol-files --enable-optimize --target-arch=x86_64 --extra-cppflags=-D__BUILD_FAST_METAMOD__"
 
           # ------------------------------------------------------------------
-          # Windows Release  (AMBuild / MSVC / windows-latest)
+          # Windows Release  (AMBuild / MSVC / windows-2022)
           # ------------------------------------------------------------------
           - os_short: win32
-            os_version: windows-latest
+            os_version: windows-2022
             package_ext: zip
             dbg_ext: pdb
             cc: not-used
@@ -132,10 +132,10 @@ jobs:
             configure_flags: "--symbol-files --enable-optimize"
 
           # ------------------------------------------------------------------
-          # Windows Fast  (AMBuild / MSVC / windows-latest)
+          # Windows Fast  (AMBuild / MSVC / windows-2022)
           # ------------------------------------------------------------------
           - os_short: win32
-            os_version: windows-latest
+            os_version: windows-2022
             package_ext: zip
             dbg_ext: pdb
             cc: not-used
@@ -182,11 +182,11 @@ jobs:
             configure_flags: "--symbol-files --enable-debug --target-arch=x86_64"
 
           # ------------------------------------------------------------------
-          # Windows Debug  (AMBuild / MSVC / windows-latest)
+          # Windows Debug  (AMBuild / MSVC / windows-2022)
           # /Od /RTC1 /MDd with debug info; no WPO.
           # ------------------------------------------------------------------
           - os_short: win32
-            os_version: windows-latest
+            os_version: windows-2022
             package_ext: zip
             dbg_ext: pdb
             cc: not-used
@@ -358,13 +358,13 @@ jobs:
             make_args: "OPT=opt-fast TARGET=amd64"
 
           # ------------------------------------------------------------------
-          # Windows Release  (MSBuild / MSVC / windows-latest)
+          # Windows Release  (MSBuild / MSVC / windows-2022)
           # .sln and .vcxproj both live in metamod\.
           # OutDir = $(SolutionDir)$(Configuration)\ → metamod\Release\
           # Release config has GenerateDebugInformation=false → no PDB.
           # ------------------------------------------------------------------
           - os_short: win32
-            os_version: windows-latest
+            os_version: windows-2022
             build_type: release
             artifact_suffix: ""
             multilib: false
@@ -372,13 +372,13 @@ jobs:
             msbuild_platform: "Win32"
 
           # ------------------------------------------------------------------
-          # Windows Fast  (MSBuild / MSVC / windows-latest)
+          # Windows Fast  (MSBuild / MSVC / windows-2022)
           # Fast is a first-class .sln configuration; __BUILD_FAST_METAMOD__
           # is already in its PreprocessorDefinitions — no injection needed.
           # OutDir → metamod\Fast\
           # ------------------------------------------------------------------
           - os_short: win32
-            os_version: windows-latest
+            os_version: windows-2022
             build_type: fast
             artifact_suffix: "-fast"
             multilib: false
@@ -408,12 +408,12 @@ jobs:
             make_args: "TARGET=amd64"
 
           # ------------------------------------------------------------------
-          # Windows Debug  (MSBuild / MSVC / windows-latest)
+          # Windows Debug  (MSBuild / MSVC / windows-2022)
           # Debug|Win32 config: /Od /RTC1 /MDd /ZI, GenerateDebugInformation=true
           # OutDir → metamod\Debug\ → produces metamod.dll + metamod.pdb
           # ------------------------------------------------------------------
           - os_short: win32
-            os_version: windows-latest
+            os_version: windows-2022
             build_type: debug
             artifact_suffix: "-debug"
             multilib: false
