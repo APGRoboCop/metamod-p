@@ -47,7 +47,7 @@
 #define VMETA_VERSION		"1.21"
 
 #define VPATCH_NAME		"Metamod-P-APG (MM-P-APG)"
-#define VPATCH_IVERSION		44
+#define VPATCH_IVERSION		45
 #define VPATCH_VERSION		"-APG"
 #define VPATCH_AUTHOR		"Jussi Kivilinna & RoboCop"
 #define VPATCH_WEBSITE		"https://apg-clan.org/"
