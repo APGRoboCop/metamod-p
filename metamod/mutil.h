@@ -37,6 +37,8 @@
 #ifndef MUTIL_H
 #define MUTIL_H
 
+#include <cstdint>
+
 #include "comp_dep.h"
 #include "plinfo.h"		// plugin_info_t, etc
 #include "sdk_util.h"	// hudtextparms_t, etc
@@ -45,7 +47,7 @@
 //#define MAX_LOGMSG_LEN  1024
 
 // For GetGameInfo:
-typedef enum {
+typedef enum : std::uint8_t {
 	GINFO_NAME = 0,
 	GINFO_DESC,
 	GINFO_GAMEDIR,

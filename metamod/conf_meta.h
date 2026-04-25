@@ -39,6 +39,8 @@
 #ifndef CONF_META_H
 #define CONF_META_H
 
+#include <cstdint>
+
 #include "types_meta.h"		// mBOOL
 #include "new_baseclass.h"
 #include "comp_dep.h"
@@ -50,7 +52,7 @@ constexpr int MAX_CONF_LEN = 1024;
 constexpr int MAX_MAPNAME_LENGTH = 256;
 
 // Supported config value-types.
-typedef enum {
+typedef enum : std::uint8_t {
 	CF_NONE = 0,
 	CF_INT,
 	CF_BOOL,

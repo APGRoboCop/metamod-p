@@ -70,10 +70,33 @@ if builder.cxx.target.platform == 'linux':
       # emits movaps/movdqa with an alignment assumption that HLDS can violate,
       # which would cause a SIGBUS or silent data corruption.
       # AMD64 always guarantees 16-byte alignment at call boundaries so this
-      # flag is x86-only. [APG]RoboCop[CL]
+      # flag is x86-only.
+      # Stack alignment flags for GoldSrc i386 compatibility.
+      # HLDS and old GoldSrc mods were built with MSVC 6/7 which only
+      # guaranteed 4-byte (2^2) stack alignment, not the modern 16-byte ABI.
+      #
+      # -mincoming-stack-boundary=2: assume the caller only provides 4-byte
+      #   alignment on entry.  Prevents GCC from emitting movaps/movdqa in
+      #   function prologues before any re-alignment has occurred.
+      #
+      # -mpreferred-stack-boundary=2: maintain 4-byte alignment for outgoing
+      #   calls rather than padding to 16 bytes.  Eliminates the 'and $-16,
+      #   %esp' prologue that wastes stack space and instructions.
+      #
+      # -mstackrealign: insert a realignment sequence at the entry of any
+      #   function that uses aligned SSE loads/stores, so SSE code is safe
+      #   even when the caller violated the alignment contract.  Small
+      #   per-function overhead but eliminates the whole class of alignment
+      #   faults from SSE instructions.
+      #
+      # AMD64 mandates 16-byte alignment at every call boundary in the
+      # System V ABI so none of these flags apply there. [APG]RoboCop[CL]
       '-mincoming-stack-boundary=2',
-      # With -mincoming-stack-boundary=2 GCC knows casts may hit 4-byte
-      # alignment; -Wcast-align warnings become expected/intended, suppress.
+      '-mpreferred-stack-boundary=2',
+      '-mstackrealign',
+      # With reduced stack alignment assumptions, -Wcast-align warnings about
+      # casting to more strictly aligned pointer types become expected and
+      # intentional rather than bugs to fix — suppress for x86 only. [APG]RoboCop[CL]
       '-Wno-cast-align',
     ]
   builder.cxx.cflags += [

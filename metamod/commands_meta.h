@@ -37,12 +37,14 @@
 #ifndef COMMANDS_META_H
 #define COMMANDS_META_H
 
+#include <cstdint>
+
 #include "types_meta.h"			// mBOOL
 #include "comp_dep.h"
 
  // Flags to use for meta_cmd_doplug(), to operate on existing plugins; note
  // "load" operates on a non-existing plugin thus isn't included here.
-typedef enum {
+typedef enum : std::uint8_t {
 	PC_NULL = 0,
 	PC_PAUSE,		// pause the plugin
 	PC_UNPAUSE,		// unpause the plugin

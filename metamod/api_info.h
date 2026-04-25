@@ -37,6 +37,8 @@
 #ifndef API_INFO_H
 #define API_INFO_H
 
+#include <cstdint>
+
 #include "comp_dep.h"
 #include "types_meta.h"			// mBOOL
 #include "ret_type.h"
@@ -45,7 +47,7 @@
 #define P_POST 1	// plugin function called after gamedll
 
  // API selector
-typedef enum enum_api_t {
+typedef enum enum_api_t : std::uint8_t {
 	e_api_engine = 0,
 	e_api_dllapi = 1,
 	e_api_newapi = 2,

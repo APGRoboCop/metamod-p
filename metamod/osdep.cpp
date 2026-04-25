@@ -44,6 +44,7 @@
 #include <dlfcn.h>			// dlopen, dladdr, etc
 #endif /* __linux__ */
 
+#include <algorithm>
 #include <cstring>			// strpbrk, etc
 
 #include <extdll.h>			// always
@@ -140,8 +141,7 @@ int DLLINTERNAL safe_vsnprintf(char* s, const size_t n, const char* format, va_l
 		bufsize *= 2;
 	}
 
-	if (bufsize < 1024)
-		bufsize = 1024;
+	bufsize = std::max<size_t>(bufsize, 1024);
 
 	char* tmpbuf = static_cast<char*>(malloc(bufsize * sizeof(char)));
 	if (!tmpbuf)

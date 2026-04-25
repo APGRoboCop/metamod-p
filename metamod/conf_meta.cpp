@@ -209,7 +209,7 @@ void DLLINTERNAL MConfig::show() const
 		META_CONS("%s and %s:", "Config options from localinfo", filename);
 	else
 		META_CONS("%s:", "Config options from localinfo");
-	for (option_t* optp = list; optp->name; optp++) {
+	for (const option_t* optp = list; optp->name; optp++) {
 		const int* optval = static_cast<int*>(optp->dest);
 		char** optstr = static_cast<char**>(optp->dest);
 		// cvar_t *optcvar = (cvar_t *) optp->dest;

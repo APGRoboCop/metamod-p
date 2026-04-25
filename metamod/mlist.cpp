@@ -36,6 +36,7 @@
  *
  */
 
+#include <algorithm>
 #include <cerrno>				// errno, etc
 
 #include <extdll.h>				// always
@@ -150,8 +151,7 @@ void DLLINTERNAL MPluginList::trim_list() {
 		n = i + 1;
 	}
 
-	if (n < endlist)
-		endlist = n;
+	endlist = std::min(n, endlist);
 }
 
 // Find a plugin with the given plid.

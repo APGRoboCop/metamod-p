@@ -171,12 +171,14 @@ CCOPT = $(CCO) $(CCOPT_ARCH) -fno-exceptions -fno-rtti
 # the ABI so these flags are implicit defaults, and GCC 12+ specifically warns
 # about -mfpmath=sse being redundant on x86_64.
 ifeq "$(TARGETTYPE)" "i386"
-# -mincoming-stack-boundary=2: GoldSrc/HLDS was built with MSVC 6/7 which
-# only guaranteed 4-byte stack alignment.  Without this flag GCC may emit
-# movaps/movdqa with a 16-byte alignment assumption that the engine violates,
-# causing SIGBUS or silent data corruption.  AMD64 always aligns to 16 bytes
-# so this is i386-only. [APG]RoboCop[CL]
-CCO = -O2 -msse -msse2 -mfpmath=sse -mincoming-stack-boundary=2 -pipe -flto=auto -fvisibility=hidden -fvisibility-inlines-hidden
+# Stack alignment flags for GoldSrc i386 compatibility.
+# HLDS/engine was built with MSVC 6/7 — only 4-byte (2^2) stack alignment.
+# -mincoming-stack-boundary=2: assume caller only provides 4-byte alignment.
+# -mpreferred-stack-boundary=2: maintain 4-byte alignment on outgoing calls,
+#  eliminating wasteful 'and $-16,%esp' prologue padding.
+# -mstackrealign: re-align stack at entry of any function using aligned SSE,
+#  preventing alignment faults even when caller violated the contract. [APG]RoboCop[CL]
+CCO = -O2 -msse -msse2 -mfpmath=sse -mincoming-stack-boundary=2 -mpreferred-stack-boundary=2 -mstackrealign -pipe -flto=auto -fvisibility=hidden -fvisibility-inlines-hidden
 else
 CCO = -O2 -pipe -flto=auto -fvisibility=hidden -fvisibility-inlines-hidden
 endif
@@ -198,11 +200,11 @@ endif
 # uninstrumented host binary causes a crash on load.  Use -g3/-ggdb3
 # and -Og for debug symbols and step-through debugging only. [APG]RoboCop[CL]
 ifeq "$(TARGETTYPE)" "i386"
-# See CCO comment above — required for i386 GoldSrc compatibility.
+# See CCO comment above for stack alignment rationale.
 # -Og: optimise for debugging experience rather than disabling all opts (-O0).
 # Preserves source-line correspondence and variable liveness for GDB while
-# keeping the plugin fast enough to test on a live server.
-CCDEBUG = -ggdb3 -g3 -Og -mincoming-stack-boundary=2
+# keeping the plugin fast enough to test on a live server. [APG]RoboCop[CL]
+CCDEBUG = -ggdb3 -g3 -Og -mincoming-stack-boundary=2 -mpreferred-stack-boundary=2 -mstackrealign
 else
 CCDEBUG = -ggdb3 -g3 -Og
 endif

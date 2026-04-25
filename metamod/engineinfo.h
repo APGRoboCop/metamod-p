@@ -8,6 +8,8 @@
 #ifndef MM_ENGINEINFO_H
 #define MM_ENGINEINFO_H
 
+#include <cstdint>
+
 #ifdef _WIN32
 typedef void* MemAddr;
 #else
@@ -87,7 +89,7 @@ private:
 public:
 	// codes :
 
-	enum {
+	enum : std::uint8_t {
 		STATE_NULL = 0,
 		STATE_VALID = 1,
 		STATE_INVALID = 2,
