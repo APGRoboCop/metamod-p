@@ -40,5 +40,6 @@
 
 #include "linkent.h"	// LINK_ENTITY_TO_PLUGIN
 
- // Entity lists for plugins
-LINK_ENTITY_TO_PLUGIN(adminmod_timer, "adminmod");
+ // Entity lists for plugins 
+LINK_ENTITY_TO_PLUGIN(adminmod_timer, "adminmod");		//Metamod-R removed AdminMod support and this is required
+											//to prevent crashes in both old and new AdminMod versions. [APG]RoboCop[CL]
